@@ -2273,7 +2273,7 @@ body[data-theme="dark"] .achieve-x-btn{background:#333;}
   /* タブのコンテンツを正規化 */
   [id^="panel-"] { display: none; width: 100% !important; }
   [id^="panel-"].active-panel { display: block !important; }
-  #panel-status { display: block !important; } /* デフォルト表示 */
+  #panel-status { display: block; } /* デフォルト表示（!importantはswitchTabのinline styleに負けるため削除） */
 }
 
 /* ════════════════════════════════════════
