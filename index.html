@@ -8472,7 +8472,7 @@ function downloadShareCard(){
   a.click();
 }
 
-function shareToX(){
+async function shareToX(){
   const canvas = document.getElementById('shareCanvas');
   const smins = studyMins(sessions);
   const todayMins = sessions
@@ -8481,11 +8481,29 @@ function shareToX(){
   const h = Math.floor(todayMins/60), m = todayMins%60;
   const timeStr = h>0 ? `${h}時間${m>0?m+'分':''}` : `${m}分`;
   const lv = getLevelProgress(smins).level;
+  const text = `今日の学習時間: ${timeStr}　Lv.${lv}\n累計: ${Math.floor(smins/60)}時間\n\n#shikaku_quest #資格勉強 #公認会計士\nhttps://hito77ki-ship-it.github.io/shikaku-quest/`;
 
-  const text = encodeURIComponent(
-    `今日の学習時間: ${timeStr}　Lv.${lv}\n累計: ${Math.floor(smins/60)}時間\n\n#shikaku_quest #資格勉強 #公認会計士\nhttps://hito77ki-ship-it.github.io/shikaku-quest/`
-  );
-  window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+  // Web Share API：画像付きネイティブシェア（スマホ対応）
+  if (navigator.share) {
+    try {
+      await new Promise(resolve => canvas.toBlob(async blob => {
+        try {
+          const file = new File([blob], 'shikaku-quest.png', { type: 'image/png' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], text });
+          } else {
+            await navigator.share({ text });
+          }
+        } catch(e) {
+          if (e.name !== 'AbortError') throw e;
+        }
+        resolve();
+      }, 'image/png'));
+      return;
+    } catch(e) { /* フォールバックへ */ }
+  }
+  // フォールバック: X intent URL（PC・非対応環境）
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 
@@ -10422,7 +10440,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <canvas id="shareCanvas" width="540" height="300"></canvas>
     <div class="share-btns">
       <button class="share-dl-btn" onclick="downloadShareCard()">💾 画像を保存</button>
-      <button class="share-x-btn" onclick="shareToX()">𝕏 Xに投稿</button>
+      <button class="share-x-btn" onclick="shareToX()">📤 シェア</button>
       <button class="share-close-btn" onclick="document.getElementById('shareCardOverlay').classList.remove('show')">閉じる</button>
     </div>
   </div>
