@@ -7874,25 +7874,21 @@ function submitFeedback(){
   const text = document.getElementById('feedbackText').value.trim();
   if(!text){ alert('内容を入力してください'); return; }
 
-  // Google Forms に送信（hidden iframe経由でCORSなし）
+  // Google Forms に送信（no-cors fetch方式）
   const typeMap = {
     '機能追加': '✨ 機能追加',
     'バグ報告':  '🐛 バグ報告',
     'UIデザイン':'🎨 UIデザイン',
     'その他':    '📝 その他'
   };
-  const form = document.createElement('form');
-  form.action = 'https://docs.google.com/forms/d/e/1FAIpQLSdlWeRLsd7_JUnePkVklSOZ5oDmWkONlTE3v8bJAytLPZmA_Q/formResponse';
-  form.method = 'POST';
-  form.target = 'feedback_iframe';
-  const f1 = document.createElement('input');
-  f1.type = 'hidden'; f1.name = 'entry.1771716428'; f1.value = typeMap[feedbackType] || feedbackType;
-  const f2 = document.createElement('input');
-  f2.type = 'hidden'; f2.name = 'entry.729033884'; f2.value = text;
-  form.appendChild(f1); form.appendChild(f2);
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
+  const params = new URLSearchParams();
+  params.append('entry.1771716428', typeMap[feedbackType] || feedbackType);
+  params.append('entry.729033884', text);
+  fetch('https://docs.google.com/forms/d/e/1FAIpQLSdlWeRLsd7_JUnePkVklSOZ5oDmWkONlTE3v8bJAytLPZmA_Q/formResponse', {
+    method: 'POST',
+    mode: 'no-cors',
+    body: params
+  }).catch(()=>{});
 
   // 送信完了表示
   document.getElementById('feedbackSuccess').style.display = 'block';
