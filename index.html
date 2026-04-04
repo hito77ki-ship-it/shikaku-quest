@@ -7870,38 +7870,29 @@ function selectFbType(btn, type){
   btn.classList.add('selected');
 }
 
-async function submitFeedback(){
+function submitFeedback(){
   const text = document.getElementById('feedbackText').value.trim();
   if(!text){ alert('内容を入力してください'); return; }
 
-  // Supabase に保存
-  try {
-    await sb.from('feedback').insert({
-      user_id:    currentUser ? currentUser.id : null,
-      user_name:  char.name || 'ゲスト',
-      type:       feedbackType,
-      content:    text,
-      created_at: new Date().toISOString()
-    });
-  } catch(e) {
-    console.warn('Feedback save error:', e);
-  }
-
-  // Web3Forms でメール送信
-  try {
-    await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        access_key: '7b22810b-dd04-4271-b6ce-4935a54ffc7d',
-        subject: `【資格クエスト】フィードバック：${feedbackType}`,
-        name: char.name || 'ゲスト',
-        message: `カテゴリ：${feedbackType}\n\n${text}\n\nユーザーID：${currentUser?.id||'未ログイン'}`,
-      })
-    });
-  } catch(e) {
-    console.warn('Web3Forms error:', e);
-  }
+  // Google Forms に送信（hidden iframe経由でCORSなし）
+  const typeMap = {
+    '機能追加': '✨ 機能追加',
+    'バグ報告':  '🐛 バグ報告',
+    'UIデザイン':'🎨 UIデザイン',
+    'その他':    '📝 その他'
+  };
+  const form = document.createElement('form');
+  form.action = 'https://docs.google.com/forms/d/e/1FAIpQLSdlWeRLsd7_JUnePkVklSOZ5oDmWkONlTE3v8bJAytLPZmA_Q/formResponse';
+  form.method = 'POST';
+  form.target = 'feedback_iframe';
+  const f1 = document.createElement('input');
+  f1.type = 'hidden'; f1.name = 'entry.1771716428'; f1.value = typeMap[feedbackType] || feedbackType;
+  const f2 = document.createElement('input');
+  f2.type = 'hidden'; f2.name = 'entry.729033884'; f2.value = text;
+  form.appendChild(f1); form.appendChild(f2);
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
 
   // 送信完了表示
   document.getElementById('feedbackSuccess').style.display = 'block';
@@ -10397,6 +10388,9 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="bg-timer-badge" id="bgTimerBadge" onclick="switchTab('quest');document.getElementById('tab-quest').click()">
   ⏱ <span id="bgTimerBadgeText">00:00:00</span>
 </div>
+<!-- Google Forms送信用 hidden iframe -->
+<iframe name="feedback_iframe" style="display:none;"></iframe>
+
 <!-- 改善要望モーダル -->
 <div class="modal-overlay" id="feedbackModal">
   <div class="modal-box" style="max-width:460px;">
