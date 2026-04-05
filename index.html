@@ -3523,6 +3523,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
           <span class="prof-info-label">🎓 学年・職業</span>
           <select class="prof-info-select" id="profGrade" onchange="saveProfileInfo()">
             <option value="">未設定</option>
+            <option>中学1年生</option><option>中学2年生</option><option>中学3年生</option>
             <option>高校1年生</option><option>高校2年生</option><option>高校3年生</option>
             <option>大学1年生</option><option>大学2年生</option><option>大学3年生</option><option>大学4年生</option>
             <option>大学院生</option><option>社会人</option><option>受験生（浪人）</option><option>その他</option>
@@ -6841,8 +6842,8 @@ function renderStudyPlan(){
         const isWeekend = [0,6].includes(new Date().getDay());
         dailyNeedMins = Math.ceil((isWeekend ? (weH||wdH) : (wdH||weH)) * 60);
       } else {
-        // 学年係数を使って今日の目標を算出
-        dailyNeedMins = Math.ceil((remainMins / daysLeft) * getGradeCoeff());
+        // 学年係数を使って今日の目標を算出（対象ジョブのみ適用）
+        dailyNeedMins = Math.ceil((remainMins / daysLeft) * getGradeCoeff(selectedJobIds));
       }
     }
     const dailyNeedH = Math.floor(dailyNeedMins / 60);
@@ -7182,15 +7183,30 @@ const PROF_INFO_KEY = 'sq2_profile_info';
 function loadProfileInfo(){
   try{ const v=localStorage.getItem(PROF_INFO_KEY); return v?JSON.parse(v):{}; }catch{ return {}; }
 }
-/* 学年係数：学年が上がるほど1日の目標時間の比重が増える */
-function getGradeCoeff(){
+/* 学年係数が適用されるジョブ */
+const GRADE_WEIGHTED_JOBS = ['highschool','univ','eiken','kanken','toeic'];
+
+/* 学年係数：対象ジョブのみ適用、それ以外は1.0 */
+function getGradeCoeff(jobIds){
+  const ids = jobIds || selectedJobIds || [];
+  const isTarget = ids.some(id => GRADE_WEIGHTED_JOBS.includes(id));
+  if(!isTarget) return 1.0;
+
   const profInfo = loadProfileInfo();
-  const map = {
+  // 高校受験向け：中学学年
+  const mapHS = {
+    '中学1年生':0.5, '中学2年生':0.8, '中学3年生':1.5,
+    '受験生（浪人）':1.3,
+  };
+  // 大学受験・英検・漢検・TOEIC向け：高校・大学学年
+  const mapUniv = {
     '高校1年生':0.5, '高校2年生':0.8, '高校3年生':1.5,
     '大学1年生':0.6, '大学2年生':0.8, '大学3年生':1.0, '大学4年生':1.3,
-    '大学院生':1.0, '社会人':1.0, '受験生（浪人）':1.5, 'その他':1.0,
+    '大学院生':1.0, '社会人':1.0, '受験生（浪人）':1.5,
   };
-  return map[profInfo.grade] || 1.0;
+  const grade = profInfo.grade || '';
+  if(ids.includes('highschool')) return mapHS[grade] || 1.0;
+  return mapUniv[grade] || 1.0;
 }
 
 /* 今日の目標分数（平日・休日設定 or 学年係数ベース） */
