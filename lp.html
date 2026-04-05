@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資格クエスト｜資格勉強を、終わらない冒険に。</title>
+<meta name="description" content="勉強時間を経験値に変えて、理想のステータスを手に入れよう。RPG風資格勉強トラッカー「資格クエスト」は完全無料で使えます。">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#8CC63F;
+  --green2:#6AAF2B;
+  --green-light:#F0F9E0;
+  --text:#1A202C;
+  --muted:#718096;
+  --border:#E2E8F0;
+  --bg:#FFFFFF;
+  --radius:16px;
+}
+body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);line-height:1.7;}
+a{text-decoration:none;color:inherit;}
+img{max-width:100%;display:block;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;}
+.nav-inner{max-width:1080px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:'Cinzel',serif;font-size:15px;color:var(--green2);letter-spacing:.1em;display:flex;align-items:center;gap:8px;}
+.nav-logo span{font-size:20px;}
+.nav-cta{background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:9px 20px;border-radius:100px;transition:background .2s;}
+.nav-cta:hover{background:var(--green2);}
+
+/* HERO */
+.hero{padding:120px 24px 80px;text-align:center;background:linear-gradient(180deg,#F7FDF0 0%,#fff 100%);}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green2);font-size:12px;font-weight:700;padding:6px 14px;border-radius:100px;margin-bottom:24px;letter-spacing:.05em;}
+.hero h1{font-family:'Cinzel',serif;font-size:clamp(28px,5vw,52px);color:var(--text);line-height:1.25;margin-bottom:20px;letter-spacing:.04em;}
+.hero h1 em{color:var(--green);font-style:normal;}
+.hero-sub{font-size:clamp(14px,2vw,18px);color:var(--muted);max-width:560px;margin:0 auto 36px;line-height:1.8;}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:56px;}
+.btn-primary{background:var(--green);color:#fff;font-size:16px;font-weight:700;padding:16px 36px;border-radius:100px;box-shadow:0 4px 20px rgba(140,198,63,.4);transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary:hover{background:var(--green2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(140,198,63,.45);}
+.btn-secondary{color:var(--muted);font-size:14px;padding:16px 24px;border-radius:100px;border:1px solid var(--border);transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-secondary:hover{border-color:var(--green);color:var(--green);}
+.hero-note{font-size:12px;color:var(--muted);}
+
+/* MOCKUP */
+.hero-mockup{max-width:800px;margin:0 auto;position:relative;}
+.mockup-frame{background:#1A1D2E;border-radius:20px;padding:16px;box-shadow:0 24px 80px rgba(0,0,0,.18);}
+.mockup-bar{display:flex;gap:6px;margin-bottom:12px;}
+.mockup-bar span{width:10px;height:10px;border-radius:50%;}
+.mockup-bar span:nth-child(1){background:#FF5F57;}
+.mockup-bar span:nth-child(2){background:#FEBC2E;}
+.mockup-bar span:nth-child(3){background:#28C840;}
+.mockup-screen{background:#F8F9FA;border-radius:12px;overflow:hidden;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;}
+.mockup-placeholder{text-align:center;color:#aaa;}
+.mockup-placeholder .icon{font-size:48px;margin-bottom:12px;}
+.mockup-placeholder p{font-size:13px;}
+
+/* STATS */
+.stats{background:var(--bg);padding:48px 24px;}
+.stats-inner{max-width:800px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;text-align:center;}
+.stat-num{font-family:'Cinzel',serif;font-size:36px;color:var(--green);font-weight:900;}
+.stat-label{font-size:13px;color:var(--muted);margin-top:4px;}
+
+/* FEATURES */
+.features{padding:80px 24px;background:#FAFAFA;}
+.section-label{text-align:center;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.3em;color:var(--green2);margin-bottom:12px;}
+.section-title{text-align:center;font-size:clamp(20px,3vw,32px);font-weight:700;margin-bottom:8px;}
+.section-sub{text-align:center;color:var(--muted);font-size:14px;margin-bottom:56px;}
+.features-grid{max-width:960px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px;}
+.feature-card{background:#fff;border-radius:var(--radius);padding:32px 28px;box-shadow:0 2px 16px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s;}
+.feature-card:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,.1);}
+.feature-icon{width:52px;height:52px;background:var(--green-light);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;}
+.feature-title{font-size:18px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.feature-rpg{font-family:'Cinzel',serif;font-size:10px;color:var(--green2);background:var(--green-light);padding:2px 8px;border-radius:100px;letter-spacing:.1em;}
+.feature-desc{font-size:14px;color:var(--muted);line-height:1.8;}
+
+/* HOW IT WORKS */
+.how{padding:80px 24px;background:#fff;}
+.steps{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:24px;position:relative;padding-bottom:40px;}
+.step:last-child{padding-bottom:0;}
+.step:not(:last-child)::after{content:'';position:absolute;left:23px;top:48px;bottom:0;width:2px;background:linear-gradient(to bottom,var(--green),var(--border));}
+.step-num{width:48px;height:48px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:18px;font-weight:900;flex-shrink:0;}
+.step-body{padding-top:8px;}
+.step-title{font-size:17px;font-weight:700;margin-bottom:6px;}
+.step-desc{font-size:14px;color:var(--muted);line-height:1.8;}
+
+/* TESTIMONIAL */
+.testimonial{padding:80px 24px;background:linear-gradient(135deg,#F7FDF0,#EDF7D6);}
+.testimonial-inner{max-width:800px;margin:0 auto;}
+.testimonial-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:48px;}
+.testimonial-card{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.testimonial-text{font-size:14px;line-height:1.8;margin-bottom:16px;color:var(--text);}
+.testimonial-author{font-size:12px;color:var(--muted);font-weight:700;}
+.stars{color:var(--green);font-size:13px;margin-bottom:10px;}
+
+/* CTA */
+.cta{padding:100px 24px;text-align:center;background:#1A202C;}
+.cta h2{font-family:'Cinzel',serif;font-size:clamp(22px,4vw,40px);color:#fff;margin-bottom:16px;letter-spacing:.04em;}
+.cta p{color:#A0AEC0;font-size:15px;margin-bottom:40px;}
+.cta .btn-primary{font-size:18px;padding:18px 48px;}
+.cta-note{color:#718096;font-size:12px;margin-top:20px;}
+
+/* FOOTER */
+footer{background:#111827;padding:32px 24px;text-align:center;}
+.footer-logo{font-family:'Cinzel',serif;font-size:14px;color:#4A5568;margin-bottom:12px;}
+.footer-links{display:flex;justify-content:center;gap:24px;margin-bottom:16px;}
+.footer-links a{font-size:12px;color:#4A5568;transition:color .2s;}
+.footer-links a:hover{color:#8CC63F;}
+.footer-copy{font-size:11px;color:#2D3748;}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .stats-inner{grid-template-columns:repeat(3,1fr);gap:12px;}
+  .stat-num{font-size:26px;}
+  .hero{padding:90px 20px 60px;}
+  .step::after{left:23px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo"><span>⚔</span> 資格クエスト</div>
+    <a href="index.html" class="nav-cta">無料で始める</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">⚔ β版公開中・完全無料</div>
+  <h1>資格勉強を、<br><em>終わらない冒険に。</em></h1>
+  <p class="hero-sub">勉強時間を経験値に変えて、理想のステータスを手に入れよう。<br>資格クエストは、あなたの学習をRPGに変えるトラッカーアプリです。</p>
+  <div class="hero-btns">
+    <a href="index.html" class="btn-primary">⚔ 無料で冒険を始める</a>
+    <a href="#features" class="btn-secondary">▼ 詳しく見る</a>
+  </div>
+  <p class="hero-note">✓ 登録無料 &nbsp;✓ アプリインストール不要 &nbsp;✓ スマホ対応</p>
+
+  <div class="hero-mockup" style="margin-top:48px;">
+    <div class="mockup-frame">
+      <div class="mockup-bar">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="mockup-screen">
+        <div class="mockup-placeholder">
+          <div class="icon">📱</div>
+          <p>スクリーンショット準備中</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-inner">
+    <div>
+      <div class="stat-num">8+</div>
+      <div class="stat-label">対応資格ジョブ</div>
+    </div>
+    <div>
+      <div class="stat-num">∞</div>
+      <div class="stat-label">完全無料</div>
+    </div>
+    <div>
+      <div class="stat-num">PWA</div>
+      <div class="stat-label">ホーム画面に追加可能</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">FEATURES</div>
+  <h2 class="section-title">3つの特徴</h2>
+  <p class="section-sub">勉強が続かない理由を、ゲームの仕組みで解決します。</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⏱</div>
+      <div class="feature-title">継続 <span class="feature-rpg">QUEST</span></div>
+      <p class="feature-desc">25分の集中が「クエスト」になる。ポモドーロ・テクニックで勉強を小さなミッションに分割。毎日のストリークがモチベーションを維持します。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📈</div>
+      <div class="feature-title">成長 <span class="feature-rpg">LEVEL UP</span></div>
+      <p class="feature-desc">勉強の成果がレベル・EXP・スキルとして可視化。科目別の進捗をHPバーで確認でき、自分の成長が数字でわかります。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <div class="feature-title">共闘 <span class="feature-rpg">GUILD</span></div>
+      <p class="feature-desc">タイムラインで仲間の冒険をチェック。ランキングで切磋琢磨。一人じゃないから頑張れる、勉強仲間との繋がりを作ります。</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="section-label">HOW IT WORKS</div>
+  <h2 class="section-title" style="margin-bottom:8px;">はじめ方は3ステップ</h2>
+  <p class="section-sub">インストール不要。ブラウザだけで今すぐ始められます。</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">ジョブを選ぶ</div>
+        <p class="step-desc">公認会計士・簿記・宅建など8種類以上のジョブ（資格）から目指すものを選択。科目が自動でセットされます。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">タイマーで勉強する</div>
+        <p class="step-desc">25分のポモドーロタイマーをスタート。集中が終わったら「クエスト完了」として記録されEXPが貯まります。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">成長を確認する</div>
+        <p class="step-desc">ヒートマップ・レーダーチャート・ランキングで自分の成長を確認。Xへのシェアで仲間に報告しましょう。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimonial">
+  <div class="testimonial-inner">
+    <div class="section-label">VOICES</div>
+    <h2 class="section-title">冒険者の声</h2>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">「勉強がゲームみたいで楽しい。レベルが上がるのが嬉しくてついつい続けてしまう。」</p>
+        <div class="testimonial-author">CPA受験生・大学2年</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">「ヒートマップで自分のサボり具合が一目でわかる。だから逆に頑張れる。」</p>
+        <div class="testimonial-author">簿記2級勉強中・社会人</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★☆</div>
+        <p class="testimonial-text">「タイムラインで他の受験生の進捗が見えるのがいい。一人じゃない感がある。」</p>
+        <div class="testimonial-author">宅建受験生・大学3年</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>冒険を、始めよう。</h2>
+  <p>登録無料・インストール不要。今すぐブラウザで使えます。</p>
+  <a href="index.html" class="btn-primary">⚔ 無料で冒険を始める</a>
+  <p class="cta-note">✓ Googleアカウントで簡単ログイン &nbsp;✓ データはクラウドに保存</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">⚔ 資格クエスト</div>
+  <div class="footer-links">
+    <a href="index.html">アプリを使う</a>
+    <a href="index.html">プライバシーポリシー</a>
+    <a href="index.html">お問い合わせ</a>
+  </div>
+  <div class="footer-copy">© 2026 資格クエスト. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
