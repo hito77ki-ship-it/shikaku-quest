@@ -3879,6 +3879,35 @@ const JOBS = [
     ]
   },
   {
+    id:'eiken', name:'英検', icon:'🇬🇧', tag:'英語の冒険者',
+    category:'国際ギルド', rpgClass:'英語の冒険者',
+    desc:'文部科学省後援の英語検定。5級〜1級まで。中学・高校・大学・就職まで幅広く使える。',
+    color:'#3B82F6', avgHours:150, maxHours:350,
+    subjects:[
+      {key:'eiken_5',    name:'5級',  desc:'中学初級レベル。アルファベット・基礎文法',   color:'#93C5FD',avgH:50, maxH:80,  attrs:{int:.5,dex:.5}},
+      {key:'eiken_4',    name:'4級',  desc:'中学中級レベル。日常会話・基礎読解',         color:'#60A5FA',avgH:100,maxH:150, attrs:{int:.5,dex:.5}},
+      {key:'eiken_3',    name:'3級',  desc:'中学卒業レベル。スピーキング試験あり',       color:'#3B82F6',avgH:150,maxH:230, attrs:{int:.6,dex:.4}},
+      {key:'eiken_p2',   name:'準2級',desc:'高校中級レベル。長文読解・英作文',           color:'#2563EB',avgH:250,maxH:380, attrs:{int:.6,mag:.4}},
+      {key:'eiken_2',    name:'2級',  desc:'高校卒業レベル。就職・大学入試に有効',       color:'#1D4ED8',avgH:350,maxH:530, attrs:{int:.7,mag:.3}},
+      {key:'eiken_p1',   name:'準1級',desc:'大学中級レベル。高度な読解・英作文',         color:'#1E40AF',avgH:700,maxH:1050,attrs:{int:.7,mag:.3}},
+      {key:'eiken_1',    name:'1級',  desc:'大学上級レベル。英語のプロフェッショナル',   color:'#1E3A8A',avgH:1500,maxH:2250,attrs:{int:.8,mag:.2}},
+    ]
+  },
+  {
+    id:'kanken', name:'漢検', icon:'🈶', tag:'文字の賢者',
+    category:'国際ギルド', rpgClass:'文字の賢者',
+    desc:'日本漢字能力検定。5級〜準1級が実用的。中学・高校生から社会人まで。',
+    color:'#DC2626', avgHours:100, maxHours:250,
+    subjects:[
+      {key:'kanken_5',  name:'5級',  desc:'小学6年生修了レベル。1006字',   color:'#FCA5A5',avgH:50, maxH:75,  attrs:{int:.5,dex:.5}},
+      {key:'kanken_4',  name:'4級',  desc:'中学在学レベル。1322字',         color:'#F87171',avgH:80, maxH:120, attrs:{int:.5,dex:.5}},
+      {key:'kanken_3',  name:'3級',  desc:'中学卒業レベル。1607字',         color:'#EF4444',avgH:100,maxH:150, attrs:{int:.6,dex:.4}},
+      {key:'kanken_p2', name:'準2級',desc:'高校在学レベル。1940字',         color:'#DC2626',avgH:150,maxH:225, attrs:{int:.6,mag:.4}},
+      {key:'kanken_2',  name:'2級',  desc:'高校卒業レベル。常用漢字2136字', color:'#B91C1C',avgH:200,maxH:300, attrs:{int:.7,mag:.3}},
+      {key:'kanken_p1', name:'準1級',desc:'常用漢字を超えた3000字レベル',   color:'#991B1B',avgH:400,maxH:600, attrs:{int:.8,mag:.2}},
+    ]
+  },
+  {
     id:'travel', name:'旅行業務取扱管理者', icon:'✈', tag:'旅人',
     category:'国際ギルド', rpgClass:'旅人',
     desc:'旅行会社・観光業の必置資格。国内外旅行の専門家。',
