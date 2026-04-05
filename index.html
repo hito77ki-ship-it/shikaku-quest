@@ -3529,6 +3529,24 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
           </select>
         </div>
         <div class="prof-info-row">
+          <span class="prof-info-label">📅 平日の目標時間</span>
+          <select class="prof-info-select" id="profWeekdayHours" onchange="saveProfileInfo()">
+            <option value="">自動計算</option>
+            <option value="0.5">30分</option><option value="1">1時間</option><option value="1.5">1時間30分</option>
+            <option value="2">2時間</option><option value="2.5">2時間30分</option><option value="3">3時間</option>
+            <option value="4">4時間</option><option value="5">5時間</option><option value="6">6時間</option>
+          </select>
+        </div>
+        <div class="prof-info-row">
+          <span class="prof-info-label">🏖 休日の目標時間</span>
+          <select class="prof-info-select" id="profWeekendHours" onchange="saveProfileInfo()">
+            <option value="">自動計算</option>
+            <option value="1">1時間</option><option value="2">2時間</option><option value="3">3時間</option>
+            <option value="4">4時間</option><option value="5">5時間</option><option value="6">6時間</option>
+            <option value="7">7時間</option><option value="8">8時間</option>
+          </select>
+        </div>
+        <div class="prof-info-row">
           <span class="prof-info-label">🎂 誕生日</span>
           <input type="date" class="prof-info-input" id="profBirthday" onchange="saveProfileInfo()">
         </div>
@@ -6341,8 +6359,8 @@ function renderWeekDailyBars(daily, goalMins){
   const el = document.getElementById('wgDailyBars');
   if(!el) return;
 
-  // 1日あたりの理想分数（目標÷7）
-  const dailyGoal = goalMins>0 ? goalMins/7 : 0;
+  // 1日あたりの理想分数（平日・休日設定 or 学年係数ベース）
+  const dailyGoal = getTodayGoalMins(goalMins);
   // バー高さ基準：最大値かdailyGoalの大きい方
   const maxM = Math.max(...daily.map(d=>d.mins), dailyGoal || 1, 1);
 
@@ -6812,8 +6830,21 @@ function renderStudyPlan(){
     const remainMins = Math.max(0, totalTargetMins - totalStudiedMins);
     const progressPct = Math.min(100, Math.round(totalStudiedMins / totalTargetMins * 100));
 
-    // 1日あたり必要な学習時間
-    const dailyNeedMins = daysLeft > 0 ? Math.ceil(remainMins / daysLeft) : 0;
+    // 1日あたり必要な学習時間（学年係数・平日休日設定を反映）
+    const profInfo = loadProfileInfo();
+    const wdH = parseFloat(profInfo.weekdayHours) || 0;
+    const weH = parseFloat(profInfo.weekendHours) || 0;
+    let dailyNeedMins = 0;
+    if(daysLeft > 0){
+      if(wdH > 0 || weH > 0){
+        // 平日・休日設定がある場合：残り日数の平日/休日比率で配分
+        const isWeekend = [0,6].includes(new Date().getDay());
+        dailyNeedMins = Math.ceil((isWeekend ? (weH||wdH) : (wdH||weH)) * 60);
+      } else {
+        // 学年係数を使って今日の目標を算出
+        dailyNeedMins = Math.ceil((remainMins / daysLeft) * getGradeCoeff());
+      }
+    }
     const dailyNeedH = Math.floor(dailyNeedMins / 60);
     const dailyNeedM = dailyNeedMins % 60;
     const dailyStr = dailyNeedMins === 0 ? '0' : dailyNeedH > 0 ? `${dailyNeedH}h${dailyNeedM ? dailyNeedM+'m' : ''}` : `${dailyNeedM}m`;
@@ -7120,6 +7151,10 @@ function renderProfileTab(){
   const bioInputEl = document.getElementById('profBio');
   if(prefEl && profInfo.pref) prefEl.value = profInfo.pref;
   if(gradeEl && profInfo.grade) gradeEl.value = profInfo.grade;
+  const wdEl = document.getElementById('profWeekdayHours');
+  const weEl = document.getElementById('profWeekendHours');
+  if(wdEl && profInfo.weekdayHours) wdEl.value = profInfo.weekdayHours;
+  if(weEl && profInfo.weekendHours) weEl.value = profInfo.weekendHours;
   if(bdayEl && profInfo.birthday) bdayEl.value = profInfo.birthday;
   if(bioInputEl) bioInputEl.value = profInfo.bio || '';
 
@@ -7147,12 +7182,39 @@ const PROF_INFO_KEY = 'sq2_profile_info';
 function loadProfileInfo(){
   try{ const v=localStorage.getItem(PROF_INFO_KEY); return v?JSON.parse(v):{}; }catch{ return {}; }
 }
+/* 学年係数：学年が上がるほど1日の目標時間の比重が増える */
+function getGradeCoeff(){
+  const profInfo = loadProfileInfo();
+  const map = {
+    '高校1年生':0.5, '高校2年生':0.8, '高校3年生':1.5,
+    '大学1年生':0.6, '大学2年生':0.8, '大学3年生':1.0, '大学4年生':1.3,
+    '大学院生':1.0, '社会人':1.0, '受験生（浪人）':1.5, 'その他':1.0,
+  };
+  return map[profInfo.grade] || 1.0;
+}
+
+/* 今日の目標分数（平日・休日設定 or 学年係数ベース） */
+function getTodayGoalMins(baseWeeklyMins){
+  const profInfo = loadProfileInfo();
+  const isWeekend = [0,6].includes(new Date().getDay());
+  const wdH = parseFloat(profInfo.weekdayHours) || 0;
+  const weH = parseFloat(profInfo.weekendHours) || 0;
+  if(wdH > 0 || weH > 0){
+    return (isWeekend ? (weH || wdH) : (wdH || weH)) * 60;
+  }
+  // 平日・休日未設定の場合は学年係数を使って日割り
+  const coeff = getGradeCoeff();
+  return baseWeeklyMins > 0 ? (baseWeeklyMins / 7) * coeff : 0;
+}
+
 function saveProfileInfo(){
   const info = {
-    pref:     document.getElementById('profPref')?.value || '',
-    grade:    document.getElementById('profGrade')?.value || '',
-    birthday: document.getElementById('profBirthday')?.value || '',
-    bio:      document.getElementById('profBio')?.value || '',
+    pref:         document.getElementById('profPref')?.value || '',
+    grade:        document.getElementById('profGrade')?.value || '',
+    weekdayHours: document.getElementById('profWeekdayHours')?.value || '',
+    weekendHours: document.getElementById('profWeekendHours')?.value || '',
+    birthday:     document.getElementById('profBirthday')?.value || '',
+    bio:          document.getElementById('profBio')?.value || '',
   };
   try{ localStorage.setItem(PROF_INFO_KEY, JSON.stringify(info)); }catch{}
   // タグを即時更新
