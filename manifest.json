@@ -1,7 +1,7 @@
 {
   "name": "スタディクエスト",
   "short_name": "スタディクエスト",
-  "description": "RPG風資格勉強トラッカー",
+  "description": "RPG風学習トラッカー。資格・受験・検定に対応。",
   "start_url": "/shikaku-quest/",
   "scope": "/shikaku-quest/",
   "display": "standalone",

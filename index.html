@@ -5418,7 +5418,7 @@ function startPomoBreak(){
 async function tweetPomo(){
   const smins = studyMins(sessions);
   const lv = getLevelProgress(smins).level;
-  const text = `ポモドーロ${pomoCount}/${POMO_SETS}セット完了！🍅\nLv.${lv} ｜ 累計${Math.floor(smins/60)}時間\n今日も資格勉強がんばった💪\n#スタディクエスト #CPA試験\nhttps://hito77ki-ship-it.github.io/shikaku-quest/`;
+  const text = `ポモドーロ${pomoCount}/${POMO_SETS}セット完了！🍅\nLv.${lv} ｜ 累計${Math.floor(smins/60)}時間\n今日も勉強がんばった💪\n#スタディクエスト #study_quest\nhttps://hito77ki-ship-it.github.io/shikaku-quest/`;
 
   if (navigator.share) {
     try {
@@ -8637,14 +8637,14 @@ async function shareToX(){
   const h = Math.floor(todayMins/60), m = todayMins%60;
   const timeStr = h>0 ? `${h}時間${m>0?m+'分':''}` : `${m}分`;
   const lv = getLevelProgress(smins).level;
-  const text = `今日の学習時間: ${timeStr}　Lv.${lv}\n累計: ${Math.floor(smins/60)}時間\n\n#study_quest #資格勉強 #公認会計士\nhttps://hito77ki-ship-it.github.io/shikaku-quest/`;
+  const text = `今日の学習時間: ${timeStr}　Lv.${lv}\n累計: ${Math.floor(smins/60)}時間\n\n#スタディクエスト #study_quest\nhttps://hito77ki-ship-it.github.io/shikaku-quest/`;
 
   // Web Share API：画像付きネイティブシェア（スマホ対応）
   if (navigator.share) {
     try {
       await new Promise(resolve => canvas.toBlob(async blob => {
         try {
-          const file = new File([blob], 'shikaku-quest.png', { type: 'image/png' });
+          const file = new File([blob], 'study-quest.png', { type: 'image/png' });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({ files: [file], text });
           } else {
