@@ -144,6 +144,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .roadmap-card.next .roadmap-items li::before{content:'◆';color:#FFC83C;}
 .roadmap-card.future .roadmap-items li::before{content:'✦';color:#7C8FFF;}
 
+/* FAQ */
+.faq{padding:96px 24px;background:#fff;}
+.faq-inner{max-width:720px;margin:0 auto;}
+.faq-list{margin-top:48px;display:flex;flex-direction:column;gap:12px;}
+.faq-item{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.faq-q{width:100%;background:none;border:none;text-align:left;padding:20px 24px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:'Noto Sans JP',sans-serif;transition:background .2s;}
+.faq-q:hover{background:var(--green-light);}
+.faq-icon{font-size:18px;color:var(--green);flex-shrink:0;transition:transform .3s;}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-a{display:none;padding:0 24px 20px;font-size:14px;color:#374151;line-height:1.8;}
+.faq-item.open .faq-a{display:block;}
+
 /* CTA */
 .cta{padding:100px 24px;text-align:center;background:#1A202C;}
 .cta h2{font-family:'Cinzel',serif;font-size:clamp(22px,4vw,40px);color:#fff;margin-bottom:16px;letter-spacing:.04em;}
@@ -410,6 +422,59 @@ footer{background:#111827;padding:32px 24px;text-align:center;}
   </div>
 </section>
 
+<!-- FAQ -->
+<section class="faq">
+  <div class="faq-inner">
+    <div class="section-label">FAQ</div>
+    <h2 class="section-title">よくある質問</h2>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          無料で使えますか？<span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">はい、完全無料です。登録・インストール不要でブラウザからすぐ使えます。現在有料プランはありません。</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          スマホでも使えますか？<span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">はい。スマホのブラウザで利用できます。また「ホーム画面に追加」することでアプリのように使うことができます（PWA対応）。</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          データはどこに保存されますか？<span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">Googleアカウントでログインするとクラウド（Supabase）に自動保存され、複数端末で同期できます。ゲスト利用の場合はブラウザのローカルストレージにのみ保存されます。</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          どんな資格に対応していますか？<span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">資格の種類は問いません。公認会計士・宅建・TOEIC・簿記など、自分で資格名を登録して使います。目標時間や合格目標日も自由に設定できます。</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          勉強時間の記録はどうやってつけますか？<span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">タイマー機能で計測するか、手動で時間を入力できます。記録するとキャラクターの経験値が上がり、レベルアップしていきます。</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          アカウントを削除したいのですが？<span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">お問い合わせフォームよりご連絡ください。データを含めて削除対応いたします。</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="cta">
   <h2>冒険を、始めよう。</h2>
@@ -423,11 +488,20 @@ footer{background:#111827;padding:32px 24px;text-align:center;}
   <div class="footer-logo">⚔ 資格クエスト</div>
   <div class="footer-links">
     <a href="index.html">アプリを使う</a>
+    <a href="terms.html">利用規約</a>
     <a href="privacy.html">プライバシーポリシー</a>
     <a href="contact.html">お問い合わせ</a>
   </div>
   <div class="footer-copy">© 2026 資格クエスト. All rights reserved.</div>
 </footer>
 
+<script>
+function toggleFaq(btn){
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+  if(!isOpen) item.classList.add('open');
+}
+</script>
 </body>
 </html>
