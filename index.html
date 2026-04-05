@@ -3445,7 +3445,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
             <div class="player-card-bio" id="profCardBio"></div>
             <div id="profCardTags"></div>
           </div>
-          <button class="follow-btn" id="selfFollowBtn" style="display:none;">✎ 編集</button>
+          <button class="follow-btn" id="selfFollowBtn" style="display:none;" onclick="openNameEdit()">✎ 名前を変更</button>
         </div>
         <!-- フォロー数 -->
         <div class="follow-row">
@@ -4253,6 +4253,25 @@ function continueAsGuest(){
     console.error('continueAsGuest error:', e);
     alert('エラーが発生しました。ページを再読み込みしてください。\n'+e.message);
   }
+}
+
+function openNameEdit(){
+  const current = char.name || '';
+  const newName = prompt('冒険者名を入力してください', current);
+  if(newName === null) return; // キャンセル
+  const trimmed = newName.trim();
+  if(!trimmed){ alert('名前を入力してください'); return; }
+  if(trimmed.length > 20){ alert('20文字以内で入力してください'); return; }
+  char.name = trimmed;
+  saveAll();
+  // 表示更新
+  const profCardName = document.getElementById('profCardName');
+  if(profCardName) profCardName.textContent = trimmed;
+  const charNameDisp = document.getElementById('charNameDisp');
+  if(charNameDisp) charNameDisp.textContent = trimmed;
+  const gnavName = document.getElementById('gnavCharName');
+  if(gnavName) gnavName.textContent = trimmed;
+  if(currentUser && !isGuest) syncToCloud();
 }
 
 async function signOut(){
@@ -6944,6 +6963,10 @@ function renderProfileTab(){
       avatarEl.innerHTML = ti.emoji;
     }
   }
+
+  // 名前変更ボタン表示
+  const selfBtn = document.getElementById('selfFollowBtn');
+  if(selfBtn) selfBtn.style.display = 'inline-flex';
 
   // 自己紹介・タグ
   const profInfo = loadProfileInfo();
