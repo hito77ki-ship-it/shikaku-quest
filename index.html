@@ -4147,6 +4147,286 @@ const JOBS = [
       {key:'sy_men',    name:'面接・論文',           desc:'個人面接・集団討論・作文',   color:'#c97cff',avgH:100,maxH:140,attrs:{spi:.7,dex:.3}},
     ]
   },
+
+  /* ══════════════════════════════
+     【追加：会計ギルド拡張】
+  ══════════════════════════════ */
+  {
+    id:'chusho', name:'中小企業診断士', icon:'🏢', tag:'経営の軍師',
+    category:'会計ギルド', rpgClass:'経営の軍師',
+    desc:'唯一の経営コンサルティング国家資格。1次7科目＋2次筆記＋口述。合格率5%前後。',
+    color:'#F59E0B', avgHours:1000, maxHours:1500,
+    subjects:[
+      {key:'cs_keizai',    name:'経済学・経済政策',   desc:'ミクロ・マクロ経済学・経済政策',color:'#F59E0B',avgH:100,maxH:150,attrs:{int:.6,dex:.4}},
+      {key:'cs_zaimu',     name:'財務・会計',          desc:'財務分析・管理会計・CVP分析',   color:'#4db8ff',avgH:150,maxH:230,attrs:{atk:.7,dex:.3}},
+      {key:'cs_kigyo',     name:'企業経営理論',        desc:'経営戦略・マーケティング・HR',  color:'#7cff6e',avgH:150,maxH:230,attrs:{int:.6,mag:.4}},
+      {key:'cs_unei',      name:'運営管理',            desc:'生産・店舗管理・SCM',           color:'#ff9e4d',avgH:130,maxH:200,attrs:{dex:.6,atk:.4}},
+      {key:'cs_houki',     name:'経営法務',            desc:'会社法・知財・契約',            color:'#c97cff',avgH:100,maxH:150,attrs:{int:.7,spi:.3}},
+      {key:'cs_jojo',      name:'経営情報システム',    desc:'IT戦略・DB・セキュリティ',      color:'#38BDF8',avgH:80, maxH:120,attrs:{dex:.5,int:.5}},
+      {key:'cs_chusho',    name:'中小企業経営・政策',  desc:'白書・中小企業施策・支援制度',  color:'#A78BFA',avgH:90, maxH:140,attrs:{int:.5,spi:.5}},
+      {key:'cs_jitai',     name:'2次試験（事例Ⅰ〜Ⅳ）',desc:'企業診断・事例分析の記述式',  color:'#F87171',avgH:200,maxH:300,attrs:{int:.6,mag:.4}},
+    ]
+  },
+  {
+    id:'uscpa', name:'米国公認会計士（USCPA）', icon:'🇺🇸', tag:'異国の会計師',
+    category:'会計ギルド', rpgClass:'異国の会計師',
+    desc:'米国の公認会計士資格。英語で会計・監査・税務を学ぶ国際資格。Big4で高評価。',
+    color:'#60A5FA', avgHours:1500, maxHours:2500,
+    subjects:[
+      {key:'us_far',  name:'FAR（財務会計）',              desc:'US GAAP・財務諸表・連結会計',    color:'#60A5FA',avgH:450,maxH:750,attrs:{int:.7,atk:.3}},
+      {key:'us_aud',  name:'AUD（監査）',                  desc:'監査基準・内部統制・倫理',       color:'#7cff6e',avgH:350,maxH:600,attrs:{int:.7,spi:.3}},
+      {key:'us_reg',  name:'REG（税務・法規）',            desc:'連邦税・ビジネス法・倫理規定',   color:'#ff9e4d',avgH:350,maxH:600,attrs:{mag:.6,int:.4}},
+      {key:'us_bar',  name:'BAR（ビジネス分析）',          desc:'データ分析・財務計画・戦略',     color:'#c97cff',avgH:350,maxH:550,attrs:{dex:.6,mag:.4}},
+    ]
+  },
+
+  /* ══════════════════════════════
+     【追加：法律ギルド拡張】
+  ══════════════════════════════ */
+  {
+    id:'shiho', name:'司法試験 / 予備試験', icon:'⚖', tag:'法の守護者',
+    category:'法律ギルド', rpgClass:'法の守護者',
+    desc:'法曹資格の最高峰。弁護士・検察官・裁判官への道。予備試験ルートで在学中合格も可能。',
+    color:'#8B5CF6', avgHours:8000, maxHours:15000,
+    subjects:[
+      {key:'sh_kenpou',    name:'憲法',             desc:'人権・統治機構・違憲審査',       color:'#8B5CF6',avgH:600, maxH:1200,attrs:{int:.8,spi:.2}},
+      {key:'sh_minpo',     name:'民法',             desc:'民法全般・判例・契約・不法行為', color:'#4db8ff',avgH:1500,maxH:3000,attrs:{int:.8,mag:.2}},
+      {key:'sh_keipo',     name:'刑法',             desc:'罪名・故意・共犯・各論',         color:'#F87171',avgH:800, maxH:1600,attrs:{int:.7,atk:.3}},
+      {key:'sh_shoho',     name:'商法・会社法',     desc:'会社設立・株式・組織再編',       color:'#7cff6e',avgH:600, maxH:1200,attrs:{int:.7,dex:.3}},
+      {key:'sh_minso',     name:'民事訴訟法',       desc:'訴訟要件・証拠・強制執行',       color:'#ff9e4d',avgH:600, maxH:1200,attrs:{int:.7,mag:.3}},
+      {key:'sh_keiso',     name:'刑事訴訟法',       desc:'捜査・公判・証拠・上訴',         color:'#c97cff',avgH:600, maxH:1200,attrs:{int:.7,spi:.3}},
+      {key:'sh_gyosei',    name:'行政法',           desc:'行政行為・取消訴訟・国賠',       color:'#A78BFA',avgH:500, maxH:1000,attrs:{int:.8,dex:.2}},
+      {key:'sh_ronbun',    name:'論文式対策',       desc:'答案作成・判例分析・起案',       color:'#F59E0B',avgH:800, maxH:1600,attrs:{int:.6,mag:.4}},
+    ]
+  },
+  {
+    id:'benrishi', name:'弁理士', icon:'💡', tag:'知財の魔導士',
+    category:'法律ギルド', rpgClass:'知財の魔導士',
+    desc:'知的財産の専門家。特許・商標・意匠を守る。理系・法律の融合。合格率7%前後。',
+    color:'#A78BFA', avgHours:3000, maxHours:4500,
+    subjects:[
+      {key:'br_tokkyo',    name:'特許法・実用新案法',desc:'特許要件・審査・審判・侵害',  color:'#A78BFA',avgH:900,maxH:1350,attrs:{int:.8,mag:.2}},
+      {key:'br_shouhyo',   name:'商標法・意匠法',    desc:'登録要件・類似判断・審判',    color:'#7cff6e',avgH:600,maxH:900, attrs:{int:.7,dex:.3}},
+      {key:'br_chosakuken',name:'著作権法',           desc:'著作物・権利制限・隣接権',    color:'#4db8ff',avgH:300,maxH:450, attrs:{int:.6,spi:.4}},
+      {key:'br_rikagaku',  name:'理工系選択科目',    desc:'機械・電気・化学・バイオ',    color:'#ff9e4d',avgH:600,maxH:900, attrs:{atk:.7,dex:.3}},
+      {key:'br_jitumu',    name:'論文・口述対策',    desc:'短答論文・口述試験',          color:'#c97cff',avgH:600,maxH:900, attrs:{int:.6,mag:.4}},
+    ]
+  },
+  {
+    id:'mansion', name:'マンション管理士 / 管理業務主任者', icon:'🏘', tag:'不動産の番人',
+    category:'法律ギルド', rpgClass:'不動産の番人',
+    desc:'マンション管理の専門家。管理組合のコンサルタント。W受験で効率よく取得できる。',
+    color:'#34D399', avgHours:400, maxHours:600,
+    subjects:[
+      {key:'mn_kanri',     name:'管理組合・管理委託',desc:'区分所有法・管理組合運営',    color:'#34D399',avgH:150,maxH:225,attrs:{int:.6,dex:.4}},
+      {key:'mn_setubi',    name:'マンション設備・維持',desc:'建物構造・設備・大規模修繕',color:'#4db8ff',avgH:130,maxH:200,attrs:{int:.5,dex:.5}},
+      {key:'mn_houki',     name:'関連法律',           desc:'民法・建築基準法・都市計画', color:'#ff9e4d',avgH:120,maxH:175,attrs:{int:.7,spi:.3}},
+    ]
+  },
+
+  /* ══════════════════════════════
+     【追加：ITギルド拡張】
+  ══════════════════════════════ */
+  {
+    id:'ouyou', name:'応用情報技術者', icon:'💡', tag:'上級魔工技師',
+    category:'ITギルド', rpgClass:'上級魔工技師',
+    desc:'IPAの中位試験。エンジニアのキャリアアップに必須。合格率20%前後。',
+    color:'#0EA5E9', avgHours:300, maxHours:500,
+    subjects:[
+      {key:'ap_kagaku',    name:'情報科学・技術',    desc:'アルゴリズム・DB・ネットワーク',  color:'#0EA5E9',avgH:120,maxH:200,attrs:{atk:.6,int:.4}},
+      {key:'ap_mgmt',      name:'プロジェクト管理',  desc:'PM・品質管理・リスク管理',        color:'#7cff6e',avgH:80, maxH:130,attrs:{int:.5,dex:.5}},
+      {key:'ap_secu',      name:'セキュリティ',      desc:'情報セキュリティ・暗号化・認証',  color:'#ff9e4d',avgH:60, maxH:100,attrs:{int:.6,dex:.4}},
+      {key:'ap_ronbun',    name:'午後（記述式）',    desc:'選択問題・論述・ケーススタディ',  color:'#c97cff',avgH:40, maxH:70, attrs:{int:.7,mag:.3}},
+    ]
+  },
+  {
+    id:'secu', name:'情報処理安全確保支援士', icon:'🔐', tag:'サイバー護衛',
+    category:'ITギルド', rpgClass:'サイバー護衛',
+    desc:'サイバーセキュリティの国家資格。唯一の登録制国家資格（RISS）。高難度。',
+    color:'#EF4444', avgHours:500, maxHours:800,
+    subjects:[
+      {key:'sc_secu',      name:'セキュリティ基礎', desc:'暗号・認証・プロトコル・脅威',   color:'#EF4444',avgH:200,maxH:320,attrs:{int:.7,mag:.3}},
+      {key:'sc_net',       name:'ネットワーク',      desc:'TCP/IP・ファイアウォール・VPN',  color:'#4db8ff',avgH:130,maxH:210,attrs:{int:.6,dex:.4}},
+      {key:'sc_ronbun',    name:'午後（記述・論述）',desc:'インシデント対応・設計・分析',   color:'#7cff6e',avgH:170,maxH:270,attrs:{int:.7,atk:.3}},
+    ]
+  },
+  {
+    id:'network', name:'ネットワークスペシャリスト', icon:'🌐', tag:'網の賢者',
+    category:'ITギルド', rpgClass:'網の賢者',
+    desc:'IPAの高度試験。ネットワーク設計・構築の専門家。合格率13%前後。',
+    color:'#06B6D4', avgHours:500, maxHours:800,
+    subjects:[
+      {key:'nw_kiso',      name:'ネットワーク基礎', desc:'TCP/IP・OSI・ルーティング',       color:'#06B6D4',avgH:150,maxH:240,attrs:{int:.6,dex:.4}},
+      {key:'nw_sekkei',    name:'ネットワーク設計', desc:'LAN設計・WAN・クラウド接続',      color:'#7cff6e',avgH:130,maxH:210,attrs:{dex:.7,atk:.3}},
+      {key:'nw_secu',      name:'セキュリティ設計', desc:'ファイアウォール・IDS・VPN',       color:'#ff9e4d',avgH:100,maxH:160,attrs:{int:.7,mag:.3}},
+      {key:'nw_ronbun',    name:'午後（記述・論述）',desc:'ネットワーク設計論述',            color:'#c97cff',avgH:120,maxH:190,attrs:{int:.6,mag:.4}},
+    ]
+  },
+  {
+    id:'aws', name:'AWS認定試験', icon:'☁', tag:'雲の術士',
+    category:'ITギルド', rpgClass:'雲の術士',
+    desc:'Amazonのクラウド資格。CLF→SAA→SAPとレベルアップ。エンジニア需要急増中。',
+    color:'#F59E0B', avgHours:150, maxHours:300,
+    subjects:[
+      {key:'aws_clf',      name:'CLF（Cloud Practitioner）',             desc:'AWSの基礎・サービス概要',        color:'#F59E0B',avgH:50, maxH:80, attrs:{int:.5,dex:.5}},
+      {key:'aws_saa',      name:'SAA（Solutions Architect Associate）',  desc:'アーキテクチャ設計・可用性',     color:'#7cff6e',avgH:80, maxH:150,attrs:{int:.7,dex:.3}},
+      {key:'aws_sap',      name:'SAP（Solutions Architect Professional）',desc:'大規模設計・移行戦略・コスト最適化',color:'#ff9e4d',avgH:120,maxH:200,attrs:{int:.8,mag:.2}},
+    ]
+  },
+
+  /* ══════════════════════════════
+     【追加：国際ギルド拡張】
+  ══════════════════════════════ */
+  {
+    id:'toefl', name:'TOEFL / IELTS', icon:'🎓', tag:'海外への探求者',
+    category:'国際ギルド', rpgClass:'海外への探求者',
+    desc:'海外大学・大学院進学・留学に必須の英語試験。4技能（読む・聞く・書く・話す）を測定。',
+    color:'#3B82F6', avgHours:400, maxHours:800,
+    subjects:[
+      {key:'tf_reading',   name:'Reading',   desc:'学術的英文の読解・推論',       color:'#3B82F6',avgH:100,maxH:200,attrs:{int:.7,mag:.3}},
+      {key:'tf_listening', name:'Listening', desc:'講義・会話の聴き取り',         color:'#7cff6e',avgH:100,maxH:200,attrs:{dex:.7,int:.3}},
+      {key:'tf_writing',   name:'Writing',   desc:'統合型・独立型英作文',         color:'#ff9e4d',avgH:100,maxH:200,attrs:{mag:.6,int:.4}},
+      {key:'tf_speaking',  name:'Speaking',  desc:'口頭応答・意見表現',           color:'#c97cff',avgH:100,maxH:200,attrs:{dex:.6,spi:.4}},
+    ]
+  },
+  {
+    id:'chinese', name:'中国語検定 / HSK', icon:'🇨🇳', tag:'中原の旅人',
+    category:'国際ギルド', rpgClass:'中原の旅人',
+    desc:'中国語の習熟を証明する資格。就職・ビジネス・留学に有効。HSKは中国政府公認。',
+    color:'#EF4444', avgHours:300, maxHours:700,
+    subjects:[
+      {key:'zh_kiso',      name:'発音・文法基礎',   desc:'ピンイン・声調・基本文型',    color:'#EF4444',avgH:80, maxH:180,attrs:{dex:.7,int:.3}},
+      {key:'zh_kanji',     name:'語彙・漢字',       desc:'常用語彙・簡体字の読み書き',  color:'#7cff6e',avgH:100,maxH:230,attrs:{int:.6,dex:.4}},
+      {key:'zh_kaiwah',    name:'会話・リスニング', desc:'日常会話・ビジネス表現',      color:'#4db8ff',avgH:70, maxH:160,attrs:{dex:.6,spi:.4}},
+      {key:'zh_reading',   name:'読解・作文',       desc:'長文読解・文章作成',          color:'#ff9e4d',avgH:50, maxH:130,attrs:{int:.7,mag:.3}},
+    ]
+  },
+  {
+    id:'korean', name:'韓国語能力試験（TOPIK）', icon:'🇰🇷', tag:'韓流の武人',
+    category:'国際ギルド', rpgClass:'韓流の武人',
+    desc:'韓国政府公認の韓国語資格。TOPIKⅠ（1〜2級）・TOPIKⅡ（3〜6級）に分かれる。',
+    color:'#2563EB', avgHours:200, maxHours:500,
+    subjects:[
+      {key:'kr_kiso',      name:'発音・文字（ハングル）',desc:'ハングル読み書き・発音規則',  color:'#2563EB',avgH:50, maxH:100,attrs:{dex:.7,int:.3}},
+      {key:'kr_bunpou',    name:'文法・語彙',            desc:'助詞・動詞活用・基本語彙',   color:'#7cff6e',avgH:80, maxH:200,attrs:{int:.6,dex:.4}},
+      {key:'kr_listening', name:'リスニング',            desc:'会話・アナウンス聴き取り',   color:'#ff9e4d',avgH:40, maxH:100,attrs:{dex:.7,spi:.3}},
+      {key:'kr_reading',   name:'読解',                  desc:'文章理解・長文読解',         color:'#c97cff',avgH:30, maxH:100,attrs:{int:.7,mag:.3}},
+    ]
+  },
+
+  /* ══════════════════════════════
+     【追加：福祉・医療ギルド拡張】
+  ══════════════════════════════ */
+  {
+    id:'ishi', name:'医師国家試験', icon:'🩺', tag:'回復魔導士の頂点',
+    category:'福祉・医療ギルド', rpgClass:'回復魔導士の頂点',
+    desc:'医師免許の国家試験。6年間の医学部教育の集大成。合格率約90%（現役）。',
+    color:'#EF4444', avgHours:3000, maxHours:5000,
+    subjects:[
+      {key:'md_naika',     name:'内科学',              desc:'循環器・消化器・呼吸器・神経・腎臓・内分泌',color:'#EF4444',avgH:800,maxH:1400,attrs:{int:.8,mag:.2}},
+      {key:'md_geka',      name:'外科・救急',          desc:'外科学・整形外科・脳外科・救急医療',        color:'#4db8ff',avgH:500,maxH:800, attrs:{atk:.7,int:.3}},
+      {key:'md_small',     name:'小科目群',            desc:'産婦人科・小児科・精神科・眼科・耳鼻科',    color:'#7cff6e',avgH:600,maxH:1000,attrs:{int:.7,spi:.3}},
+      {key:'md_kiso',      name:'基礎医学',            desc:'解剖・生理・生化学・病理・微生物・薬理',    color:'#ff9e4d',avgH:500,maxH:800, attrs:{int:.8,dex:.2}},
+      {key:'md_eisei',     name:'公衆衛生・社会医学',  desc:'疫学・統計・医療法規・社会保障',            color:'#c97cff',avgH:200,maxH:300, attrs:{int:.6,spi:.4}},
+    ]
+  },
+  {
+    id:'yakuzaishi', name:'薬剤師国家試験', icon:'💊', tag:'調薬の賢者',
+    category:'福祉・医療ギルド', rpgClass:'調薬の賢者',
+    desc:'薬剤師免許の国家試験。6年制薬学部の集大成。合格率約70%。',
+    color:'#8B5CF6', avgHours:2000, maxHours:3000,
+    subjects:[
+      {key:'yak_butsuri',  name:'物理・化学',          desc:'有機化学・薬物動態・放射線', color:'#8B5CF6',avgH:400,maxH:600,attrs:{int:.7,atk:.3}},
+      {key:'yak_seimei',   name:'生物・微生物',        desc:'生化学・免疫・感染症',       color:'#7cff6e',avgH:400,maxH:600,attrs:{int:.7,spi:.3}},
+      {key:'yak_jitsumu',  name:'薬剤・薬理',          desc:'薬の作用・副作用・相互作用', color:'#ff9e4d',avgH:500,maxH:750,attrs:{int:.8,mag:.2}},
+      {key:'yak_houki',    name:'衛生・法規',          desc:'公衆衛生・薬事法・医療倫理', color:'#4db8ff',avgH:300,maxH:450,attrs:{int:.6,spi:.4}},
+      {key:'yak_rinsho',   name:'実務・薬局学',        desc:'処方設計・服薬指導・チーム医療',color:'#c97cff',avgH:400,maxH:600,attrs:{dex:.6,spi:.4}},
+    ]
+  },
+  {
+    id:'toroku', name:'登録販売者', icon:'🏪', tag:'薬草商人',
+    category:'福祉・医療ギルド', rpgClass:'薬草商人',
+    desc:'第2類・第3類医薬品を販売できる資格。ドラッグストアで需要高。合格率40〜50%。',
+    color:'#10B981', avgHours:300, maxHours:500,
+    subjects:[
+      {key:'tr_shikumi',   name:'薬事に関わる法規・制度',desc:'薬機法・調剤・販売ルール',  color:'#10B981',avgH:80, maxH:130,attrs:{int:.6,spi:.4}},
+      {key:'tr_seibun',    name:'主な医薬品成分・作用',  desc:'OTC薬の成分・副作用・禁忌',color:'#4db8ff',avgH:120,maxH:200,attrs:{int:.7,mag:.3}},
+      {key:'tr_shintai',   name:'人体の構造・機能',      desc:'各器官の仕組みと疾病',      color:'#ff9e4d',avgH:60, maxH:100,attrs:{int:.6,dex:.4}},
+      {key:'tr_seido',     name:'薬局業務と接客',        desc:'相談応需・リスク管理',      color:'#c97cff',avgH:40, maxH:70, attrs:{dex:.6,spi:.4}},
+    ]
+  },
+  {
+    id:'shinrishi', name:'公認心理師', icon:'🧠', tag:'心の探求者',
+    category:'福祉・医療ギルド', rpgClass:'心の探求者',
+    desc:'心理職唯一の国家資格。医療・福祉・学校・産業の4分野で活躍。合格率50〜60%。',
+    color:'#A78BFA', avgHours:600, maxHours:1000,
+    subjects:[
+      {key:'ps_kiso',      name:'基礎心理学',    desc:'知覚・記憶・学習・発達・人格',      color:'#A78BFA',avgH:180,maxH:300,attrs:{int:.7,mag:.3}},
+      {key:'ps_rinsho',    name:'臨床・相談心理',desc:'カウンセリング・アセスメント・支援',color:'#7cff6e',avgH:180,maxH:300,attrs:{spi:.7,int:.3}},
+      {key:'ps_seishin',   name:'精神医学',      desc:'精神疾患・DSM・向精神薬',           color:'#4db8ff',avgH:120,maxH:200,attrs:{int:.7,spi:.3}},
+      {key:'ps_houki',     name:'関連法規・倫理',desc:'公認心理師法・守秘義務',            color:'#ff9e4d',avgH:60, maxH:100,attrs:{int:.5,spi:.5}},
+      {key:'ps_jisshu',    name:'事例・実践問題',desc:'事例問題・選択肢演習',              color:'#c97cff',avgH:60, maxH:100,attrs:{dex:.6,spi:.4}},
+    ]
+  },
+
+  /* ══════════════════════════════
+     【追加：金融ギルド拡張】
+  ══════════════════════════════ */
+  {
+    id:'analyst', name:'証券アナリスト（CMA）', icon:'📊', tag:'金融の魔法使い',
+    category:'金融ギルド', rpgClass:'金融の魔法使い',
+    desc:'日本証券アナリスト協会認定。第1次・第2次試験の2段階。金融機関・運用会社で高評価。',
+    color:'#F97316', avgHours:600, maxHours:900,
+    subjects:[
+      {key:'an_zaimu',     name:'財務分析',              desc:'財務諸表分析・企業価値評価',         color:'#F97316',avgH:180,maxH:270,attrs:{atk:.7,int:.3}},
+      {key:'an_keizai',    name:'経済・金融理論',        desc:'ミクロ・マクロ・金融政策',           color:'#7cff6e',avgH:150,maxH:225,attrs:{int:.7,mag:.3}},
+      {key:'an_toshi',     name:'投資論・ポートフォリオ',desc:'資産配分・リスク管理・デリバティブ',color:'#4db8ff',avgH:150,maxH:225,attrs:{int:.6,dex:.4}},
+      {key:'an_rinri',     name:'職業倫理',              desc:'アナリスト倫理・規制・GIPS',        color:'#c97cff',avgH:60, maxH:90, attrs:{spi:.7,int:.3}},
+      {key:'an_ronbun',    name:'2次試験（論述）',       desc:'企業分析・投資判断の記述式',        color:'#ff9e4d',avgH:60, maxH:90, attrs:{int:.6,mag:.4}},
+    ]
+  },
+
+  /* ══════════════════════════════
+     【技術ギルド（新設）】
+  ══════════════════════════════ */
+  {
+    id:'denken', name:'電気主任技術者（電験三種）', icon:'⚡', tag:'雷の魔導師',
+    category:'技術ギルド', rpgClass:'雷の魔導師',
+    desc:'電気設備の保安・管理の国家資格。合格率10〜15%。ビル管理・電力会社で必須。',
+    color:'#FBBF24', avgHours:1000, maxHours:1500,
+    subjects:[
+      {key:'dk_riron',     name:'理論',  desc:'電磁気学・電気回路・電子回路',  color:'#FBBF24',avgH:300,maxH:450,attrs:{atk:.7,int:.3}},
+      {key:'dk_denki',     name:'電力',  desc:'発電・変電・送配電・電気材料',  color:'#4db8ff',avgH:250,maxH:375,attrs:{int:.6,atk:.4}},
+      {key:'dk_kikai',     name:'機械',  desc:'変圧器・電動機・発電機・制御',  color:'#7cff6e',avgH:250,maxH:375,attrs:{dex:.6,atk:.4}},
+      {key:'dk_houki',     name:'法規',  desc:'電気事業法・電気工事士法',      color:'#c97cff',avgH:200,maxH:300,attrs:{int:.6,spi:.4}},
+    ]
+  },
+  {
+    id:'kikenbutsu', name:'危険物取扱者（乙種4類）', icon:'🔥', tag:'炎の番人',
+    category:'技術ギルド', rpgClass:'炎の番人',
+    desc:'ガソリン・灯油など引火性液体を扱う資格。乙4は最も受験者が多い国家資格の一つ。',
+    color:'#EF4444', avgHours:60, maxHours:100,
+    subjects:[
+      {key:'kb_kiso',      name:'危険物の性質・火災予防',desc:'引火点・発火点・消火方法',  color:'#EF4444',avgH:30,maxH:50,attrs:{int:.6,dex:.4}},
+      {key:'kb_houki',     name:'法令',                  desc:'危険物安全法・設備基準',    color:'#4db8ff',avgH:20,maxH:35,attrs:{int:.6,spi:.4}},
+      {key:'kb_jitumu',    name:'消火・基礎物化',        desc:'燃焼理論・消火設備・物化',  color:'#7cff6e',avgH:10,maxH:15,attrs:{atk:.6,dex:.4}},
+    ]
+  },
+
+  /* ══════════════════════════════
+     【追加：スキルギルド拡張】
+  ══════════════════════════════ */
+  {
+    id:'sekaiisan', name:'世界遺産検定', icon:'🏛', tag:'遺産の探求者',
+    category:'スキルギルド', rpgClass:'遺産の探求者',
+    desc:'世界遺産の知識を証明する民間検定。観光・教育・国際交流に活かせる。2級から就活で評価される。',
+    color:'#10B981', avgHours:80, maxHours:150,
+    subjects:[
+      {key:'ws_sekai',     name:'世界遺産の基礎知識',desc:'登録基準・委員会・条約',                        color:'#10B981',avgH:25,maxH:50,attrs:{int:.5,spi:.5}},
+      {key:'ws_isan',      name:'世界遺産（各地域）',desc:'ヨーロッパ・アジア・アフリカ・南北米の遺産',    color:'#4db8ff',avgH:40,maxH:75,attrs:{int:.6,spi:.4}},
+      {key:'ws_nihon',     name:'日本の世界遺産',    desc:'富士山・屋久島・法隆寺など国内遺産',            color:'#ff9e4d',avgH:15,maxH:25,attrs:{int:.5,dex:.5}},
+    ]
+  },
 ];
 
 
@@ -4729,6 +5009,7 @@ function buildJobGrid(){
     'スキルギルド':'🎨',
     '受験ギルド':'🎓',
     '福祉・医療ギルド':'🏥',
+    '技術ギルド':'⚙',
     'その他':'📚',
   };
 
