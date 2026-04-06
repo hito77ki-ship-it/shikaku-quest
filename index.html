@@ -9897,11 +9897,6 @@ function openAchieveModal(){
   document.getElementById('achieveMaxScore').value = '';
   document.getElementById('achieveComment').value = '';
   achieveBreakdownCount = 0;
-  // 選択中の資格を自動入力
-  if(selectedJobIds.length){
-    const job = JOBS.find(j => j.id === selectedJobIds[0]);
-    if(job) document.getElementById('achieveTitle').value = job.name + ' ';
-  }
   // 内訳グリッドをリセット
   const grid = document.getElementById('achieveBreakdownGrid');
   if(grid) grid.innerHTML = '';
@@ -9910,6 +9905,36 @@ function openAchieveModal(){
   document.querySelectorAll('.achieve-type-btn').forEach((b,i)=>{
     b.classList.toggle('selected', i===0);
   });
+  // ジョブセレクターを初期化
+  const sel = document.getElementById('achieveJobSelect');
+  if(sel){
+    // カテゴリごとにoptgroupで整理
+    const cats = {};
+    JOBS.forEach(j => {
+      if(!cats[j.category]) cats[j.category] = [];
+      cats[j.category].push(j);
+    });
+    sel.innerHTML = '<option value="">-- 資格を選ぶ --</option>';
+    Object.entries(cats).forEach(([cat, jobs]) => {
+      const grp = document.createElement('optgroup');
+      grp.label = cat;
+      jobs.forEach(j => {
+        const opt = document.createElement('option');
+        opt.value = j.id;
+        opt.textContent = j.icon + ' ' + j.name;
+        grp.appendChild(opt);
+      });
+      sel.appendChild(grp);
+    });
+    // 選択中のジョブがあれば初期選択
+    if(selectedJobIds.length){
+      sel.value = selectedJobIds[0];
+      onAchieveJobSelect(selectedJobIds[0]);
+    }
+  }
+  // ジョブセレクター表示（資格合格がデフォルトなので表示）
+  const grp = document.getElementById('achieveJobSelectGroup');
+  if(grp) grp.style.display = '';
   document.getElementById('achieveModal').classList.add('show');
 }
 
@@ -9921,6 +9946,16 @@ function selectAchieveType(btn, type){
   achieveType = type;
   document.querySelectorAll('.achieve-type-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
+  // 資格合格の場合だけジョブセレクターを表示
+  const grp = document.getElementById('achieveJobSelectGroup');
+  if(grp) grp.style.display = (type === 'pass') ? '' : 'none';
+}
+
+function onAchieveJobSelect(jobId){
+  if(!jobId) return;
+  const job = JOBS.find(j => j.id === jobId);
+  if(!job) return;
+  document.getElementById('achieveTitle').value = job.name + ' 合格！';
 }
 
 /* ── 内訳行を追加 ── */
@@ -11282,6 +11317,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="achieve-type-btn-icon">✨</span>その他
           </button>
         </div>
+      </div>
+
+      <!-- 資格選択（資格合格の場合のみ表示） -->
+      <div class="form-group" id="achieveJobSelectGroup">
+        <label class="form-label">資格を選択</label>
+        <select class="form-input" id="achieveJobSelect" onchange="onAchieveJobSelect(this.value)" style="cursor:pointer;">
+          <option value="">-- 資格を選ぶ --</option>
+        </select>
       </div>
 
       <!-- タイトル -->
