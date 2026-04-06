@@ -10,14 +10,14 @@
 <meta property="og:url" content="https://hito77ki-ship-it.github.io/study-quest/lp.html">
 <meta property="og:title" content="スタディクエスト｜すべての勉強を、終わらない冒険に。">
 <meta property="og:description" content="勉強時間を経験値に変えて、理想のステータスを手に入れよう。資格・受験・検定に対応したRPG風学習トラッカー「スタディクエスト」は完全無料で使えます。">
-<meta property="og:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/screen1.png">
+<meta property="og:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/ogp.svg">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:site_name" content="スタディクエスト">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="スタディクエスト｜すべての勉強を、終わらない冒険に。">
 <meta name="twitter:description" content="勉強時間を経験値に変えて、理想のステータスを手に入れよう。資格・受験・検定に対応したRPG風学習トラッカー「スタディクエスト」は完全無料で使えます。">
-<meta name="twitter:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/screen1.png">
+<meta name="twitter:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/ogp.svg">
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WL5KSKG1JK"></script>
 <script>
@@ -314,6 +314,30 @@ nav.scrolled{
 .voice-text{font-size:15px;color:var(--ink2);line-height:1.85;font-style:italic;}
 .voice-author{font-size:12px;color:var(--ink3);font-weight:700;font-style:normal;}
 
+/* ─── JOBS ─── */
+.jobs{padding:128px 24px;background:var(--bg);}
+.jobs-inner{max-width:1020px;margin:0 auto;}
+.jobs-cats{margin-top:64px;display:flex;flex-direction:column;gap:40px;}
+.jobs-cat{}
+.jobs-cat-label{
+  font-size:11px;font-weight:700;letter-spacing:.18em;
+  color:var(--ink3);text-transform:uppercase;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.jobs-cat-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.jobs-badges{display:flex;flex-wrap:wrap;gap:10px;}
+.job-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:500;color:var(--ink2);
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  padding:7px 14px;border-radius:100px;
+  transition:border-color .2s,color .2s;
+}
+.job-badge:hover{border-color:var(--green);color:var(--green);}
+.job-badge .ji{font-size:14px;}
+
 /* ─── FOUNDER ─── */
 .founder{padding:128px 24px;background:var(--surface);}
 .founder-inner{max-width:680px;margin:0 auto;text-align:center;}
@@ -598,6 +622,89 @@ footer{background:#091505;padding:48px 24px 40px;}
         <p class="feat-desc">EXP・レベル・ヒートマップ・レーダーチャートで学習の進捗を可視化。ランキングで仲間と競い合い、加速できる。</p>
         <span class="feat-tag">LEVEL UP</span>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOBS -->
+<section class="jobs">
+  <div class="jobs-inner">
+    <div class="sec-label">SUPPORTED JOBS</div>
+    <h2 class="sec-title">対応ジョブ一覧</h2>
+    <div class="jobs-cats">
+
+      <div class="jobs-cat fi">
+        <div class="jobs-cat-label">会計ギルド</div>
+        <div class="jobs-badges">
+          <span class="job-badge"><span class="ji">⚖</span>公認会計士</span>
+          <span class="job-badge"><span class="ji">📊</span>税理士</span>
+          <span class="job-badge"><span class="ji">🥇</span>日商簿記1級</span>
+          <span class="job-badge"><span class="ji">🥈</span>日商簿記2級</span>
+          <span class="job-badge"><span class="ji">🥉</span>日商簿記3級</span>
+          <span class="job-badge"><span class="ji">🌍</span>BATIC / 全経簿記上級</span>
+        </div>
+      </div>
+
+      <div class="jobs-cat fi">
+        <div class="jobs-cat-label">法律・不動産ギルド</div>
+        <div class="jobs-badges">
+          <span class="job-badge"><span class="ji">📜</span>行政書士</span>
+          <span class="job-badge"><span class="ji">🏠</span>宅地建物取引士</span>
+          <span class="job-badge"><span class="ji">⚖</span>司法書士</span>
+          <span class="job-badge"><span class="ji">💰</span>FP 2・3級</span>
+          <span class="job-badge"><span class="ji">📈</span>証券外務員一種</span>
+          <span class="job-badge"><span class="ji">🤝</span>社会保険労務士</span>
+        </div>
+      </div>
+
+      <div class="jobs-cat fi">
+        <div class="jobs-cat-label">語学ギルド</div>
+        <div class="jobs-badges">
+          <span class="job-badge"><span class="ji">🌐</span>TOEIC</span>
+          <span class="job-badge"><span class="ji">🇬🇧</span>英検 1〜5級</span>
+          <span class="job-badge"><span class="ji">🈶</span>漢検 2〜10級</span>
+        </div>
+      </div>
+
+      <div class="jobs-cat fi">
+        <div class="jobs-cat-label">受験ギルド</div>
+        <div class="jobs-badges">
+          <span class="job-badge"><span class="ji">🏫</span>高校受験</span>
+          <span class="job-badge"><span class="ji">🎓</span>大学受験（共通テスト・二次）</span>
+        </div>
+      </div>
+
+      <div class="jobs-cat fi">
+        <div class="jobs-cat-label">IT・デザインギルド</div>
+        <div class="jobs-badges">
+          <span class="job-badge"><span class="ji">💻</span>基本情報技術者</span>
+          <span class="job-badge"><span class="ji">📱</span>ITパスポート</span>
+          <span class="job-badge"><span class="ji">🖥</span>MOS / PCスキル</span>
+          <span class="job-badge"><span class="ji">🎨</span>WEBクリエイター / デザイン</span>
+        </div>
+      </div>
+
+      <div class="jobs-cat fi">
+        <div class="jobs-cat-label">公務員ギルド</div>
+        <div class="jobs-badges">
+          <span class="job-badge"><span class="ji">🏛</span>国家公務員（一般職）</span>
+          <span class="job-badge"><span class="ji">🏙</span>地方公務員（上級）</span>
+          <span class="job-badge"><span class="ji">🚔</span>警察官・消防官</span>
+          <span class="job-badge"><span class="ji">📚</span>教員採用試験</span>
+          <span class="job-badge"><span class="ji">🏙</span>市役所（教養のみ）</span>
+        </div>
+      </div>
+
+      <div class="jobs-cat fi">
+        <div class="jobs-cat-label">ビジネスギルド</div>
+        <div class="jobs-badges">
+          <span class="job-badge"><span class="ji">🎨</span>色彩検定 / マナー検定</span>
+          <span class="job-badge"><span class="ji">✈</span>旅行業務取扱管理者</span>
+          <span class="job-badge"><span class="ji">📋</span>秘書検定2級・準1級</span>
+          <span class="job-badge"><span class="ji">🛒</span>販売士（リテールマーケティング）</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
