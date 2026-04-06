@@ -18,19 +18,29 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .nav-back{color:var(--muted);font-size:13px;padding:9px 20px;border-radius:100px;border:1px solid var(--border);transition:all .2s;}
 .nav-back:hover{border-color:var(--green);color:var(--green);}
 
-.container{max-width:680px;margin:0 auto;padding:100px 24px 64px;text-align:center;}
+.container{max-width:640px;margin:0 auto;padding:100px 24px 64px;text-align:center;}
 h1{font-size:28px;font-weight:700;margin-bottom:12px;}
-.lead{color:var(--muted);font-size:15px;margin-bottom:40px;line-height:1.8;}
+.lead{color:var(--muted);font-size:15px;margin-bottom:48px;line-height:1.8;}
 
-.form-wrap{
-  border-radius:16px;overflow:hidden;
-  border:1px solid var(--border);
-  background:#fff;
-}
-.form-wrap iframe{
-  width:100%;border:none;
-  min-height:680px;display:block;
-}
+.contact-card{background:#F8FDF0;border:1px solid #D4EDAD;border-radius:16px;padding:36px 32px;text-align:left;}
+.contact-card h2{font-size:16px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.contact-card p{font-size:14px;color:#374151;margin-bottom:20px;}
+
+.form-group{margin-bottom:20px;}
+.form-group label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.form-group input,
+.form-group select,
+.form-group textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'Noto Sans JP',sans-serif;color:var(--text);transition:border-color .2s;outline:none;background:#fff;}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{border-color:var(--green);}
+.form-group textarea{resize:vertical;min-height:140px;}
+
+.btn-submit{width:100%;background:var(--green);color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:100px;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:background .2s;margin-top:8px;}
+.btn-submit:hover{background:var(--green2);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;}
+
+.note{font-size:12px;color:var(--muted);margin-top:16px;text-align:center;}
 
 footer{background:#111827;padding:32px 24px;text-align:center;margin-top:64px;}
 .footer-logo{font-family:'Cinzel',serif;font-size:14px;color:#4A5568;margin-bottom:12px;}
@@ -53,12 +63,42 @@ footer{background:#111827;padding:32px 24px;text-align:center;margin-top:64px;}
   <h1>お問い合わせ</h1>
   <p class="lead">バグの報告・機能のご要望・その他ご質問はこちらからどうぞ。<br>通常2〜3日以内にご返信します。</p>
 
-  <div class="form-wrap">
-    <iframe
-      src="https://docs.google.com/forms/d/e/1FAIpQLSffAgcOkl6am1JgoiHQGiYDnpC0rISkfA2aOncEmsRNEHirQw/viewform?embedded=true"
-      title="お問い合わせフォーム">
-      読み込んでいます…
-    </iframe>
+  <div class="contact-card">
+    <h2>📬 お問い合わせフォーム</h2>
+    <p>以下のフォームに必要事項を入力して送信してください。</p>
+
+    <form id="contactForm" onsubmit="handleSubmit(event)">
+      <div class="form-group">
+        <label>お名前（ニックネーム可）<span style="color:#EF4444">*</span></label>
+        <input type="text" id="f_name" placeholder="冒険者名など" required>
+      </div>
+      <div class="form-group">
+        <label>メールアドレス（返信が必要な場合）</label>
+        <input type="email" id="f_email" placeholder="任意">
+      </div>
+      <div class="form-group">
+        <label>お問い合わせ種別<span style="color:#EF4444">*</span></label>
+        <select id="f_type" required>
+          <option value="">選択してください</option>
+          <option value="バグ報告">バグ・不具合の報告</option>
+          <option value="機能要望">機能のご要望</option>
+          <option value="アカウントについて">アカウント・データについて</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>お問い合わせ内容<span style="color:#EF4444">*</span></label>
+        <textarea id="f_message" placeholder="詳しく教えていただけると助かります。" required></textarea>
+      </div>
+      <button type="submit" class="btn-submit" id="submitBtn">送信する</button>
+      <p class="note">※個人情報は返信のみに使用し、第三者に提供しません。</p>
+    </form>
+
+    <div id="successMsg" style="display:none;text-align:center;padding:32px 0;">
+      <div style="font-size:48px;margin-bottom:16px;">✅</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px;">送信しました！</div>
+      <div style="font-size:14px;color:#718096;">お問い合わせありがとうございます。確認次第ご連絡します。</div>
+    </div>
   </div>
 </div>
 
@@ -73,6 +113,34 @@ footer{background:#111827;padding:32px 24px;text-align:center;margin-top:64px;}
   </div>
   <div class="footer-copy">© 2026 スタディクエスト. All rights reserved.</div>
 </footer>
+
+<script>
+const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSffAgcOkl6am1JgoiHQGiYDnpC0rISkfA2aOncEmsRNEHirQw/formResponse';
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '送信中...';
+  btn.disabled = true;
+
+  const body = new FormData();
+  body.append('entry.206498477',  document.getElementById('f_name').value);
+  body.append('entry.1572080067', document.getElementById('f_email').value);
+  body.append('entry.1970467623', document.getElementById('f_type').value);
+  body.append('entry.1205251950', document.getElementById('f_message').value);
+
+  try {
+    // Google Formsはno-corsで送信（レスポンスは取得不可だが送信は成功する）
+    await fetch(FORM_ACTION, { method: 'POST', body, mode: 'no-cors' });
+    document.getElementById('contactForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  } catch {
+    alert('送信に失敗しました。お手数ですがXのDM（@ichiro_cpa_st）でお知らせください。');
+    btn.textContent = '送信する';
+    btn.disabled = false;
+  }
+}
+</script>
 
 </body>
 </html>
