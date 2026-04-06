@@ -8786,8 +8786,27 @@ function renderPostHTML(post, likes){
       ⚔ ${escHtml(post.rpg_log || '')}
     </div>
 
-    <!-- 学習カード -->
-    <div class="tl-post-card">
+    <!-- 達成報告カード or 学習カード -->
+    ${post.is_achievement ? (() => {
+      const ach = post.achievement_data ? (()=>{try{return JSON.parse(post.achievement_data);}catch{return {};}})() : {};
+      const typeLabel = {pass:'🎓 資格合格',exam:'📝 模試・答練',hours:'⏱ 時間達成',other:'✨ その他'}[ach.type||'other'];
+      const scoreStr = (ach.score != null && ach.maxScore != null)
+        ? `<div class="tl-achieve-score">${ach.score} <span style="font-size:14px;color:var(--muted);">/ ${ach.maxScore} 点</span></div>`
+        : ach.score != null ? `<div class="tl-achieve-score">${ach.score} 点</div>` : '';
+      const breakdownHtml = (ach.breakdown||[]).map(b =>
+        `<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:2px 0;border-bottom:1px solid var(--border);">
+          <span>${escHtml(b.subjectName||'')}</span>
+          <span style="font-family:'Share Tech Mono',monospace;">${b.score}${b.maxScore?' / '+b.maxScore:''}</span>
+        </div>`
+      ).join('');
+      return `<div class="tl-achieve-card">
+        <div class="tl-achieve-badge">${typeLabel}</div>
+        <div class="tl-achieve-title">${escHtml(ach.title||post.subject_name||'')}</div>
+        ${scoreStr}
+        ${breakdownHtml ? `<div style="margin-top:8px;">${breakdownHtml}</div>` : ''}
+        ${ach.comment ? `<div style="margin-top:8px;font-size:12px;color:var(--muted);">${escHtml(ach.comment)}</div>` : ''}
+      </div>`;
+    })() : `<div class="tl-post-card">
       <div class="tl-post-card-icon">📚</div>
       <div class="tl-post-card-info">
         <div class="tl-post-card-title">${escHtml(post.subject_name || '学習')}</div>
@@ -8797,7 +8816,7 @@ function renderPostHTML(post, likes){
         <div class="tl-post-card-hours">${timeStudy}</div>
         <div style="font-size:10px;color:${expColor};font-family:'Share Tech Mono',monospace;">+${post.exp||0} EXP</div>
       </div>
-    </div>
+    </div>`}
 
     <!-- フッター -->
     <div class="tl-post-footer">
