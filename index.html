@@ -416,11 +416,6 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .lu-close{background:var(--accent);border:none;color:#fff;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.25em;padding:9px 28px;cursor:pointer;transition:all .2s;border-radius:20px;}
 .lu-close:hover{background:rgba(201,168,76,.1);}
 
-/* DATA BAR */
-.data-bar{position:fixed;bottom:0;left:0;right:0;z-index:900;background:rgba(255,255,255,.97);border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 16px;flex-wrap:wrap;}
-.data-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.15em;padding:7px 14px;cursor:pointer;transition:all .2s;border-radius:20px;}
-.data-btn:hover{border-color:var(--accent);color:var(--accent2);background:rgba(140,198,63,.06);}
-.data-btn.primary{border-color:var(--accent);color:var(--accent2);background:rgba(140,198,63,.08);}
 .data-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--border);}
 /* ══════════════ DQ STAT ALLOCATION ══════════════ */
@@ -1226,7 +1221,6 @@ body[data-theme="dark"] .help-modal,
 body[data-theme="dark"] .lu-box { background: #1A1D2E; }
 body[data-theme="dark"] .help-modal-header { background:#1A1D2E; }
 body[data-theme="dark"] .admin-header,
-body[data-theme="dark"] .data-bar,
 body[data-theme="dark"] .gnav { background:rgba(26,29,46,.97); }
 body[data-theme="dark"] .input-field,
 body[data-theme="dark"] .form-input,
@@ -2061,11 +2055,10 @@ body[data-theme="light"] .medal-item{background:var(--panel2);border-color:var(-
   .gnav { display: none !important; }
   .gnav-drawer { display: none !important; }
   .gnav-drawer-overlay { display: none !important; }
-  /* data-bar も位置調整 */
-  .data-bar { left: 220px; }
+
 }
 @media (min-width: 1280px) {
-  .data-bar { left: 240px; }
+
 }
 
 /* ════════ PC ワイドレイアウト修正 ════════ */
@@ -2081,7 +2074,6 @@ body[data-theme="light"] .medal-item{background:var(--panel2);border-color:var(-
   /* タブ非表示・サイドバー対応 */
   .tabs { display: none !important; }
   .gnav-menu-btn { display: none !important; }
-  .data-bar { left: 220px; }
 
   /* STATUSパネルを2カラムに */
   #panel-status { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
@@ -2090,7 +2082,7 @@ body[data-theme="light"] .medal-item{background:var(--panel2);border-color:var(-
 }
 @media (min-width: 1280px) {
   .wrap { padding: 24px 36px 100px !important; }
-  .data-bar { left: 240px; }
+
   #panel-status { grid-template-columns: 1fr 1fr 1fr; }
 }
 
@@ -2340,7 +2332,7 @@ body[data-theme="dark"] .achieve-x-btn{background:#333;}
   .wrap { max-width: 100% !important; padding: 24px 14px 100px !important; margin: 0 auto !important; }
   .tabs { display: flex !important; }
   .gnav-menu-btn { display: flex !important; }
-  .data-bar { left: 0 !important; }
+
   /* タブのコンテンツを正規化 */
   [id^="panel-"] { display: none; width: 100% !important; }
   [id^="panel-"].active-panel { display: block !important; }
@@ -3792,14 +3784,6 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
 </div><!-- /wrap -->
 </div><!-- /pc-main-area -->
 
-<!-- DATA BAR -->
-<div class="data-bar" id="dataBar" style="display:none;">
-  <span class="data-label">● localStorage + Cloud</span>
-  <button class="data-btn primary" onclick="exportData()">💾 JSONで保存</button>
-  <button class="data-btn" onclick="importData()">📂 読み込む</button>
-  <button class="data-btn" onclick="resetConfirm()" style="border-color:#5a1515;color:#ff6e6e;">🗑 リセット</button>
-  <button class="data-btn" onclick="window.open('game.html','_blank')" style="border-color:#8888ff;color:#aaaaff;">⚔ RPGで遊ぶ</button>
-</div>
 
 <!-- EXAM MODAL -->
 <div class="modal-overlay" id="examModal">
@@ -5648,8 +5632,6 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const target = document.getElementById(id);
   if(target) target.classList.add('active');
-  const bar=document.getElementById('dataBar');
-  if(bar)bar.style.display=id==='screen-dash'?'flex':'none';
   // gnav はダッシュボード画面のみ表示
   const gnav=document.getElementById('gnav');
   if(gnav) gnav.style.display=id==='screen-dash'?'':'none';
@@ -5696,7 +5678,6 @@ function resetConfirm(){
   scoreRecords=[];isGuest=false;
   char={name:'',totalEXP:0,streak:0,lastLoginDate:null,level:1};
   sessions=[];selectedJobIds=[];selectedSubjectKeys=[];bosses=[];examGoals=[];
-  document.getElementById('dataBar').style.display='none';
   buildJobGrid();showScreen('screen-job');
 }
 
