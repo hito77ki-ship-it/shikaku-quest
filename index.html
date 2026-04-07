@@ -2337,19 +2337,37 @@ body[data-theme="dark"] .achieve-x-btn{background:#333;}
   width: 100%;
   box-sizing: border-box;
 }
-/* タブバーをモバイルで確実に表示 */
+/* ════ PC以外（〜1023px）共通: サイドバー非表示・タブ表示 ════ */
 @media (max-width: 1023px) {
   body { display: block !important; }
   .pc-sidebar { display: none !important; }
   .pc-main-area { display: block !important; width: 100% !important; }
-  .wrap { max-width: 100% !important; padding: 24px 14px 80px !important; margin: 0 auto !important; }
-  .tabs { display: flex !important; }
+  .wrap { max-width: 720px !important; padding: 16px 14px 90px !important; margin: 0 auto !important; }
   .gnav-menu-btn { display: flex !important; }
-
-  /* タブのコンテンツを正規化 */
   [id^="panel-"] { display: none; width: 100% !important; }
   [id^="panel-"].active-panel { display: block !important; }
-  #panel-status { display: block; } /* デフォルト表示（!importantはswitchTabのinline styleに負けるため削除） */
+  #panel-status { display: block; }
+
+  /* タブレット・スマホ共通: 底部タブバーを使用、横スクロールタブを非表示 */
+  #mobileTabBar { display: grid !important; }
+  .tabs { display: none !important; }
+  .user-bar { display: none !important; }
+  .mobile-nav-section { display: block !important; }
+}
+
+/* ════ タブレット専用（601〜1023px）════ */
+@media (min-width: 601px) and (max-width: 1023px) {
+  .wrap { max-width: 680px !important; padding: 20px 24px 100px !important; }
+  .gnav { height: 54px; padding: 0 20px; }
+  .gnav-logo { font-size: 14px; }
+  /* タブバーをやや大きく */
+  #mobileTabBar { padding: 8px 16px calc(8px + env(safe-area-inset-bottom,0px)); }
+  .m-tab-btn { padding: 8px 8px; }
+  .m-tab-icon { font-size: 24px; }
+  .m-tab-label { font-size: 10px; }
+  /* セクションに余裕を持たせる */
+  .section { padding: 20px; border-radius: 16px; }
+  .char-card { padding: 18px 20px; }
 }
 
 /* ════════════════════════════════════════
@@ -2504,6 +2522,50 @@ body[data-theme="dark"] #mobileTabBar {
   .section { padding: 12px 10px; }
   .m-tab-icon { font-size: 20px; }
   .m-tab-label { font-size: 7.5px; }
+  .wrap { padding: 10px 10px 86px !important; }
+}
+
+/* ════ Galaxy Z Fold 折りたたみ時（〜300px）════ */
+@media (max-width: 300px) {
+  .wrap { padding: 8px 8px 80px !important; }
+  .section { padding: 10px 8px; border-radius: 12px; margin-bottom: 8px; }
+  .char-avatar { width: 44px; height: 44px; font-size: 20px; }
+  .char-name-disp { font-size: 13px; }
+  .gnav { height: 46px; padding: 0 8px; }
+  .gnav-logo { font-size: 10px; letter-spacing: .06em; }
+  .m-tab-icon { font-size: 17px; }
+  .m-tab-label { font-size: 7px; }
+  .m-tab-btn { padding: 5px 2px; }
+  /* フォーム */
+  .form-row-2 { grid-template-columns: 1fr; }
+  .prof-quick-actions { gap: 6px; }
+}
+
+/* ════ スマホ横向き（landscape）════ */
+@media (max-width: 1023px) and (orientation: landscape) and (max-height: 500px) {
+  /* gnavを薄く */
+  .gnav { height: 40px; }
+  .gnav-logo { font-size: 11px; }
+  /* 底部タブバーを薄く */
+  #mobileTabBar {
+    padding: 4px 0 calc(4px + env(safe-area-inset-bottom, 0px));
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .m-tab-btn { padding: 3px 4px; flex-direction: row; gap: 5px; justify-content: center; }
+  .m-tab-icon { font-size: 16px; }
+  .m-tab-label { font-size: 9px; }
+  /* アクティブインジケーターを左端に変更 */
+  .m-tab-btn.active::before {
+    top: 50%; left: 0; right: auto;
+    width: 2.5px; height: 60%;
+    border-radius: 0 4px 4px 0;
+    transform: translateY(-50%);
+  }
+  /* wrap: 横向きで左右を広く使う */
+  .wrap { padding: 8px 16px calc(52px + env(safe-area-inset-bottom, 0px)) !important; }
+  /* セクション間隔を詰める */
+  .section { margin-bottom: 8px; padding: 12px 14px; }
+  .char-card { margin-bottom: 8px; }
 }
 
 /* ════════════════════════════════════════
