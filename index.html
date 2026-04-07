@@ -1710,19 +1710,31 @@ body[data-theme="light"] .medal-item{background:var(--panel2);border-color:var(-
 .dm-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.6);
   z-index:1200;display:none;
-  align-items:flex-end;justify-content:center;
-  padding-bottom:0;
+  align-items:center;justify-content:center;
+  padding:20px;
 }
 .dm-overlay.show{display:flex;}
 
 .dm-window{
   background:var(--panel);
-  border-radius:16px 16px 0 0;
+  border-radius:16px;
   width:100%;max-width:520px;
-  height:85vh;
+  height:min(85vh, 700px);
   display:flex;flex-direction:column;
   overflow:hidden;
-  box-shadow:0 -8px 40px rgba(0,0,0,.25);
+  box-shadow:0 8px 40px rgba(0,0,0,.3);
+}
+
+/* モバイルではボトムシートに戻す */
+@media (max-width:600px){
+  .dm-overlay{ align-items:flex-end; padding:0; }
+  .dm-window{
+    border-radius:20px 20px 0 0;
+    height:88vh;
+    max-height:88vh;
+    width:100%;
+    max-width:100%;
+  }
 }
 
 /* DM ヘッダー */
