@@ -2329,7 +2329,7 @@ body[data-theme="dark"] .achieve-x-btn{background:#333;}
   body { display: block !important; }
   .pc-sidebar { display: none !important; }
   .pc-main-area { display: block !important; width: 100% !important; }
-  .wrap { max-width: 100% !important; padding: 24px 14px 100px !important; margin: 0 auto !important; }
+  .wrap { max-width: 100% !important; padding: 24px 14px 80px !important; margin: 0 auto !important; }
   .tabs { display: flex !important; }
   .gnav-menu-btn { display: flex !important; }
 
@@ -2337,6 +2337,87 @@ body[data-theme="dark"] .achieve-x-btn{background:#333;}
   [id^="panel-"] { display: none; width: 100% !important; }
   [id^="panel-"].active-panel { display: block !important; }
   #panel-status { display: block; } /* デフォルト表示（!importantはswitchTabのinline styleに負けるため削除） */
+}
+
+/* ════════════════════════════════════════
+   モバイル専用スタイル（〜600px）
+════════════════════════════════════════ */
+@media (max-width: 600px) {
+  /* iOSセーフエリア対応 */
+  body { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .wrap { padding: 12px 12px 72px !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
+
+  /* gnav: 小さい画面では要望・ヘルプボタンを隠す */
+  .gnav { height: 52px; padding: 0 12px; }
+  .gnav-pc-only { display: none !important; }
+  .gnav-logo { font-size: 12px; }
+
+  /* タブバー */
+  .tabs { padding: 3px; gap: 1px; border-radius: 10px; }
+  .tab-btn { min-width: 48px; padding: 9px 3px 7px; font-size: 8px; gap: 2px; }
+  .tab-icon { font-size: 17px; }
+
+  /* フォーム入力: iOSズームを防ぐため16px以上必須 */
+  input, select, textarea,
+  .form-input, .form-select, .prof-info-input, .prof-info-select,
+  #planSubjectInput, #planTargetSelect,
+  .name-input, .tl-compose-input { font-size: 16px !important; }
+
+  /* プロフィールクイックアクション: 縦並び */
+  .prof-quick-actions { flex-direction: column; }
+  .prof-quick-btn { min-width: unset; }
+
+  /* 週間スケジュールモーダル: ボトムシート風 */
+  #addPlanModal > div { margin: 0 !important; max-width: 100% !important; width: 100% !important;
+    border-radius: var(--radius) var(--radius) 0 0 !important;
+    position: fixed !important; bottom: 0; left: 0; right: 0; top: auto !important;
+    max-height: 90vh; overflow-y: auto; padding: 20px 16px 32px !important; }
+  #addPlanModal { align-items: flex-end !important; }
+
+  /* QRモーダル */
+  #qrModal > div { width: 90% !important; max-width: 340px; }
+
+  /* セクションカード: パディング縮小 */
+  .section { padding: 14px 14px; }
+  .player-card-body { padding: 0 14px 16px; }
+
+  /* キャラカード */
+  .char-card { padding: 14px 14px; }
+  .char-avatar { width: 60px; height: 60px; font-size: 28px; }
+  .char-name-disp { font-size: 17px; }
+
+  /* タイマー: 画面幅に合わせる */
+  .timer-time { font-size: 48px !important; }
+  .timer-enemy { font-size: 44px !important; }
+
+  /* ボタンのタップ領域を44px以上に */
+  .step-btn, .btn-submit, .prof-quick-btn, .qr-dl-btn { min-height: 44px; }
+
+  /* today plan */
+  .today-plan-card { padding: 12px 14px; }
+
+  /* タイムブロックグリッド */
+  #rpt-sub-timeblock .rpt-section { padding: 12px; }
+
+  /* ランキングカード */
+  .rank-item { padding: 10px 12px; }
+
+  /* ヒートマップ: 横スクロール強調 */
+  .heatmap-scroll { -webkit-overflow-scrolling: touch; }
+
+  /* フォームグループ間隔 */
+  .form-group { margin-bottom: 14px; }
+}
+
+/* ════ 極小画面（〜375px iPhone SE等）════ */
+@media (max-width: 375px) {
+  .logo-jp { font-size: 24px; }
+  .tab-btn { min-width: 42px; font-size: 7px; }
+  .tab-icon { font-size: 15px; }
+  .char-avatar { width: 52px; height: 52px; font-size: 24px; }
+  .char-name-disp { font-size: 15px; }
+  .section { padding: 12px 10px; }
 }
 
 /* ════════════════════════════════════════
@@ -2806,13 +2887,13 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     <span id="gnavUserName" style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);display:none;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
     <!-- ダークモードトグル -->
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="ダーク/ライト切替" aria-label="テーマ切替"></button>
-    <!-- 改善要望 -->
-    <button class="user-bar-btn" onclick="openFeedback()"
+    <!-- 改善要望（PCのみ表示） -->
+    <button class="user-bar-btn gnav-pc-only" onclick="openFeedback()"
       style="font-size:10px;padding:6px 12px;">
       💬 要望
     </button>
-    <!-- ヘルプボタン（常時表示） -->
-    <button class="user-bar-btn" onclick="openHelp('guide')"
+    <!-- ヘルプボタン（PCのみ表示） -->
+    <button class="user-bar-btn gnav-pc-only" onclick="openHelp('guide')"
       style="font-size:10px;padding:6px 12px;border-color:rgba(140,198,63,.35);color:var(--accent2);">
       ❓ ヘルプ
     </button>
