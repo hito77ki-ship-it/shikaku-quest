@@ -5793,6 +5793,8 @@ function initDashboard(){
   renderAll();
   // 通知ポーリング開始
   if(currentUser && !isGuest) startNotifPolling();
+  // チュートリアル（ログイン後・ダッシュボード表示後に起動）
+  setTimeout(showTutorial, 800);
 }
 function renderAll(){
   const smins=studyMins(sessions);
@@ -12633,9 +12635,7 @@ function restartTutorial() {
   renderTutStep();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(showTutorial, 800);
-});
+// チュートリアルはinitDashboard()内で起動（ログイン後）
 </script>
 </body>
 </html>
