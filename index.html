@@ -7068,16 +7068,17 @@ function getWeekStart(){
 }
 function getMonthStr(){ return new Date().toISOString().slice(0,7); }
 
+function isStudyType(s){ return s.type==='study'||s.type==='exam'; }
 function getTodayMins(){
   const t=getTodayStr();
-  return sessions.filter(s=>s.type==='study'&&s.date===t).reduce((a,s)=>a+s.amount,0);
+  return sessions.filter(s=>isStudyType(s)&&s.date===t).reduce((a,s)=>a+s.amount,0);
 }
 function getThisMonthMins(){
   const m=getMonthStr();
-  return sessions.filter(s=>s.type==='study'&&s.date&&s.date.startsWith(m)).reduce((a,s)=>a+s.amount,0);
+  return sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(m)).reduce((a,s)=>a+s.amount,0);
 }
 function getWeekMinsForDate(dateStr){
-  return sessions.filter(s=>s.type==='study'&&s.date===dateStr).reduce((a,s)=>a+s.amount,0);
+  return sessions.filter(s=>isStudyType(s)&&s.date===dateStr).reduce((a,s)=>a+s.amount,0);
 }
 function getLast7DaysData(){
   const days=[];
@@ -7096,7 +7097,7 @@ function getLast6MonthsData(){
     const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
     const ms=d.toISOString().slice(0,7);
     const label=(d.getMonth()+1)+'月';
-    const mins=sessions.filter(s=>s.type==='study'&&s.date&&s.date.startsWith(ms)).reduce((a,s)=>a+s.amount,0);
+    const mins=sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(ms)).reduce((a,s)=>a+s.amount,0);
     months.push({label,mins});
   }
   return months;
