@@ -2310,10 +2310,10 @@ body[data-theme="dark"] .achieve-x-btn{background:#333;}
   margin-bottom:10px;flex-wrap:wrap;
 }
 .timer-material-thumb{
-  width:36px;height:48px;border-radius:4px;
+  width:54px;height:72px;border-radius:6px;
   background:var(--panel2);border:1px solid var(--border);
   overflow:hidden;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:16px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
 }
 .timer-material-thumb img{width:100%;height:100%;object-fit:cover;}
 .material-category-header{
@@ -11259,7 +11259,12 @@ function updateTimerMaterial(){
   if(m && m.cover){
     thumb.innerHTML = `<img src="${m.cover}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
   } else {
-    thumb.innerHTML = m ? '📖' : '📖';
+    thumb.innerHTML = '📖';
+  }
+  // 教材に紐づく科目を自動セット
+  if(m && m.subjectKey){
+    const subjSel = document.getElementById('timerSubject');
+    if(subjSel) subjSel.value = m.subjectKey;
   }
 }
 
@@ -11267,8 +11272,7 @@ function updateTimerMaterial(){
 function selectMaterialForTimer(materialId){
   switchTab('quest');
   const sel = document.getElementById('timerMaterial');
-  if(sel){ sel.value = materialId; updateTimerMaterial(); }
-  // タイマーパネルにスクロール
+  if(sel){ sel.value = materialId; updateTimerMaterial(); } // updateTimerMaterial内で科目も自動セット
   document.querySelector('.timer-panel')?.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
