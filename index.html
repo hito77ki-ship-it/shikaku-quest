@@ -11572,6 +11572,48 @@ const NEWS_READ_KEY = 'sq2_news_read';
 // ── アップデートログ（新しい順） ──
 const NEWS_ITEMS = [
   {
+    id: 'v20260408_tutorial_restart',
+    date: '2026-04-08',
+    type: 'feature',
+    title: '🎓 チュートリアルをいつでも見直せるように',
+    desc: 'ヘルプ「はじめかた」タブの下部と、PCサイドバーの「チュートリアル」から、いつでもチュートリアルを再実行できるようになりました。使い方を確認したいときにどうぞ。'
+  },
+  {
+    id: 'v20260408_tutorial_pc',
+    date: '2026-04-08',
+    type: 'fix',
+    title: '🖥 チュートリアルがPC表示で正しく動作するように修正',
+    desc: 'PC表示でチュートリアルのスポットライトが表示されない問題を修正しました。PCではサイドバーのメニュー項目をハイライト表示するようになりました。また背景の暗さも調整し、画面が見やすくなりました。'
+  },
+  {
+    id: 'v20260408_material_edit',
+    date: '2026-04-08',
+    type: 'fix',
+    title: '📚 教材編集時に科目が引き継がれない問題を修正',
+    desc: '教材を編集する際、登録済みの科目選択がリセットされてしまう不具合を修正しました。編集モーダルを開くと以前設定した科目が選択された状態で表示されます。またボタンのラベルも「追加する」→「更新する」に変わりました。'
+  },
+  {
+    id: 'v20260407_mobile_ui',
+    date: '2026-04-07',
+    type: 'improve',
+    title: '📱 モバイル・タブレット表示を全面改善',
+    desc: 'iOSスタイルのボトムタブバーを導入し、スマホでの操作性を向上しました。Android・Galaxy Z Fold・タブレット横向きへの対応も強化。DMウィンドウはスマホではボトムシート表示になりました。'
+  },
+  {
+    id: 'v20260407_studyplus_ui',
+    date: '2026-04-07',
+    type: 'improve',
+    title: '📖 教材モーダルのUIを改善',
+    desc: '教材登録・編集モーダルの科目名・教材名をフル幅表示に変更しました。長い名前でも見切れずに表示されます。'
+  },
+  {
+    id: 'v20260407_pwa_google_play',
+    date: '2026-04-07',
+    type: 'feature',
+    title: '🤖 Google Play対応（TWA）を準備中',
+    desc: 'Android向けにTWA（Trusted Web Activity）でGoogle Playへの配信準備を進めています。Digital Asset Linksの設定・Service Worker強化・manifest更新が完了しました。公開時にあらためてお知らせします。'
+  },
+  {
     id: 'v20260406_grade_weight',
     date: '2026-04-06',
     type: 'feature',
