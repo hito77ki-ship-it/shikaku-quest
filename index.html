@@ -7105,7 +7105,7 @@ function getLast6MonthsData(){
 function getSubjectDistribution(){
   const subjs=allSelectedSubjects();
   return subjs.map(s=>({
-    name:s.name, key:s.key,
+    name:s.name, key:s.key, color:s.color,
     mins:subjStudyMins(sessions,s.key)
   })).filter(s=>s.mins>0).sort((a,b)=>b.mins-a.mins);
 }
@@ -7137,48 +7137,49 @@ function renderReportStats(){
   document.getElementById('rpt-total').textContent = Math.floor(totalM/60)+'時間';
 }
 
-/* 週間棒グラフ */
+/* 週間棒グラフ（科目別スタック） */
 function renderWeekBar(){
   const canvas=document.getElementById('rptWeekChart');
   if(!canvas) return;
-  const data=getLast7DaysData();
-  const maxM=Math.max(...data.map(d=>d.mins),60);
+  const days=getLast7DaysData();
+  const subjs=allSelectedSubjects();
+
+  // 科目ごとに各日の分数を集計
+  const datasets=subjs.map(s=>{
+    return {
+      label: s.name,
+      data: days.map(d=>+(sessions.filter(x=>isStudyType(x)&&x.date===d.date&&x.subject===s.key).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)),
+      backgroundColor: s.color,
+      borderWidth:0,
+      borderRadius:2,
+      borderSkipped:false,
+    };
+  }).filter(ds=>ds.data.some(v=>v>0));
 
   if(rptChartInstances.week){rptChartInstances.week.destroy();}
   rptChartInstances.week=new Chart(canvas,{
     type:'bar',
     data:{
-      labels:data.map(d=>d.label.replace('\n','\n')),
-      datasets:[{
-        data:data.map(d=>+(d.mins/60).toFixed(2)),
-        backgroundColor:data.map(d=>{
-          const t=getTodayStr();
-          return d.date===t?'#7cff6e':'rgba(124,255,110,.35)';
-        }),
-        hoverBackgroundColor:data.map(d=>{
-          const t=getTodayStr();
-          return d.date===t?'#aaffaa':'rgba(124,255,110,.55)';
-        }),
-        borderRadius:4,
-        borderSkipped:false,
-      }]
+      labels:days.map(d=>d.label),
+      datasets
     },
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{
+        mode:'index', intersect:false,
         backgroundColor:'rgba(15,8,32,.95)',
         titleColor:'#c9a84c',bodyColor:'#aaa',
         borderColor:'rgba(201,168,76,.3)',borderWidth:1,
         callbacks:{label:ctx=>{
           const h=Math.floor(ctx.raw);
           const m=Math.round((ctx.raw-h)*60);
-          return h+'h'+(m?m+'m':'');
+          return ctx.dataset.label+': '+(h?h+'h':'')+(m?m+'m':'0m');
         }}
       }},
       scales:{
-        x:{grid:{display:false},ticks:{font:{size:9},color:'#999',maxRotation:0}},
-        y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},color:'#bbb',
-          callback:v=>v===0?'0分':v+'h'
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:9},color:'#999',maxRotation:0}},
+        y:{stacked:true,grid:{color:'rgba(255,255,255,.05)'},ticks:{font:{size:9},color:'#bbb',
+          callback:v=>v===0?'0':v+'h'
         },beginAtZero:true}
       }
     }
@@ -7197,7 +7198,7 @@ function renderDonutChart(){
     return;
   }
   const total=dist.reduce((a,d)=>a+d.mins,0);
-  const COLORS=['#8bc34a','#42a5f5','#ef5350','#ff9800','#ab47bc','#26a69a','#ec407a','#7e57c2'];
+  const colors=dist.map(d=>d.color||'#8bc34a');
 
   if(rptChartInstances.donut){rptChartInstances.donut.destroy();}
   rptChartInstances.donut=new Chart(canvas,{
@@ -7206,7 +7207,7 @@ function renderDonutChart(){
       labels:dist.map(d=>d.name),
       datasets:[{
         data:dist.map(d=>d.mins),
-        backgroundColor:COLORS.slice(0,dist.length),
+        backgroundColor:colors,
         borderWidth:2, borderColor:'rgba(15,8,32,1)',
         hoverOffset:6
       }]
@@ -7227,7 +7228,7 @@ function renderDonutChart(){
   legend.innerHTML=dist.map((d,i)=>{
     const pct=((d.mins/total)*100).toFixed(0);
     return `<div class="rpt-legend-item">
-      <div class="rpt-legend-dot" style="background:${COLORS[i]}"></div>
+      <div class="rpt-legend-dot" style="background:${colors[i]}"></div>
       <span>${d.name}</span>
       <span class="rpt-legend-pct">${pct}%</span>
     </div>`;
@@ -7502,12 +7503,11 @@ function renderSubjectBars(){
   const dist=getSubjectDistribution();
   if(!dist.length){el.innerHTML='<div style="font-size:12px;color:#aaa;text-align:center;padding:20px">記録がありません</div>';return;}
   const max=dist[0].mins||1;
-  const COLORS=['#8bc34a','#42a5f5','#ef5350','#ff9800','#ab47bc','#26a69a','#ec407a','#7e57c2'];
-  el.innerHTML=dist.map((d,i)=>`
+  el.innerHTML=dist.map(d=>`
     <div class="rpt-subj-bar-row">
       <div class="rpt-subj-bar-label">${d.name}</div>
       <div class="rpt-subj-bar-track">
-        <div class="rpt-subj-bar-fill" style="width:${(d.mins/max*100).toFixed(1)}%;background:${COLORS[i%8]}"></div>
+        <div class="rpt-subj-bar-fill" style="width:${(d.mins/max*100).toFixed(1)}%;background:${d.color||'#7cff6e'}"></div>
       </div>
       <div class="rpt-subj-bar-val">${Math.floor(d.mins/60)}h${d.mins%60}m</div>
     </div>`).join('');
@@ -7515,23 +7515,30 @@ function renderSubjectBars(){
 function renderMonthChart(){
   const canvas=document.getElementById('rptMonthChart');
   if(!canvas) return;
-  const data=getLast6MonthsData();
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
+    months.push({label:(d.getMonth()+1)+'月', ym:d.toISOString().slice(0,7)});
+  }
+  const subjs=allSelectedSubjects();
+  const datasets=subjs.map(s=>({
+    label:s.name,
+    data:months.map(m=>+(sessions.filter(x=>isStudyType(x)&&x.date&&x.date.startsWith(m.ym)&&x.subject===s.key).reduce((a,x)=>a+x.amount,0)/60).toFixed(1)),
+    backgroundColor:s.color,borderWidth:0,borderRadius:2,borderSkipped:false
+  })).filter(ds=>ds.data.some(v=>v>0));
   if(rptChartInstances.month){rptChartInstances.month.destroy();}
   rptChartInstances.month=new Chart(canvas,{
     type:'bar',
-    data:{
-      labels:data.map(d=>d.label),
-      datasets:[{
-        data:data.map(d=>+(d.mins/60).toFixed(1)),
-        backgroundColor:'rgba(124,77,255,.5)',hoverBackgroundColor:'rgba(200,64,251,.6)',borderRadius:4,borderSkipped:false
-      }]
-    },
+    data:{labels:months.map(m=>m.label),datasets},
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,
+        backgroundColor:'rgba(15,8,32,.95)',titleColor:'#c9a84c',bodyColor:'#aaa',
+        borderColor:'rgba(201,168,76,.3)',borderWidth:1,
+        callbacks:{label:ctx=>{const h=Math.floor(ctx.raw);const m=Math.round((ctx.raw-h)*60);return ctx.dataset.label+': '+(h?h+'h':'')+(m?m+'m':'0m');}}}},
       scales:{
-        x:{grid:{display:false},ticks:{font:{size:10},color:'#999'}},
-        y:{grid:{color:'#f0f0f0'},ticks:{font:{size:9},color:'#bbb',callback:v=>v+'h'},beginAtZero:true}
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:10},color:'#999'}},
+        y:{stacked:true,grid:{color:'rgba(255,255,255,.05)'},ticks:{font:{size:9},color:'#bbb',callback:v=>v+'h'},beginAtZero:true}
       }
     }
   });
@@ -7566,16 +7573,11 @@ function switchReportSubTab(sub){
 ════════════════════════════════════════ */
 let tbCurrentDate = null;
 
-// 科目ごとの色を固定割り当て
-const TB_COLORS = ['#4CAF50','#2196F3','#FF9800','#E91E63','#9C27B0','#00BCD4','#FF5722','#3F51B5','#8BC34A','#FFC107'];
-const tbColorMap = {};
-let tbColorIdx = 0;
 function tbColor(subject){
-  if(!tbColorMap[subject]){
-    tbColorMap[subject] = TB_COLORS[tbColorIdx % TB_COLORS.length];
-    tbColorIdx++;
-  }
-  return tbColorMap[subject];
+  return allSelectedSubjects().find(s=>s.key===subject)?.color || '#7cff6e';
+}
+function tbName(subject){
+  return allSelectedSubjects().find(s=>s.key===subject)?.name || subject;
 }
 
 function tbPrevDay(){
@@ -7642,7 +7644,7 @@ function renderTimeBlock(dateStr){
     subList.innerHTML = Object.entries(subMap).sort((a,b)=>b[1]-a[1]).map(([sub,min])=>`
       <div style="display:flex;align-items:center;gap:8px;font-size:13px;">
         <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${tbColor(sub)};flex-shrink:0;"></span>
-        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${sub}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${tbName(sub)}</span>
         <span style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);">${Math.floor(min/60)?Math.floor(min/60)+'h ':''} ${Math.round(min%60)}m</span>
       </div>`).join('');
   }
