@@ -3718,6 +3718,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
                 <div class="wg-lock-title">今週の目標：<span id="wgLockedHours"></span>時間</div>
                 <div class="wg-lock-sub" id="wgLockedSub"></div>
                 <div class="wg-lock-note">日曜日が終わったら来週の目標を設定できます</div>
+                <button onclick="shareWeeklyGoalToX()" style="margin-top:10px;background:none;border:1px solid #1d9bf0;border-radius:20px;padding:5px 14px;font-size:11px;color:#1d9bf0;cursor:pointer;">𝕏 Xにシェア</button>
               </div>
             </div>
           </div>
@@ -4063,7 +4064,14 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     <div id="tlComposeToggle" style="display:none;">
       <div class="tl-compose">
         <textarea class="tl-compose-input" id="tlInput" rows="2" placeholder="一言メモを投稿…（任意）"></textarea>
+        <!-- 画像プレビュー -->
+        <div id="tlImagePreview" style="display:none;margin-top:8px;position:relative;">
+          <img id="tlImagePreviewImg" src="" alt="" style="max-width:100%;max-height:200px;border-radius:8px;border:1px solid var(--border);display:block;">
+          <button onclick="clearTlImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:1;">✕</button>
+        </div>
+        <input type="file" id="tlImageFile" accept="image/*" style="display:none;" onchange="handleTlImageSelect(event)">
         <div class="tl-compose-footer">
+          <button onclick="document.getElementById('tlImageFile').click()" style="background:none;border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--muted);cursor:pointer;">📷 写真</button>
           <button class="tl-post-btn" onclick="manualPost()">投稿</button>
         </div>
       </div>
@@ -7325,7 +7333,7 @@ function renderWeekDailyBars(daily, goalMins){
 }
 
 /* 設定ボタン押下 */
-function setWeeklyGoal(){
+async function setWeeklyGoal(){
   const inp = document.getElementById('rptGoalInput');
   const v = parseInt(inp?.value)||0;
   if(v < 1){
@@ -7356,6 +7364,64 @@ function setWeeklyGoal(){
   weeklyGoalData[ws] = { hours: v, setAt: new Date().toISOString() };
   saveReportState();
   renderWeeklyGoal();
+
+  // タイムラインに自動投稿
+  await postWeeklyGoalToTimeline(v, d1, d2);
+}
+
+async function postWeeklyGoalToTimeline(hours, d1, d2){
+  const name = char.name || 'ゲスト';
+  const smins = studyMins(sessions);
+  const lv = computeLevel(smins);
+  const post = {
+    id:           Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    user_id:      currentUser ? currentUser.id : 'guest_' + (char.name || 'anonymous'),
+    user_name:    name,
+    user_level:   lv,
+    job_ids:      selectedJobIds || [],
+    subject_name: '週間目標',
+    minutes:      0,
+    note:         `${d1}〜${d2} の目標：${hours}時間`,
+    rpg_log:      `${name} は今週の目標を「${hours}時間」に設定した！`,
+    exp:          0,
+    likes:        0,
+    created_at:   new Date().toISOString(),
+    is_own:       true,
+    is_weekly_goal: true,
+    goal_hours:   hours,
+  };
+  const posts = loadLocalPosts();
+  posts.push(post);
+  saveLocalPosts(posts);
+  if(currentUser){
+    try {
+      await sb.from('timeline_posts').insert({
+        user_id:      currentUser.id,
+        user_name:    post.user_name,
+        user_level:   post.user_level,
+        job_ids:      post.job_ids,
+        subject_name: post.subject_name,
+        minutes:      0,
+        note:         post.note,
+        rpg_log:      post.rpg_log,
+        exp:          0,
+        likes_count:  0,
+        created_at:   post.created_at,
+      });
+    } catch(e){ console.warn('Weekly goal TL post failed:', e); }
+  }
+  const panel = document.getElementById('panel-timeline');
+  if(panel && panel.style.display === 'block') loadTimeline();
+}
+
+function shareWeeklyGoalToX(){
+  const ws  = getWeekStart();
+  const sun = getWeekSunday();
+  const d1  = ws.slice(5).replace('-','/');
+  const d2  = sun.slice(5).replace('-','/');
+  const hours = getThisWeekGoalHours();
+  const text = `今週の勉強目標を設定しました🎯\n\n📅 ${d1}〜${d2}\n⏱ 目標：${hours}時間\n\n達成まで頑張ります💪\n#スタディクエスト #study_quest #勉強垢\nhttps://hito77ki-ship-it.github.io/study-quest/`;
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
 }
 
 /* EXP連動バナー */
@@ -9502,26 +9568,36 @@ function saveLocalLikes(likes){
 }
 
 /* ── 自動投稿（記録完了時に呼ばれる） ── */
-async function autoPostToTimeline({ subject, minutes, note, exp, lv, name }){
+async function autoPostToTimeline({ subject, minutes, note, exp, lv, name, material_name, material_cover, material_id, post_image }){
   const subj = allSelectedSubjects().find(s => s.key === subject);
   const subjName = subj ? subj.name : subject || '学習';
   const rpgLog = generateRpgLog(name, subjName, minutes);
 
+  // 教材が未指定の場合、同じ科目の教材から表紙を探す
+  if(!material_cover && subject && typeof materials !== 'undefined'){
+    const mat = materials.find(m => m.subjectKey === subject && m.cover);
+    if(mat){ material_name = material_name || mat.name; material_cover = mat.cover; material_id = material_id || mat.id; }
+  }
+
   const post = {
-    id:          Date.now().toString(36) + Math.random().toString(36).slice(2,6),
-    user_id:     currentUser ? currentUser.id : 'guest_' + (char.name || 'anonymous'),
-    user_name:   name || 'ゲスト',
-    user_level:  lv || 1,
-    job_ids:     selectedJobIds,
-    subject_key: subject,
-    subject_name:subjName,
+    id:           Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    user_id:      currentUser ? currentUser.id : 'guest_' + (char.name || 'anonymous'),
+    user_name:    name || 'ゲスト',
+    user_level:   lv || 1,
+    job_ids:      selectedJobIds,
+    subject_key:  subject,
+    subject_name: subjName,
     minutes,
-    note:        note || '',
-    rpg_log:     rpgLog,
+    note:         note || '',
+    rpg_log:      rpgLog,
     exp,
-    likes:       0,
-    created_at:  new Date().toISOString(),
-    is_own:      true,
+    likes:        0,
+    created_at:   new Date().toISOString(),
+    is_own:       true,
+    material_name:  material_name  || null,
+    material_cover: material_cover || null,
+    material_id:    material_id    || null,
+    post_image:     post_image     || null,
   };
 
   // ① ローカル保存（即時・確実）
@@ -9555,21 +9631,46 @@ async function autoPostToTimeline({ subject, minutes, note, exp, lv, name }){
 }
 
 /* ── 手動投稿 ── */
+let tlPostImage = null;
+
+function handleTlImageSelect(e){
+  const file = e.target.files?.[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    tlPostImage = ev.target.result;
+    const preview = document.getElementById('tlImagePreview');
+    const img = document.getElementById('tlImagePreviewImg');
+    if(preview && img){ img.src = tlPostImage; preview.style.display = 'inline-block'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearTlImage(){
+  tlPostImage = null;
+  const preview = document.getElementById('tlImagePreview');
+  const fileInput = document.getElementById('tlImageFile');
+  if(preview) preview.style.display = 'none';
+  if(fileInput) fileInput.value = '';
+}
+
 async function manualPost(){
   const content = document.getElementById('tlInput')?.value.trim() || '';
   const latest = sessions[sessions.length - 1];
   if(!latest){ alert('先に学習記録を作成してください'); return; }
 
   await autoPostToTimeline({
-    subject: latest.subject,
-    minutes: latest.amount,
-    note:    content || latest.note || '',
-    exp:     latest.exp,
-    lv:      char.level,
-    name:    char.name,
+    subject:    latest.subject,
+    minutes:    latest.amount,
+    note:       content || latest.note || '',
+    exp:        latest.exp,
+    lv:         char.level,
+    name:       char.name,
+    post_image: tlPostImage,
   });
 
   if(document.getElementById('tlInput')) document.getElementById('tlInput').value = '';
+  clearTlImage();
   document.getElementById('tlCompose').style.display = 'none';
 }
 
@@ -9753,8 +9854,18 @@ function renderPostHTML(post, likes){
       ⚔ ${escHtml(post.rpg_log || '')}
     </div>
 
-    <!-- 達成報告カード or 学習カード -->
-    ${post.is_achievement ? (() => {
+    <!-- 投稿画像 -->
+    ${post.post_image ? `<img src="${post.post_image}" alt="" style="max-width:100%;border-radius:8px;margin-bottom:10px;display:block;">` : ''}
+
+    <!-- 週間目標 or 達成報告カード or 学習カード -->
+    ${post.is_weekly_goal ? `<div class="tl-post-card">
+      <div class="tl-post-card-icon">🎯</div>
+      <div class="tl-post-card-info">
+        <div class="tl-post-card-title">今週の目標を設定</div>
+        <div class="tl-post-card-sub">${escHtml(post.note||'')}</div>
+      </div>
+      <div class="tl-post-card-hours">${post.goal_hours||0}h</div>
+    </div>` : post.is_achievement ? (() => {
       const ach = post.achievement_data ? (()=>{try{return JSON.parse(post.achievement_data);}catch{return {};}})() : {};
       const typeLabel = {pass:'🎓 資格合格',exam:'📝 模試・答練',hours:'⏱ 時間達成',other:'✨ その他'}[ach.type||'other'];
       const scoreStr = (ach.score != null && ach.maxScore != null)
