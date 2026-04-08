@@ -6023,7 +6023,7 @@ async function addQuest(){
       const subj = allSelectedSubjects().find(s=>s.key===subject);
       const subjName = subj?.name || subject;
       autoPostToTimeline({
-        subject, minutes: 0, note: note || `⚔ 答練・模試を受験しました`,
+        subject, minutes: amount, note: note || `⚔ 答練・模試を受験しました`,
         exp, lv: char.level, name: char.name,
         examPost: true, subjName
       });
@@ -9625,13 +9625,13 @@ function saveLocalLikes(likes){
 }
 
 /* ── 自動投稿（記録完了時に呼ばれる） ── */
-async function autoPostToTimeline({ subject, minutes, note, exp, lv, name, material_name, material_cover, material_id, post_image }){
+async function autoPostToTimeline({ subject, minutes, note, exp, lv, name, material_name, material_cover, material_id, post_image, examPost }){
   const subj = allSelectedSubjects().find(s => s.key === subject);
   const subjName = subj ? subj.name : subject || '学習';
   const rpgLog = generateRpgLog(name, subjName, minutes);
 
-  // 教材が未指定の場合、同じ科目の教材から表紙を探す
-  if(!material_cover && subject && typeof materials !== 'undefined'){
+  // 教材が未指定の場合、同じ科目の教材から表紙を探す（答練・模試は対象外）
+  if(!examPost && !material_cover && subject && typeof materials !== 'undefined'){
     const mat = materials.find(m => m.subjectKey === subject && m.cover);
     if(mat){ material_name = material_name || mat.name; material_cover = mat.cover; material_id = material_id || mat.id; }
   }
