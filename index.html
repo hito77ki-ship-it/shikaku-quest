@@ -6031,7 +6031,9 @@ async function addQuest(){
       document.getElementById('examPostToTl').checked = false;
     }
   }
-  document.getElementById('questAmount').value='';document.getElementById('questNote').value='';
+  const qah=document.getElementById('questAmountHour');if(qah)qah.value='';
+  const qam=document.getElementById('questAmountMin');if(qam)qam.value='';
+  document.getElementById('questNote').value='';
   const qst = document.getElementById('questStartTime'); if(qst) qst.value='';
 }
 function changeJob(){
