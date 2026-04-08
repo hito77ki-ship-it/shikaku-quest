@@ -3427,7 +3427,15 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         </div>
         <div class="form-row-2">
           <div class="form-group"><label class="form-label">科目</label><select class="form-select" id="questSubject"></select></div>
-          <div class="form-group"><label class="form-label" id="amountLabel">時間（分）</label><input class="form-input" id="questAmount" type="number" min="1" placeholder="60"></div>
+          <div class="form-group">
+            <label class="form-label" id="amountLabel">時間</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input class="form-input" id="questAmountHour" type="number" min="0" max="12" placeholder="0" style="width:60px;">
+              <span style="color:var(--muted);font-size:12px;">時間</span>
+              <input class="form-input" id="questAmountMin" type="number" min="0" max="59" placeholder="0" style="width:60px;">
+              <span style="color:var(--muted);font-size:12px;">分</span>
+            </div>
+          </div>
         </div>
         <div class="form-row-2">
           <div class="form-group"><label class="form-label">メモ</label><input class="form-input" id="questNote" type="text" placeholder="今日の内容..."></div>
@@ -5937,7 +5945,7 @@ function renderTitles(){
 function selectType(type){
   currentType=type;
   document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.type===type));
-  document.getElementById('amountLabel').textContent={study:'時間（分）',exam:'（自動）'}[type];
+  document.getElementById('amountLabel').textContent={study:'時間',exam:'（自動）'}[type];
   document.getElementById('questAmount').disabled=type==='exam';
   if(type==='exam')document.getElementById('questAmount').value='';
   // 答練・模試のみタイムライン投稿オプションを表示
@@ -5948,9 +5956,11 @@ async function addQuest(){
   const subject=document.getElementById('questSubject').value;
   const note=document.getElementById('questNote').value.trim();
   const date=document.getElementById('questDate').value;
-  let amount=parseFloat(document.getElementById('questAmount').value)||0;
+  const qh=parseInt(document.getElementById('questAmountHour')?.value)||0;
+  const qm=parseInt(document.getElementById('questAmountMin')?.value)||0;
+  let amount=qh*60+qm;
   let exp=0;
-  if(currentType==='study'){if(amount<=0){alert('時間（分）を入力してください');return;}exp=Math.round(amount);}
+  if(currentType==='study'){if(amount<=0){alert('時間または分を入力してください');return;}exp=Math.round(amount);}
   else{exp=500;amount=1;}
   const smins0=studyMins(sessions),lv0=computeLevel(smins0);
   const today=new Date().toISOString().slice(0,10);
