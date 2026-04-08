@@ -3319,7 +3319,9 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <!-- 目標時間設定 -->
       <div class="timer-goal-row">
         <span style="color:var(--muted)">目標</span>
-        <input type="number" class="timer-goal-input" id="timerGoalInput" placeholder="30" min="1" max="480" value="">
+        <input type="number" class="timer-goal-input" id="timerGoalHourInput" placeholder="0" min="0" max="12" value="" style="width:44px;">
+        <span style="color:var(--muted)">時間</span>
+        <input type="number" class="timer-goal-input" id="timerGoalMinInput" placeholder="0" min="0" max="59" value="" style="width:44px;">
         <span style="color:var(--muted)">分</span>
         <button class="timer-goal-set" onclick="setTimerGoal()">SET</button>
         <span style="flex:1;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--exp2);" id="timerGoalDisp"></span>
@@ -8732,10 +8734,12 @@ function showAutosaveToast(){
 
 /* ── 目標時間設定 ── */
 function setTimerGoal(){
-  const v = parseInt(document.getElementById('timerGoalInput')?.value)||0;
+  const h = parseInt(document.getElementById('timerGoalHourInput')?.value)||0;
+  const m = parseInt(document.getElementById('timerGoalMinInput')?.value)||0;
+  const v = h * 60 + m;
   timerGoalMins = v;
   const disp = document.getElementById('timerGoalDisp');
-  if(disp) disp.textContent = v>0?`目標: ${Math.floor(v/60)?Math.floor(v/60)+'h ':''} ${v%60?v%60+'分':''}` : '';
+  if(disp) disp.textContent = v>0 ? `目標: ${h?h+'時間':''}${m?m+'分':''}` : '';
 }
 
 /* ── Web Notifications ── */
