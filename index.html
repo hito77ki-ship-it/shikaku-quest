@@ -8783,7 +8783,7 @@ function renderSessions(subjs){
   [...sessions].reverse().slice(0,60).forEach((s,revIdx)=>{
     const realIdx = sessions.length - 1 - revIdx; // 実際のindexに変換
     const sub=smap[s.subject]||{name:s.subject||'—',color:'#606080'};
-    const tl=s.type==='study'?s.amount+'分':s.type==='calc'?s.amount+'問':'答練';
+    const tl=s.type==='study'?s.amount+'分':s.type==='calc'?s.amount+'問':s.type==='exam'?'答練 '+s.amount+'分':'答練';
     const item=document.createElement('div');
     item.className='session-item'+(editMode?' edit-mode':'');
     item.innerHTML=`
@@ -8806,9 +8806,10 @@ function renderQuestLogStats(){
   })();
   const month = new Date().toISOString().slice(0,7);
 
-  const todayM  = sessions.filter(s=>s.type==='study'&&s.date===today).reduce((a,s)=>a+s.amount,0);
-  const weekM   = sessions.filter(s=>s.type==='study'&&s.date>=weekStart).reduce((a,s)=>a+s.amount,0);
-  const monthM  = sessions.filter(s=>s.type==='study'&&s.date&&s.date.startsWith(month)).reduce((a,s)=>a+s.amount,0);
+  const isStudy = s => s.type==='study'||s.type==='exam';
+  const todayM  = sessions.filter(s=>isStudy(s)&&s.date===today).reduce((a,s)=>a+s.amount,0);
+  const weekM   = sessions.filter(s=>isStudy(s)&&s.date>=weekStart).reduce((a,s)=>a+s.amount,0);
+  const monthM  = sessions.filter(s=>isStudy(s)&&s.date&&s.date.startsWith(month)).reduce((a,s)=>a+s.amount,0);
   const totalM  = studyMins(sessions);
 
   const fmt = m => m<60 ? m+'分' : Math.floor(m/60)+'h'+(m%60?m%60+'m':'');
