@@ -3598,7 +3598,8 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label">試験名</label>
-            <input class="form-input" id="scoreExamName" type="text" placeholder="第○回 短答式模試">
+            <input class="form-input" id="scoreExamName" type="text" placeholder="第○回 短答式模試" list="examNameList" autocomplete="off">
+            <datalist id="examNameList"></datalist>
           </div>
           <div class="form-group">
             <label class="form-label">実施日</label>
@@ -6742,6 +6743,12 @@ async function deleteScoreRecord(id){
 }
 
 function renderScoreTab(){
+  // 試験名のdatalistを更新
+  const dl = document.getElementById('examNameList');
+  if(dl){
+    const names = [...new Set(scoreRecords.map(r=>r.name))];
+    dl.innerHTML = names.map(n=>`<option value="${n}">`).join('');
+  }
   buildScoreSubjInputs();
   renderScoreSummary();
   if(scoreRecords.length>0){
