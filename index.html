@@ -157,6 +157,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .char-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
 .char-title-text{font-family:'Cinzel',serif;font-size:12px;color:var(--gold);}
 .streak-badge{font-family:'Share Tech Mono',monospace;font-size:11px;color:#F59E0B;border:1px solid rgba(245,158,11,.3);padding:2px 9px;background:rgba(245,158,11,.08);border-radius:20px;}
+.gold-badge{font-family:'Share Tech Mono',monospace;font-size:11px;color:#c9a84c;border:1px solid rgba(201,168,76,.3);padding:2px 9px;background:rgba(201,168,76,.08);border-radius:20px;}
 .char-meta{display:flex;gap:14px;flex-wrap:wrap;}
 .meta-item{display:flex;flex-direction:column;gap:1px;}
 .meta-label{font-size:8px;letter-spacing:.2em;color:var(--muted);font-family:'Share Tech Mono',monospace;text-transform:uppercase;}
@@ -2820,6 +2821,46 @@ body[data-theme="dark"] #mobileTabBar {
 .sp-no-exam{text-align:center;color:var(--muted);font-size:12px;padding:18px;line-height:1.8;}
 .sp-set-btn{background:var(--accent);border:none;color:#fff;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;padding:8px 16px;cursor:pointer;border-radius:var(--radius-sm);margin-top:8px;transition:all .2s;}
 .sp-set-btn:hover{background:var(--gold2);}
+/* ════ PACE DIAG ════ */
+.pd-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;position:relative;overflow:hidden;}
+.pd-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
+.pd-card.pd-warn::before{background:#F59E0B;}
+.pd-card.pd-danger::before{background:#ef4444;}
+.pd-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px;}
+.pd-title{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:2px;}
+.pd-exam-name{font-size:13px;font-weight:700;color:var(--text);}
+.pd-badge{font-family:'Share Tech Mono',monospace;font-size:9px;padding:3px 9px;border-radius:10px;font-weight:bold;white-space:nowrap;flex-shrink:0;}
+.pd-badge.ok{background:rgba(140,198,63,.15);color:var(--accent);}
+.pd-badge.warn{background:rgba(245,158,11,.15);color:#F59E0B;}
+.pd-badge.danger{background:rgba(239,68,68,.12);color:#ef4444;}
+.pd-progress-wrap{margin-bottom:10px;}
+.pd-progress-info{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:3px;}
+.pd-progress-track{height:8px;background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.pd-progress-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.25,1,.5,1);}
+.pd-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.pd-metric{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 10px;}
+.pd-metric-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.1em;color:var(--muted);margin-bottom:2px;}
+.pd-metric-val{font-family:'Share Tech Mono',monospace;font-size:20px;font-weight:bold;color:var(--text);}
+.pd-card.pd-warn .pd-metric-val.need{color:#F59E0B;}
+.pd-card.pd-danger .pd-metric-val.need{color:#ef4444;}
+.pd-verdict{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px;line-height:1.4;}
+.pd-verdict-icon{font-size:16px;flex-shrink:0;}
+.pd-no-exam{text-align:center;color:var(--muted);font-size:12px;padding:14px;line-height:1.8;}
+/* ════ DAILY MISSION ════ */
+.dm-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;}
+.dm-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.dm-title{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;}
+.dm-progress-text{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent2);}
+.dm-list{display:flex;flex-direction:column;gap:6px;}
+.dm-item{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:9px 12px;transition:all .3s;}
+.dm-item.done{background:rgba(140,198,63,.07);border-color:rgba(140,198,63,.25);}
+.dm-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;}
+.dm-item.done .dm-check{background:var(--accent);border-color:var(--accent);color:#fff;}
+.dm-text{font-size:12px;color:var(--text);flex:1;line-height:1.3;}
+.dm-item.done .dm-text{color:var(--muted);text-decoration:line-through;}
+.dm-exp{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent2);flex-shrink:0;}
+.dm-item.done .dm-exp{color:var(--muted);}
+.dm-all-done{text-align:center;padding:6px;font-size:12px;color:var(--accent);font-weight:bold;letter-spacing:.05em;}
 /* ════ HEATMAP ════ */display:flex;align-items:center;gap:6px;margin-bottom:10px;justify-content:flex-end;}
 .heatmap-legend-cells{display:flex;gap:2px;}
 .hm-cell{width:11px;height:11px;border-radius:2px;}
@@ -3208,6 +3249,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         <div class="char-compact-top">
           <span class="char-name-disp" id="charNameDisp" style="font-size:16px;">—</span>
           <span class="streak-badge" id="streakBadge">🔥 0日連続</span>
+          <span class="gold-badge" id="goldBadge">💰 0G</span>
         </div>
         <div class="char-compact-sub">
           <span class="char-title-text" id="charTitleText" style="font-size:11px;">見習い冒険者</span>
@@ -3255,6 +3297,10 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
   <div id="panel-status">
     <!-- 試験カウントダウン（ミニ表示） -->
     <div id="statusExamMini"></div>
+    <!-- 合格ペース診断 -->
+    <div id="paceDiagCard"></div>
+    <!-- デイリーミッション -->
+    <div id="dailyMissionCard"></div>
     <!-- 今日のスケジュール -->
     <div id="todayPlanCard" style="display:none;" class="today-plan-card"></div>
     <!-- 統合：全体進捗 + 科目HP -->
@@ -4992,7 +5038,7 @@ const BADGES = [
 /* ═══════════════ STATE ═══════════════ */
 let selectedJobIds = [];
 let selectedSubjectKeys = [];
-let char = {name:'',totalEXP:0,streak:0,lastLoginDate:null,level:1,sp:0,stats:{str:10,vit:10,int:10,agi:10}};
+let char = {name:'',totalEXP:0,streak:0,lastLoginDate:null,level:1,sp:0,stats:{str:10,vit:10,int:10,agi:10},gold:0};
 let sessions = [];
 let bosses = [];  // [{id,name,date,targetHours}, ...]
 let examGoals = []; // [{id,title,date,startDate}, ...]
@@ -5841,6 +5887,7 @@ function renderAll(){
   if(gnavName&&char.name){gnavName.textContent=char.name;gnavName.style.display='';}
   document.getElementById('charTitleText').textContent=ti.title;
   document.getElementById('streakBadge').textContent='🔥 '+char.streak+'日連続';
+  const goldEl=document.getElementById('goldBadge'); if(goldEl) goldEl.textContent='💰 '+(char.gold||0)+'G';
   document.getElementById('levelDispMeta').textContent=lp.level+' / 100';
   document.getElementById('totalHoursDisp').textContent=Math.floor(smins/60)+'h';
   document.getElementById('questCountDisp').textContent=sessions.length;
@@ -5856,6 +5903,8 @@ function renderAll(){
   renderEquipBadge(smins);
   renderRaidBoss();
   renderStatusExamMini();
+  renderPaceDiag();
+  renderDailyMissions();
   // レポート/プロフィールタブが開いていれば即更新
   const rptPanel=document.getElementById('panel-report');
   const profPanel=document.getElementById('panel-profile');
@@ -6080,7 +6129,7 @@ function switchTab(tab){
   if(tab==='timeline') requestAnimationFrame(()=>loadTimeline());
   if(tab==='report')  requestAnimationFrame(()=>renderReportTab());
   if(tab==='profile') requestAnimationFrame(()=>{ renderProfileTab(); renderWeekPlan(); initProfileQR(); });
-  if(tab==='status')  requestAnimationFrame(()=>renderTodayPlan());
+  if(tab==='status')  requestAnimationFrame(()=>{ renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); });
   // モバイルタブバーも同期
   document.querySelectorAll('.m-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   const activeBtn=document.getElementById('tab-'+tab);
@@ -8210,6 +8259,194 @@ function clearImportPast(){
   saveAll();
   renderAll();
   renderImportPastSection();
+}
+
+/* ════════════════════════════════════════
+   デイリーミッション
+════════════════════════════════════════ */
+function dmSeededRng(seed){
+  let s = seed >>> 0;
+  return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0x100000000; };
+}
+
+function generateDailyMissions(dateStr){
+  const subjs = allSelectedSubjects();
+  const goals = (typeof examGoals !== 'undefined') ? examGoals : [];
+  const today = new Date(dateStr); today.setHours(0,0,0,0);
+  const upcoming = goals.filter(g => new Date(g.date) >= today).sort((a,b) => new Date(a.date)-new Date(b.date));
+  const eg = upcoming[0];
+
+  // 1日の必要学習時間を計算
+  let dailyNeedMins = 120;
+  if(eg){
+    const daysLeft = Math.round((new Date(eg.date) - today) / 86400000);
+    const totalStudied = studyMins(sessions);
+    const job = JOBS.find(j => selectedJobIds.includes(j.id));
+    const totalTarget = (eg.targetHours > 0 ? eg.targetHours : (job?.avgHours || 300)) * 60;
+    const remain = Math.max(0, totalTarget - totalStudied);
+    if(daysLeft > 0) dailyNeedMins = Math.max(60, Math.ceil(remain / daysLeft));
+  }
+
+  const seed = parseInt(dateStr.replace(/-/g,'')) || 20260101;
+  const rng = dmSeededRng(seed);
+
+  // ミッションプール
+  const pool = [];
+  const totalH = Math.ceil(dailyNeedMins / 60);
+  pool.push({ id:'total_time', text:`今日${totalH}時間以上学習する`, type:'total_time', target:totalH*60, exp:30 });
+  pool.push({ id:'log_session', text:'学習セッションを2回以上記録する', type:'session_count', target:2, exp:15 });
+  pool.push({ id:'exam_session', text:'答練・模試を1回記録する', type:'exam_session', target:1, exp:25 });
+  if(subjs.length >= 2){
+    pool.push({ id:'multi_subj', text:'2科目以上学習する', type:'multi_subj', target:2, exp:20 });
+  }
+  if(subjs.length > 0){
+    const shuffled = [...subjs].sort(() => rng()-0.5);
+    const targets = [30, 45, 60, 90];
+    shuffled.slice(0, Math.min(4, subjs.length)).forEach(s => {
+      const t = targets[Math.floor(rng()*targets.length)];
+      pool.push({ id:`subj_${s.key}`, text:`${s.name}を${t}分以上学習する`, type:'subj_time', subjKey:s.key, target:t, exp:20 });
+    });
+  }
+  pool.push({ id:'streak', text:`連続記録を${Math.max(1,(typeof char!=='undefined'?char.streak:0)+1)}日にする`, type:'streak', target:(typeof char!=='undefined'?char.streak:0)+1, exp:10 });
+
+  const shuffledPool = [...pool].sort(() => rng()-0.5);
+  return shuffledPool.slice(0,5);
+}
+
+function checkMissionDone(mission, todaySess){
+  switch(mission.type){
+    case 'total_time':   return todaySess.filter(s=>isStudyType(s)).reduce((a,s)=>a+s.amount,0) >= mission.target;
+    case 'session_count':return todaySess.filter(s=>isStudyType(s)).length >= mission.target;
+    case 'exam_session': return todaySess.filter(s=>s.type==='exam').length >= mission.target;
+    case 'multi_subj':   return new Set(todaySess.filter(s=>isStudyType(s)).map(s=>s.subject)).size >= mission.target;
+    case 'subj_time':    return todaySess.filter(s=>isStudyType(s)&&s.subject===mission.subjKey).reduce((a,s)=>a+s.amount,0) >= mission.target;
+    case 'streak':       return (typeof char!=='undefined'?char.streak:0) >= mission.target;
+    default: return false;
+  }
+}
+
+const DM_AWARDED_KEY = 'sq2_dm_awarded_';
+function getDmAwarded(dateStr){ try{ return JSON.parse(localStorage.getItem(DM_AWARDED_KEY+dateStr)||'[]'); }catch(e){ return []; } }
+function setDmAwarded(dateStr, ids){ try{ localStorage.setItem(DM_AWARDED_KEY+dateStr, JSON.stringify(ids)); }catch(e){} }
+
+function renderDailyMissions(){
+  const el = document.getElementById('dailyMissionCard');
+  if(!el) return;
+  const dateStr = getTodayStr();
+  const missions = generateDailyMissions(dateStr);
+  const todaySess = sessions.filter(s => s.date === dateStr);
+  const results = missions.map(m => ({ ...m, done: checkMissionDone(m, todaySess) }));
+  const doneCount = results.filter(r=>r.done).length;
+  const allDone = doneCount === results.length;
+
+  // ゴールド付与（未付与のミッションのみ）
+  const awarded = getDmAwarded(dateStr);
+  let goldGained = 0;
+  results.forEach(m => {
+    if(m.done && !awarded.includes(m.id)){
+      awarded.push(m.id);
+      goldGained += m.exp; // expフィールドをgoldとして使用
+    }
+  });
+  // 全達成ボーナス
+  const allBonusId = 'all_done_bonus';
+  if(allDone && !awarded.includes(allBonusId)){
+    awarded.push(allBonusId);
+    goldGained += 50;
+  }
+  if(goldGained > 0){
+    if(!char.gold) char.gold = 0;
+    char.gold += goldGained;
+    setDmAwarded(dateStr, awarded);
+    saveAll();
+    const goldEl = document.getElementById('goldBadge');
+    if(goldEl) goldEl.textContent = '💰 '+char.gold+'G';
+  }
+
+  el.innerHTML = `<div class="dm-card">
+    <div class="dm-header">
+      <div class="dm-title">⚔ デイリーミッション</div>
+      <div class="dm-progress-text">${doneCount} / ${results.length}</div>
+    </div>
+    <div class="dm-list">
+      ${results.map(m=>`
+        <div class="dm-item${m.done?' done':''}">
+          <div class="dm-check">${m.done?'✓':''}</div>
+          <div class="dm-text">${escHtml(m.text)}</div>
+          <div class="dm-exp">+${m.exp}G</div>
+        </div>`).join('')}
+    </div>
+    ${allDone?'<div class="dm-all-done">🎉 全ミッション達成！ ボーナス +50G</div>':''}
+  </div>`;
+}
+
+function renderPaceDiag(){
+  const el = document.getElementById('paceDiagCard');
+  if(!el) return;
+  const goals = (typeof examGoals !== 'undefined') ? examGoals : [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = goals.filter(g => new Date(g.date) >= today).sort((a,b) => new Date(a.date)-new Date(b.date));
+  if(!upcoming.length){
+    el.innerHTML = `<div class="pd-card"><div class="pd-no-exam">試験日を設定すると合格ペースを診断します<br><button class="sp-set-btn" onclick="switchTab('boss')" style="margin-top:8px;">⚔ 試験日を設定</button></div></div>`;
+    return;
+  }
+  const eg = upcoming[0];
+  const examDate = new Date(eg.date); examDate.setHours(0,0,0,0);
+  const daysLeft = Math.round((examDate - today) / 86400000);
+  const totalStudiedMins = studyMins(sessions);
+  const job = JOBS.find(j => selectedJobIds.includes(j.id));
+  const totalTargetMins = (eg.targetHours > 0 ? eg.targetHours : (job?.avgHours || 300)) * 60;
+  const remainMins = Math.max(0, totalTargetMins - totalStudiedMins);
+  const progressPct = Math.min(100, Math.round(totalStudiedMins / totalTargetMins * 100));
+  const dailyNeedMins = daysLeft > 0 ? Math.ceil(remainMins / daysLeft) : 0;
+  const sevenDaysAgo = new Date(today.getTime() - 7 * 86400000);
+  const recentMins = sessions.filter(s => isStudyType(s) && s.date && new Date(s.date) >= sevenDaysAgo).reduce((a,s) => a + s.amount, 0);
+  const recentDailyMins = Math.round(recentMins / 7);
+  let status = 'ok';
+  if(dailyNeedMins > recentDailyMins * 1.5 || dailyNeedMins > 240) status = 'danger';
+  else if(dailyNeedMins > recentDailyMins * 1.1 || dailyNeedMins > 120) status = 'warn';
+  const badgeText = {ok:'合格ペース ✓', warn:'ペースアップ必要', danger:'危険域'}[status];
+  const progressColor = {ok:'#8CC63F', warn:'#F59E0B', danger:'#ef4444'}[status];
+  function fmtH(m){ if(m<=0) return '0m'; const h=Math.floor(m/60),r=m%60; return h>0?`${h}h${r?r+'m':''}`:r+'m'; }
+  const diffMins = dailyNeedMins - recentDailyMins;
+  const verdictIcon = {ok:'✅', warn:'📢', danger:'⚠️'}[status];
+  const verdictText = status==='ok'
+    ? 'このペースを維持すれば合格ラインに届きます'
+    : status==='warn'
+    ? `1日あたりあと${fmtH(diffMins)}多く学習が必要です`
+    : `大幅なペースアップが必要です（+${fmtH(diffMins)}/日）`;
+  el.innerHTML = `<div class="pd-card pd-${status}">
+    <div class="pd-header">
+      <div>
+        <div class="pd-title">⚔ 合格ペース診断</div>
+        <div class="pd-exam-name">${escHtml(eg.title||'試験日')} — 残り${daysLeft}日</div>
+      </div>
+      <div class="pd-badge ${status}">${badgeText}</div>
+    </div>
+    <div class="pd-progress-wrap">
+      <div class="pd-progress-info">
+        <span>学習済み ${fmtH(totalStudiedMins)}</span>
+        <span>${progressPct}% / 目標 ${fmtH(totalTargetMins)}</span>
+      </div>
+      <div class="pd-progress-track">
+        <div class="pd-progress-fill" style="width:${progressPct}%;background:${progressColor}"></div>
+      </div>
+    </div>
+    <div class="pd-metrics">
+      <div class="pd-metric">
+        <div class="pd-metric-label">今日の必要時間</div>
+        <div class="pd-metric-val need">${fmtH(dailyNeedMins)}</div>
+      </div>
+      <div class="pd-metric">
+        <div class="pd-metric-label">直近7日の実績/日</div>
+        <div class="pd-metric-val">${fmtH(recentDailyMins)}</div>
+      </div>
+    </div>
+    <div class="pd-verdict">
+      <span class="pd-verdict-icon">${verdictIcon}</span>
+      <span>${verdictText}</span>
+    </div>
+  </div>`;
 }
 
 function renderStudyPlan(){
