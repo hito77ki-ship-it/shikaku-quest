@@ -142,9 +142,9 @@ nav.scrolled{
   position:relative;
   overflow:hidden;
 }
-#heroCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+#heroCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
 .hero>*:not(#heroCanvas):not(.hero-symbols){position:relative;z-index:1;}
-.hero-symbols{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.hero-symbols{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
 .hero-symbol{
   position:absolute;font-size:clamp(18px,3vw,32px);
   opacity:0;animation:floatSymbol linear infinite;
@@ -568,10 +568,14 @@ footer{background:#091505;padding:48px 24px 40px;}
 [data-theme="dark"] .hero{
   background:
     radial-gradient(ellipse 90% 55% at 50% 0%,rgba(140,198,63,.16) 0%,transparent 65%),
-    var(--bg);
+    rgba(13,15,20,0.6);
 }
-[data-theme="dark"] .cta{background:#04060D;}
-[data-theme="dark"] footer{background:#020408;}
+[data-theme="dark"] .cta{background:rgba(4,6,13,0.85);}
+[data-theme="dark"] footer{background:rgba(2,4,8,0.92);}
+[data-theme="dark"] .stats{background:rgba(13,15,20,0.75);}
+[data-theme="dark"] .features{background:transparent;}
+[data-theme="dark"] section:not(.hero):not(.cta):not(.stats){background:rgba(13,15,20,0.7);}
+[data-theme="dark"] .card-wrap,.feature-card,[data-theme="dark"] .faq-item{position:relative;z-index:1;}
 
 /* ─── FADE IN ─── */
 .fi{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
@@ -603,9 +607,10 @@ footer{background:#091505;padding:48px 24px 40px;}
 </nav>
 
 <!-- HERO -->
+<canvas id="heroCanvas"></canvas>
+<div class="hero-symbols" id="heroSymbols"></div>
+
 <section class="hero">
-  <canvas id="heroCanvas"></canvas>
-  <div class="hero-symbols" id="heroSymbols"></div>
   <img src="screenshots/ogp_icon.png" alt="スタディクエスト アプリアイコン" style="width:96px;height:96px;border-radius:22px;margin-bottom:18px;box-shadow:0 8px 32px rgba(0,0,0,.4);">
   <div class="hero-eyebrow">⚔ β版公開中・完全無料</div>
   <h1>すべての勉強を、<br><em>終わらない冒険に。</em></h1>
