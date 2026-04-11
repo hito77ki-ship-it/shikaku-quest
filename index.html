@@ -13319,8 +13319,37 @@ function restartTutorial() {
     return { pct: Math.floor(weekMins / goalMins * 100), goalHours, weekMins };
   }
 
+  function getNoStudyDays(){
+    // 今日を含まず、直近何日間0分が続いているか
+    let days = 0;
+    const today = new Date();
+    for(let i = 1; i <= 7; i++){
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const ds = toLocalDateStr ? toLocalDateStr(d) : d.toISOString().slice(0,10);
+      const hasSess = sessions && sessions.some(s => s.date === ds && (s.type === 'study' || s.type === 'exam'));
+      if(hasSess) break;
+      days++;
+    }
+    return days;
+  }
+
+  const MESSAGES_WORRY = [
+    '大丈夫？最近記録が途絶えてるよ…',
+    '少しだけでもいいから、一緒に始めない？',
+    '芽依、ちょっと心配してるよ。元気にしてる？',
+    '5分だけでもいい。また一緒に頑張ろう？',
+  ];
+
   function getMsg(){
     const mins = getTodayMins ? getTodayMins() : 0;
+
+    // 2日以上0時間が続いていたら心配メッセージを最優先
+    const noStudyDays = getNoStudyDays();
+    if(noStudyDays >= 2){
+      return MESSAGES_WORRY[Math.floor(Math.random() * MESSAGES_WORRY.length)];
+    }
+
     const week = getWeekPct();
 
     // 週間目標が設定されていれば割合メッセージを優先（25%刻み）
