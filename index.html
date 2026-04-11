@@ -4035,6 +4035,13 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <div id="linkAccountContent"></div>
     </div>
 
+    <!-- ─── アカウント削除 ─── -->
+    <div class="section" id="deleteAccountSection" style="display:none;">
+      <div class="sec-title">⚠️ アカウント削除</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;">アカウントとすべての学習データを完全に削除します。この操作は取り消せません。</p>
+      <button onclick="openDeleteAccountModal()" style="background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:8px;padding:10px 16px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">🗑 アカウントを削除する</button>
+    </div>
+
     <!-- ─── データ管理 ─── -->
     <div class="section">
       <div class="sec-title">💾 データ管理</div>
@@ -9010,6 +9017,10 @@ async function renderLinkAccountSection(){
   const content = document.getElementById('linkAccountContent');
   if(!section || !content || !currentUser) return;
 
+  // アカウント削除セクションも表示
+  const delSection = document.getElementById('deleteAccountSection');
+  if(delSection) delSection.style.display = '';
+
   section.style.display = '';
   const { data: { user } } = await sb.auth.getUser();
   if(!user){ section.style.display = 'none'; return; }
@@ -13498,6 +13509,45 @@ async function submitLinkEmail(){
     btn.textContent='登録する'; btn.disabled=false;
   }
 }
+
+/* ── アカウント削除 ── */
+function openDeleteAccountModal(){
+  document.getElementById('deleteAccountModal').style.display='flex';
+}
+function closeDeleteAccountModal(){
+  document.getElementById('deleteAccountModal').style.display='none';
+}
+async function submitDeleteAccount(){
+  closeDeleteAccountModal();
+  try {
+    const uid = currentUser.id;
+    // profilesテーブルから削除
+    await sb.from('profiles').delete().eq('id', uid);
+    // Supabase Authからサインアウト
+    await sb.auth.signOut();
+    // localStorageをクリア
+    localStorage.clear();
+    alert('アカウントを削除しました。ご利用ありがとうございました。');
+    location.reload();
+  } catch(e) {
+    alert('削除に失敗しました: ' + e.message);
+  }
+}
 </script>
+
+<!-- アカウント削除確認モーダル -->
+<div id="deleteAccountModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:2000;align-items:center;justify-content:center;" onclick="if(event.target===this)closeDeleteAccountModal()">
+  <div style="background:var(--panel);border:2px solid #ef4444;border-radius:16px;padding:28px;width:90%;max-width:360px;text-align:center;">
+    <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
+    <div style="font-size:16px;font-weight:700;color:#ef4444;margin-bottom:8px;">本当に削除しますか？</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.7;">
+      アカウントとすべての学習データが<b style="color:var(--text);">完全に削除</b>されます。<br>この操作は取り消せません。
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeDeleteAccountModal()" style="flex:1;padding:12px;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:8px;font-size:13px;cursor:pointer;">キャンセル</button>
+      <button onclick="submitDeleteAccount()" style="flex:1;padding:12px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">削除する</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
