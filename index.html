@@ -5896,6 +5896,22 @@ function initDashboard(){
   const tsel=document.getElementById('timerSubject');
   if(tsel)tsel.addEventListener('change',updateTimerEnemy);
   renderAll();
+  // 固定習慣タスクの自動登録（なければ追加）
+  (function ensureFixedHabits(){
+    const FIXED_ID = 'fixed_x_like_habit';
+    const plans = loadPlans();
+    if(!plans.find(p=>p.id===FIXED_ID)){
+      plans.push({
+        id: FIXED_ID,
+        subject: '𝕏「簿記」検索いいね（7:00〜10分）',
+        days: [0,1,2,3,4,5,6],
+        targetMin: 10,
+        icon: '🐦',
+        repeat: true
+      });
+      savePlans(plans);
+    }
+  })();
   // 通知ポーリング開始
   if(currentUser && !isGuest) startNotifPolling();
   // チュートリアル（ログイン後・ダッシュボード表示後に起動）
