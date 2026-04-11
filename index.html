@@ -13246,6 +13246,115 @@ function restartTutorial() {
 }
 
 // チュートリアルはinitDashboard()内で起動（ログイン後）
+
+/* ════ 若葉芽依 パートナーウィジェット ════ */
+(function(){
+  const MESSAGES_ZERO = [
+    'まだ記録がないよ。一緒に始めよう！',
+    '今日の最初の一歩、踏み出してみて！',
+    'どんな短い時間でも、記録してみよう！',
+    '芽依がそばにいるから、大丈夫だよ！',
+  ];
+  const MESSAGES_ACTIVE = [
+    'よく頑張ってるね！この調子で！',
+    '今日も記録できてる、すごい！',
+    '積み重ねが合格への道だよ！',
+    'コツコツ続けることが大事。応援してる！',
+    '一緒に合格目指そう！',
+  ];
+
+  function getMsg(){
+    const mins = getTodayMins ? getTodayMins() : 0;
+    const pool = mins === 0 ? MESSAGES_ZERO : MESSAGES_ACTIVE;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  // HTML注入
+  const wrapper = document.createElement('div');
+  wrapper.id = 'wakabaMei';
+  wrapper.innerHTML = `
+    <div id="wakabaBubble"></div>
+    <img src="screenshots/ogp_icon.png" alt="若葉芽依" id="wakabaIcon">
+  `;
+  document.body.appendChild(wrapper);
+
+  // スタイル
+  const style = document.createElement('style');
+  style.textContent = `
+    #wakabaMei {
+      position: fixed;
+      bottom: 72px;
+      right: 14px;
+      z-index: 9990;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      pointer-events: none;
+    }
+    #wakabaIcon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.15s;
+      border: 2px solid rgba(140,198,63,0.6);
+    }
+    #wakabaIcon:hover { transform: scale(1.08); }
+    #wakabaBubble {
+      background: rgba(255,255,255,0.95);
+      color: #374151;
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 8px 12px;
+      border-radius: 12px 12px 0 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      max-width: 180px;
+      text-align: right;
+      pointer-events: auto;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    #wakabaBubble.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    body[data-theme="dark"] #wakabaBubble {
+      background: rgba(30,35,45,0.95);
+      color: #e2e8f0;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // 吹き出し表示ロジック
+  let bubbleTimer = null;
+  const bubble = document.getElementById('wakabaBubble');
+  const icon = document.getElementById('wakabaIcon');
+
+  function showBubble(){
+    bubble.textContent = getMsg();
+    bubble.classList.add('visible');
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(()=>bubble.classList.remove('visible'), 4000);
+  }
+
+  icon.addEventListener('click', showBubble);
+  bubble.addEventListener('click', ()=>bubble.classList.remove('visible'));
+
+  // 初回ログイン後に自動で一度表示（3秒後）
+  window.addEventListener('load', ()=>{
+    setTimeout(()=>{
+      if(document.getElementById('dashboard') &&
+         document.getElementById('dashboard').style.display !== 'none'){
+        showBubble();
+      }
+    }, 3000);
+  });
+})();
 </script>
 </body>
 </html>
