@@ -5896,24 +5896,10 @@ function initDashboard(){
   const tsel=document.getElementById('timerSubject');
   if(tsel)tsel.addEventListener('change',updateTimerEnemy);
   renderAll();
-  // 固定習慣タスクの自動登録（なければ追加）
-  (function ensureFixedHabits(){
-    const OLD_ID = 'fixed_x_like_habit';
-    const plans_old = loadPlans().filter(p=>p.id!==OLD_ID);
-    savePlans(plans_old);
-    const FIXED_ID = 'fixed_x_like_habit_v2';
-    const plans = loadPlans();
-    if(!plans.find(p=>p.id===FIXED_ID)){
-      plans.push({
-        id: FIXED_ID,
-        subject: '𝕏「簿記」検索いいね（7:00〜3分）',
-        days: [0,1,2,3,4,5,6],
-        targetMin: 3,
-        icon: '🐦',
-        repeat: true
-      });
-      savePlans(plans);
-    }
+  // 過去に追加した固定習慣タスクを削除
+  (function removeFixedHabits(){
+    const plans = loadPlans().filter(p=>p.id!=='fixed_x_like_habit'&&p.id!=='fixed_x_like_habit_v2');
+    savePlans(plans);
   })();
   // 通知ポーリング開始
   if(currentUser && !isGuest) startNotifPolling();
