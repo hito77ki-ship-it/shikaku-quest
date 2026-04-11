@@ -3051,20 +3051,6 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
 
       <div class="auth-note">※ ログイン情報はランキング表示にのみ使用されます</div>
 
-      <div class="auth-divider"><span>または メールアドレスで</span></div>
-
-      <div class="auth-mode-tabs">
-        <button class="auth-mode-tab active" id="tabLogin" onclick="switchAuthMode('login')">ログイン</button>
-        <button class="auth-mode-tab" id="tabSignup" onclick="switchAuthMode('signup')">新規登録</button>
-      </div>
-      <div class="email-auth-form">
-        <input class="email-auth-input" id="authEmail" type="email" placeholder="メールアドレス" autocomplete="email">
-        <input class="email-auth-input" id="authPassword" type="password" placeholder="パスワード（6文字以上）" autocomplete="current-password">
-        <input class="email-auth-input" id="authPasswordConfirm" type="password" placeholder="パスワード（確認）" autocomplete="new-password" style="display:none;">
-        <div class="email-auth-msg" id="authMsg"></div>
-        <button class="email-auth-btn" id="authSubmitBtn" onclick="submitEmailAuth()">ログイン</button>
-      </div>
-
       <div class="auth-divider"><span>または</span></div>
       <button class="guest-btn" onclick="continueAsGuest()">
         👤 ゲストとして続ける（ランキング非参加）
@@ -9051,7 +9037,7 @@ async function renderLinkAccountSection(){
         </div>
         ${hasEmail
           ? '<span style="font-size:11px;color:#8CC63F;font-weight:600;">✓ 連携済み</span>'
-          : '<button onclick="openLinkEmailModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;">登録する</button>'
+          : '<span style="font-size:11px;color:var(--muted);">非対応</span>'
         }
       </div>
     </div>`;
