@@ -9053,7 +9053,7 @@ async function renderLinkAccountSection(){
         </div>
         ${hasEmail
           ? '<span style="font-size:11px;color:#8CC63F;font-weight:600;">✓ 連携済み</span>'
-          : '<span style="font-size:11px;color:var(--muted);">ログイン画面から登録</span>'
+          : '<button onclick="openLinkEmailModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;">登録する</button>'
         }
       </div>
     </div>`;
@@ -13454,6 +13454,63 @@ function restartTutorial() {
     }, 3000);
   });
 })();
+</script>
+
+<!-- メールアドレス連携モーダル -->
+<div id="linkEmailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;" onclick="if(event.target===this)closeLinkEmailModal()">
+  <div style="background:var(--panel);border-radius:16px;padding:24px;width:90%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,.4);">
+    <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em;color:var(--accent2);margin-bottom:16px;">✉️ メールアドレス登録</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <input id="linkEmailInput" type="email" placeholder="メールアドレス" class="email-auth-input" autocomplete="email">
+      <input id="linkPasswordInput" type="password" placeholder="パスワード（6文字以上）" class="email-auth-input">
+      <input id="linkPasswordConfirmInput" type="password" placeholder="パスワード（確認）" class="email-auth-input">
+      <div id="linkEmailMsg" class="email-auth-msg"></div>
+      <button id="linkEmailSubmitBtn" onclick="submitLinkEmail()" class="email-auth-btn">登録する</button>
+      <button onclick="closeLinkEmailModal()" style="background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;padding:10px;cursor:pointer;">キャンセル</button>
+    </div>
+  </div>
+</div>
+<script>
+function openLinkEmailModal(){
+  document.getElementById('linkEmailInput').value='';
+  document.getElementById('linkPasswordInput').value='';
+  document.getElementById('linkPasswordConfirmInput').value='';
+  document.getElementById('linkEmailMsg').textContent='';
+  document.getElementById('linkEmailMsg').className='email-auth-msg';
+  document.getElementById('linkEmailModal').style.display='flex';
+}
+function closeLinkEmailModal(){
+  document.getElementById('linkEmailModal').style.display='none';
+}
+async function submitLinkEmail(){
+  const email    = document.getElementById('linkEmailInput').value.trim();
+  const password = document.getElementById('linkPasswordInput').value;
+  const confirm  = document.getElementById('linkPasswordConfirmInput').value;
+  const msgEl    = document.getElementById('linkEmailMsg');
+  const btn      = document.getElementById('linkEmailSubmitBtn');
+
+  if(!email || !password){ msgEl.textContent='メールアドレスとパスワードを入力してください'; msgEl.className='email-auth-msg error'; return; }
+  if(password.length < 6){ msgEl.textContent='パスワードは6文字以上で設定してください'; msgEl.className='email-auth-msg error'; return; }
+  if(password !== confirm){ msgEl.textContent='パスワードが一致しません'; msgEl.className='email-auth-msg error'; return; }
+
+  btn.textContent='処理中...'; btn.disabled=true;
+  try {
+    const { error } = await sb.auth.updateUser({ email, password });
+    if(error) throw error;
+    msgEl.textContent='確認メールを送りました。メールのリンクをクリックして完了です。';
+    msgEl.className='email-auth-msg success';
+    btn.textContent='登録する'; btn.disabled=false;
+    setTimeout(()=>{ closeLinkEmailModal(); renderAccountLinks&&renderAccountLinks(); }, 3000);
+  } catch(e) {
+    const errMap = {
+      'User already registered': 'このメールアドレスはすでに使われています',
+      'Email rate limit exceeded': 'しばらく時間をおいてから再試行してください',
+    };
+    msgEl.textContent = errMap[e.message] || e.message;
+    msgEl.className='email-auth-msg error';
+    btn.textContent='登録する'; btn.disabled=false;
+  }
+}
 </script>
 </body>
 </html>
