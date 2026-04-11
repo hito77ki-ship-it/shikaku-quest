@@ -6181,7 +6181,7 @@ function switchTab(tab){
     const b=document.getElementById('tab-'+t);
     if(p){
       const showing = t===tab;
-      p.style.display=showing?'block':'none';
+      p.style.display=showing?(t==='status'?'':'block'):'none';
       if(showing){ p.classList.remove('panel-anim'); void p.offsetWidth; p.classList.add('panel-anim'); }
     }
     if(b) b.classList.toggle('active',t===tab);
