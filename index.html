@@ -360,6 +360,12 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .form-input:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(140,198,63,.15);}
 .form-input::placeholder{color:var(--muted);}
 .form-select option{background:var(--panel2);}
+/* ── number input 文字色固定（スピンボタン操作・フォーカス時も薄くならない） ── */
+input[type="number"]{color:var(--text)!important;opacity:1!important;-webkit-text-fill-color:var(--text)!important;}
+input[type="number"]:focus,input[type="number"]:active{color:var(--text)!important;opacity:1!important;-webkit-text-fill-color:var(--text)!important;}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{opacity:1;}
+body[data-theme="light"] input[type="number"]{color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;}
+body[data-theme="dark"] input[type="number"]{color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;}
 .type-btns{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
 .type-btn{background:var(--panel2);border:1px solid var(--border);color:var(--muted);font-family:'Noto Serif JP',serif;font-size:11px;padding:11px 6px;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4;}
 .type-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.07);}
@@ -961,10 +967,12 @@ body[data-theme="dark"] .rpt-streak-card{background:linear-gradient(135deg,#1a0a
   background:var(--panel2);border:1px solid var(--border);font-size:11px;
 }
 .timer-goal-input{
-  background:var(--panel);border:1px solid var(--border);color:var(--text);
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;opacity:1!important;
   font-family:'Share Tech Mono',monospace;font-size:12px;
   padding:4px 8px;width:60px;border-radius:4px;text-align:center;
 }
+.timer-goal-input:focus,.timer-goal-input:active{color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;opacity:1!important;}
 .timer-goal-set{
   background:none;border:1px solid var(--exp);color:var(--exp2);
   font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:.1em;
@@ -2924,8 +2932,8 @@ body[data-theme="dark"] #mobileTabBar {
 .decl-form-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;color:var(--accent2);margin-bottom:12px;}
 .decl-form-row{margin-bottom:10px;}
 .decl-form-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--muted);margin-bottom:5px;display:block;text-transform:uppercase;}
-.decl-input{background:#fff;border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:14px;padding:7px 10px;border-radius:var(--radius-sm);outline:none;transition:border-color .2s;}
-.decl-input:focus{border-color:var(--accent);}
+.decl-input{background:var(--panel);border:1px solid var(--border);color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;opacity:1!important;font-family:'Share Tech Mono',monospace;font-size:14px;padding:7px 10px;border-radius:var(--radius-sm);outline:none;transition:border-color .2s;}
+.decl-input:focus{border-color:var(--accent);color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;opacity:1!important;}
 .decl-subj-input-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .decl-subj-input-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .decl-subj-input-name{font-size:12px;color:var(--text);flex:1;}
