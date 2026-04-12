@@ -715,7 +715,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .rpt-shell{background:var(--panel);border-radius:8px;padding:0 0 20px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;border:1px solid var(--border);}
 
 /* サブタブ */
-.rpt-header-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.1);padding:0 16px;background:var(--panel2);}
+.rpt-header-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 16px;background:var(--panel2);}
+body[data-theme="dark"] .rpt-header-tabs{border-bottom-color:rgba(255,255,255,.1);}
 .rpt-htab{background:none;border:none;font-size:13px;font-weight:600;color:var(--muted);padding:12px 18px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
 .rpt-htab.active{color:var(--gold);border-bottom-color:var(--gold);}
 
@@ -744,12 +745,16 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .rpt-legend-pct{font-weight:700;margin-left:auto;color:var(--gold2);}
 
 /* カウントダウンカード */
-.rpt-countdown-card{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#1a0a3a,#2a1050);border:1px solid #3a2060;border-radius:8px;padding:14px 18px;margin-bottom:10px;}
-.rpt-cd-num{font-size:36px;font-weight:700;color:#fff;min-width:56px;text-align:center;line-height:1;}
+.rpt-countdown-card{display:flex;align-items:center;gap:16px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:10px;}
+.rpt-cd-num{font-size:36px;font-weight:700;color:var(--text);min-width:56px;text-align:center;line-height:1;}
 .rpt-cd-info{flex:1;}
-.rpt-cd-name{font-size:13px;font-weight:600;color:#fff;margin-bottom:3px;}
+.rpt-cd-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
 .rpt-cd-date{font-size:11px;color:var(--muted);}
 .rpt-cd-note{font-size:11px;color:var(--muted);}
+/* ダークモードでは紫グラデーションを維持 */
+body[data-theme="dark"] .rpt-countdown-card{background:linear-gradient(135deg,#1a0a3a,#2a1050);border-color:#3a2060;}
+body[data-theme="dark"] .rpt-cd-num{color:#fff;}
+body[data-theme="dark"] .rpt-cd-name{color:#fff;}
 .rpt-no-exam{font-size:12px;color:var(--muted);text-align:center;padding:20px;background:var(--panel2);border-radius:8px;border:1px dashed var(--border);}
 
 /* 週間目標リング */
@@ -759,23 +764,27 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .rpt-goal-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:700;color:var(--gold);font-family:'Share Tech Mono',monospace;}
 .rpt-goal-text{font-size:12px;color:var(--text);line-height:1.6;flex:1;}
 .rpt-goal-input-row{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;flex-wrap:wrap;}
-.rpt-goal-input{background:var(--panel);border:1px solid #2a1a5a;color:var(--text);font-family:'Share Tech Mono',monospace;border-radius:4px;padding:6px 10px;font-size:12px;width:80px;}
+.rpt-goal-input{background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;border-radius:4px;padding:6px 10px;font-size:12px;width:80px;}
+body[data-theme="dark"] .rpt-goal-input{border-color:#2a1a5a;}
 .rpt-goal-set-btn{background:var(--exp);color:#fff;border:none;border-radius:4px;padding:7px 14px;font-size:10px;cursor:pointer;letter-spacing:.1em;font-family:'Share Tech Mono',monospace;}
 .rpt-goal-set-btn:hover{background:#7c55ee;}
 
 /* EXP連動バナー */
-.rpt-exp-banner{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0e0820,#1a0a35);border:1px solid rgba(124,77,255,.25);border-radius:8px;padding:14px 16px;margin:14px 14px 0;}
+.rpt-exp-banner{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:14px 14px 0;}
+body[data-theme="dark"] .rpt-exp-banner{background:linear-gradient(135deg,#0e0820,#1a0a35);border-color:rgba(124,77,255,.25);}
 .rpt-exp-icon{font-size:24px;}
 
 /* 科目別バー（分析タブ） */
 .rpt-subj-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .rpt-subj-bar-label{font-size:11px;color:var(--text);min-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.rpt-subj-bar-track{flex:1;height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+.rpt-subj-bar-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+body[data-theme="dark"] .rpt-subj-bar-track{background:rgba(255,255,255,.08);}
 .rpt-subj-bar-fill{height:100%;border-radius:4px;transition:width .8s;}
 .rpt-subj-bar-val{font-size:10px;color:var(--muted);min-width:40px;text-align:right;font-family:'Share Tech Mono',monospace;}
 
 /* ストリークカード */
-.rpt-streak-card{background:linear-gradient(135deg,#1a0a00,#2a1500);border:1px solid #3a2000;border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;}
+.rpt-streak-card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px;display:flex;align-items:center;gap:16px;}
+body[data-theme="dark"] .rpt-streak-card{background:linear-gradient(135deg,#1a0a00,#2a1500);border-color:#3a2000;}
 .rpt-streak-num{font-size:40px;font-weight:700;color:#f57c00;line-height:1;}
 .rpt-streak-info{font-size:12px;color:var(--muted);}
 
@@ -962,20 +971,25 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 /* 設定済みロックカード */
 .wg-locked-card{
   display:flex;align-items:center;gap:14px;
-  background:linear-gradient(135deg,#0a1a0a,#0f2010);
-  border:1px solid rgba(100,200,100,.25);border-radius:8px;
+  background:#f0faf0;
+  border:1px solid #b2dfb2;border-radius:8px;
   padding:16px;margin-top:4px;
 }
 .wg-lock-icon{font-size:28px;flex-shrink:0;}
 .wg-lock-title{
-  font-size:13px;font-weight:700;color:#7cff6e;margin-bottom:4px;
+  font-size:13px;font-weight:700;color:#2d7a2d;margin-bottom:4px;
 }
 .wg-lock-sub{
-  font-size:11px;color:#44cc44;margin-bottom:4px;
+  font-size:11px;color:#388e3c;margin-bottom:4px;
 }
 .wg-lock-note{
-  font-size:10px;color:var(--muted);
+  font-size:10px;color:#5a8a5a;
 }
+/* ダークモードでは濃い緑背景を維持 */
+body[data-theme="dark"] .wg-locked-card{background:linear-gradient(135deg,#0a1a0a,#0f2010);border-color:rgba(100,200,100,.25);}
+body[data-theme="dark"] .wg-lock-title{color:#7cff6e;}
+body[data-theme="dark"] .wg-lock-sub{color:#44cc44;}
+body[data-theme="dark"] .wg-lock-note{color:var(--muted);}
 
 /* 達成バナー（目標100%超え） */
 .wg-achieved-badge{
