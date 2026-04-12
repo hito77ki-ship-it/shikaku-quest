@@ -1953,108 +1953,132 @@ body[data-theme="light"] .medal-item{background:var(--panel2);border-color:var(-
   .pc-sidebar {
     display: flex;
     flex-direction: column;
-    width: 220px;
-    min-width: 220px;
+    width: 232px;
+    min-width: 232px;
     height: 100vh;
     position: sticky;
     top: 0;
     background: var(--panel);
     border-right: 1px solid var(--border);
-    box-shadow: 2px 0 12px rgba(0,0,0,.06);
+    box-shadow: 1px 0 0 var(--border);
     z-index: 500;
     overflow-y: auto;
+    overflow-x: hidden;
     flex-shrink: 0;
   }
   body[data-theme="dark"] .pc-sidebar {
-    background: #1A1D2E;
-    border-right-color: #2A2D45;
+    background: #161824;
+    border-right-color: #252840;
+    box-shadow: 1px 0 0 #252840;
   }
 
+  /* ── ロゴエリア ── */
   .pc-sidebar-logo {
-    padding: 20px 20px 16px;
+    padding: 18px 16px 14px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
   .pc-sidebar-logo-title {
     font-family: 'Cinzel', serif;
-    font-size: 13px;
-    letter-spacing: .15em;
+    font-size: 12px;
+    letter-spacing: .18em;
     color: var(--accent2);
     font-weight: 700;
+    line-height: 1;
   }
   .pc-sidebar-logo-sub {
     font-size: 9px;
     color: var(--muted);
-    letter-spacing: .1em;
-    margin-top: 2px;
+    letter-spacing: .08em;
+    margin-top: 4px;
+    opacity: .7;
   }
 
-  .pc-sidebar-nav { flex: 1; padding: 12px 10px; }
+  /* ── ナビゲーション ── */
+  .pc-sidebar-nav { flex: 1; padding: 8px 10px 4px; }
   .pc-sidebar-section-label {
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: .15em;
+    letter-spacing: .18em;
     color: var(--muted);
     text-transform: uppercase;
-    padding: 10px 8px 4px;
+    padding: 12px 10px 5px;
+    opacity: .6;
   }
   .pc-nav-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: 7px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     color: var(--muted);
-    transition: all .15s;
-    margin-bottom: 2px;
+    transition: background .12s, color .12s;
+    margin-bottom: 1px;
     text-decoration: none;
+    letter-spacing: .01em;
+    border-left: 2px solid transparent;
   }
   .pc-nav-item:hover {
-    background: rgba(140,198,63,.08);
-    color: var(--accent2);
+    background: rgba(140,198,63,.07);
+    color: var(--text);
+    border-left-color: transparent;
   }
   .pc-nav-item.active {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(140,198,63,.3);
+    background: rgba(140,198,63,.12);
+    color: var(--accent2);
+    font-weight: 600;
+    border-left-color: var(--accent2);
+    box-shadow: none;
   }
   body[data-theme="dark"] .pc-nav-item.active {
-    color: #fff;
+    background: rgba(140,198,63,.15);
+    color: #a8e063;
+    border-left-color: #a8e063;
   }
-  .pc-nav-icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+  .pc-nav-icon {
+    font-size: 15px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+    opacity: .85;
+  }
+  .pc-nav-item.active .pc-nav-icon { opacity: 1; }
+  .pc-nav-item:hover .pc-nav-icon { opacity: 1; }
 
+  /* ── ボトムエリア ── */
   .pc-sidebar-bottom {
-    padding: 12px;
+    padding: 10px;
     border-top: 1px solid var(--border);
     flex-shrink: 0;
   }
   .pc-sidebar-user {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    background: var(--panel2);
+    gap: 9px;
+    padding: 9px 10px;
+    border-radius: 7px;
     cursor: pointer;
-    transition: all .15s;
+    transition: background .12s;
   }
-  .pc-sidebar-user:hover { background: rgba(140,198,63,.06); }
+  .pc-sidebar-user:hover { background: rgba(140,198,63,.07); }
   .pc-sidebar-user-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--accent); color: #fff;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; font-weight: 700; flex-shrink: 0;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
     overflow: hidden;
+    box-shadow: 0 1px 4px rgba(140,198,63,.25);
   }
   .pc-sidebar-user-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
   .pc-sidebar-user-name {
-    font-size: 12px; font-weight: 600; color: var(--text);
+    font-size: 11px; font-weight: 600; color: var(--text);
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    line-height: 1.3;
   }
-  .pc-sidebar-user-level { font-size: 10px; color: var(--accent2); font-family: 'Share Tech Mono', monospace; }
+  .pc-sidebar-user-level { font-size: 9px; color: var(--accent2); font-family: 'Share Tech Mono', monospace; margin-top: 1px; }
 
   /* ── メインコンテンツエリア ── */
   .pc-main-area {
@@ -2116,8 +2140,8 @@ body[data-theme="light"] .medal-item{background:var(--panel2);border-color:var(-
 
 /* ════════ PC ワイドレイアウト修正 ════════ */
 @media (min-width: 1024px) {
-  /* wrap を全幅に統一 */
-  .wrap { max-width: none !important; width: 100% !important; padding: 20px 28px 100px !important; }
+  /* ── スペーシング基準：16px ── */
+  .wrap { max-width: none !important; width: 100% !important; padding: 20px 24px 80px !important; }
 
   /* すべてのパネルを100%幅に */
   .rpt-shell { max-width: none !important; }
@@ -2128,13 +2152,37 @@ body[data-theme="light"] .medal-item{background:var(--panel2);border-color:var(-
   .tabs { display: none !important; }
   .gnav-menu-btn { display: none !important; }
 
-  /* STATUSパネルを2カラムに */
-  #panel-status { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+  /* ── STATUSパネル 2カラム ── */
+  #panel-status { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
   #panel-status > * { margin-bottom: 0; }
-  #overallProgressSection, #raidBossSection, .petrified-banner { grid-column: 1 / -1; }
+  #overallProgressSection, #raidBossSection, #paceDiagCard, .petrified-banner { grid-column: 1 / -1; }
+
+  /* ── カード共通スペーシング ── */
+  .section { padding: 16px !important; border-radius: 10px !important; }
+  .sec-title { font-size: 10px !important; margin-bottom: 12px !important; }
+
+  /* ── 試験カウントダウンチップ ── */
+  .status-exam-mini { gap: 10px !important; }
+  .status-exam-chip { padding: 10px 14px !important; border-radius: 10px !important; }
+  .status-exam-days { font-size: 22px !important; min-width: 36px !important; }
+  .status-exam-name { font-size: 11px !important; }
+  .status-exam-label { font-size: 9px !important; }
+
+  /* ── 合格ペース診断カード ── */
+  .pd-card { padding: 16px !important; border-radius: 10px !important; }
+  .pd-title { font-size: 11px !important; }
+  .pd-exam-name { font-size: 10px !important; }
+  .pd-metric-val { font-size: 20px !important; }
+  .pd-metric-label { font-size: 9px !important; }
+
+  /* ── デイリーミッション ── */
+  .dm-card { padding: 14px 16px !important; border-radius: 10px !important; }
+  .dm-title { font-size: 10px !important; margin-bottom: 10px !important; }
+  .dm-item { padding: 8px 10px !important; border-radius: 6px !important; font-size: 11px !important; gap: 8px !important; }
 }
 @media (min-width: 1280px) {
-  .wrap { padding: 24px 36px 100px !important; }
+  .pc-sidebar { width: 248px; min-width: 248px; }
+  .wrap { padding: 24px 32px 80px !important; }
 
   #panel-status { grid-template-columns: 1fr 1fr 1fr; }
 }
@@ -3310,11 +3358,11 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <div id="statusExamMini"></div>
       <div id="todayPlanCard" style="display:none;" class="today-plan-card"></div>
     </div>
-    <!-- 合格ペース診断 -->
-    <div id="paceDiagCard"></div>
-    <!-- デイリーミッション -->
+    <!-- 右カラム：デイリーミッション -->
     <div id="dailyMissionCard"></div>
-    <!-- 統合：全体進捗 + 科目HP -->
+    <!-- 合格ペース診断（全幅） -->
+    <div id="paceDiagCard"></div>
+    <!-- 統合：全体進捗 + 科目HP（全幅） -->
     <div class="section" id="overallProgressSection"></div>
     <div id="dqStatusCard" style="display:none;"></div>
     <div style="display:none;" id="radarSection">
