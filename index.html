@@ -10831,6 +10831,7 @@ const TL_PAGE_SIZE = 15;
 let tlAllPosts = [];
 let tlRealtimeChannel = null;
 let tlPendingPosts = [];   // Realtimeで受信した未表示の新着
+let tlLikedSet = new Set(); // クラウドいいね済みIDキャッシュ
 
 /* ── Realtime購読：タイムライン ── */
 function subscribeTlRealtime(){
