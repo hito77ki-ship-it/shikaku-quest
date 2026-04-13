@@ -7971,9 +7971,22 @@ function shareWeeklyGoalToX(){
   const sun = getWeekSunday();
   const d1  = ws.slice(5).replace('-','/');
   const d2  = sun.slice(5).replace('-','/');
-  const hours = getThisWeekGoalHours();
-  const text = `今週の勉強目標を設定しました🎯\n\n📅 ${d1}〜${d2}\n⏱ 目標：${hours}時間\n\n達成まで頑張ります💪\n#StudyQuest #勉強垢 #公認会計士試験\nhttps://hito77ki-ship-it.github.io/study-quest/`;
+  const hours    = getThisWeekGoalHours();
+  const examInfo = getNextExamDays();
+  const examLine = examInfo ? `\n📅 ${examInfo.title}まであと${examInfo.days}日` : '';
+  const text = `今週の勉強目標を設定しました🎯\n\n📅 ${d1}〜${d2}\n⏱ 目標：${hours}時間${examLine}\n\n達成まで頑張ります💪\n#StudyQuest #公認会計士試験\nhttps://hito77ki-ship-it.github.io/study-quest/`;
   window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
+}
+
+/* 最も近い試験日までの残日数を返す（過去は除外、なければnull） */
+function getNextExamDays(){
+  if(!examGoals || !examGoals.length) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = examGoals
+    .map(g=>{ const d=new Date(g.date); d.setHours(0,0,0,0); return {days:Math.round((d-today)/86400000), title:g.title||'試験'}; })
+    .filter(g=>g.days>=0)
+    .sort((a,b)=>a.days-b.days);
+  return days.length ? days[0] : null;
 }
 
 function shareGoalProgressToX(){
@@ -7984,11 +7997,19 @@ function shareGoalProgressToX(){
   const doneM     = weekMins % 60;
   const doneStr   = doneH ? `${doneH}時間${doneM?doneM+'分':''}` : `${doneM}分`;
   const emoji     = pct >= 100 ? '🎉🏆' : pct >= 90 ? '🔥' : pct >= 50 ? '💪' : '📚';
-  const text = `今週の学習進捗 ${emoji}\n\n目標${goalHours}時間に対して ${pct}% 達成！\n学習済み：${doneStr}\n\n#StudyQuest #勉強垢 #公認会計士試験\nhttps://hito77ki-ship-it.github.io/study-quest/`;
+  const examInfo  = getNextExamDays();
+  const examLine  = examInfo ? `📅 ${examInfo.title}まであと${examInfo.days}日\n` : '';
+  const text = `今週の学習進捗 ${emoji}\n\n🎯 目標：${goalHours}時間\n✅ 達成率：${pct}%（${doneStr}）\n${examLine}\n#StudyQuest #公認会計士試験\nhttps://hito77ki-ship-it.github.io/study-quest/`;
   window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
 }
 
-/* ════ 週間目標マイルストーン ════ */
+/* ════ 週間目標マイルストーン ════
+   二重投稿防止の仕組み：
+   - weeklyGoalData[ws].notifiedMilestones[] に投稿済み%を記録
+   - ws = その週の月曜日（例: '2026-04-14'）→ 週が変わると自動で別エントリ
+   - 勉強時間を増減しても includes() チェックで再投稿不可
+   - 新しい週の目標設定時は ws が新しくなるため完全リセット
+════ */
 const WG_MILESTONES = [10, 50, 90, 100];
 
 async function checkWeeklyGoalMilestones(){
@@ -8001,12 +8022,23 @@ async function checkWeeklyGoalMilestones(){
 
   const entry = weeklyGoalData[ws];
   if(!entry) return;
+  // 週識別子をエントリに記録（ws = '2026-04-14' 形式）
+  if(!entry.weekKey) { entry.weekKey = ws; }
   if(!entry.notifiedMilestones) entry.notifiedMilestones = [];
 
+  // 週が変わっていたら（weekKeyが異なる）フラグをリセット
+  // ※通常はwsキー自体が変わるので不要だが、念のため二重チェック
+  if(entry.weekKey !== ws) {
+    entry.notifiedMilestones = [];
+    entry.weekKey = ws;
+  }
+
   for(const milestone of WG_MILESTONES){
-    if(pct >= milestone && !entry.notifiedMilestones.includes(milestone)){
+    const alreadyPosted = entry.notifiedMilestones.includes(milestone);
+    if(pct >= milestone && !alreadyPosted){
+      // ★フラグを投稿前に記録 → 投稿失敗しても再投稿しない
       entry.notifiedMilestones.push(milestone);
-      saveReportState();
+      saveReportState(); // 即座に永続化
       await postGoalMilestoneToTimeline(milestone, weekMins, goalHours);
       if(milestone === 100) showGoalCelebration();
     }
