@@ -10816,11 +10816,12 @@ async function manualPost(){
 
   if(document.getElementById('tlInput')) document.getElementById('tlInput').value = '';
   clearTlImage();
-  document.getElementById('tlCompose').style.display = 'none';
+  const compose = document.getElementById('tlComposeToggle');
+  if(compose) compose.style.display = 'none';
 }
 
 function openTlCompose(){
-  const el = document.getElementById('tlCompose');
+  const el = document.getElementById('tlComposeToggle');
   if(el) el.style.display = el.style.display === 'none' ? '' : 'none';
 }
 
