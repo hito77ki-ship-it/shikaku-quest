@@ -10801,23 +10801,58 @@ function clearTlImage(){
 
 async function manualPost(){
   const content = document.getElementById('tlInput')?.value.trim() || '';
-  const latest = sessions[sessions.length - 1];
-  if(!latest){ alert('先に学習記録を作成してください'); return; }
+  if(!content && !tlPostImage){ alert('一言を入力してください'); return; }
 
-  await autoPostToTimeline({
-    subject:    latest.subject,
-    minutes:    latest.amount,
-    note:       content || latest.note || '',
-    exp:        latest.exp,
-    lv:         char.level,
-    name:       char.name,
-    post_image: tlPostImage,
-  });
+  const post = {
+    id:           Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    user_id:      currentUser ? currentUser.id : 'guest_' + (char.name || 'anonymous'),
+    user_name:    char.name || '冒険者',
+    user_level:   char.level || 1,
+    job_ids:      selectedJobIds,
+    subject_name: '',
+    minutes:      0,
+    note:         content,
+    rpg_log:      '',
+    exp:          0,
+    likes_count:  0,
+    is_free_post: true,
+    post_image:   tlPostImage || null,
+    avatar_url:   profileAvatarData || null,
+    created_at:   new Date().toISOString(),
+  };
+
+  const posts = loadLocalPosts();
+  posts.push(post);
+  saveLocalPosts(posts);
+
+  if(currentUser){
+    try {
+      await sb.from('timeline_posts').insert({
+        user_id:      post.user_id,
+        user_name:    post.user_name,
+        user_level:   post.user_level,
+        job_ids:      post.job_ids,
+        subject_name: '',
+        minutes:      0,
+        note:         post.note,
+        rpg_log:      '',
+        exp:          0,
+        likes_count:  0,
+        is_free_post: true,
+        post_image:   post.post_image,
+        avatar_url:   post.avatar_url,
+        created_at:   post.created_at,
+      });
+    } catch(e){ console.warn('Free post cloud failed:', e); }
+  }
 
   if(document.getElementById('tlInput')) document.getElementById('tlInput').value = '';
   clearTlImage();
   const compose = document.getElementById('tlComposeToggle');
   if(compose) compose.style.display = 'none';
+
+  const tlPanel = document.getElementById('panel-timeline');
+  if(tlPanel && tlPanel.style.display === 'block') loadTimeline();
 }
 
 function openTlCompose(){
@@ -11051,6 +11086,12 @@ function renderPostHTML(post, likes){
       <div class="tl-post-lv">Lv.${post.user_level || 1}</div>
     </div>
 
+    <!-- 自由投稿の場合はシンプルテキストのみ -->
+    ${post.is_free_post ? `
+    ${post.post_image ? `<img src="${post.post_image}" alt="" style="max-width:100%;border-radius:8px;margin-bottom:10px;display:block;">` : ''}
+    ${post.note ? `<div style="font-size:14px;color:var(--text);line-height:1.7;padding:2px 0 10px;">${escHtml(post.note)}</div>` : ''}
+    ` : `
+
     <!-- RPG戦闘ログ -->
     <div style="background:linear-gradient(135deg,rgba(140,198,63,.06),transparent);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--text);line-height:1.6;">
       ⚔ ${escHtml(post.rpg_log || '')}
@@ -11097,6 +11138,7 @@ function renderPostHTML(post, likes){
         <div style="font-size:10px;color:${expColor};font-family:'Share Tech Mono',monospace;">+${post.exp||0} EXP</div>
       </div>
     </div>`}
+    `}
 
     <!-- フッター -->
     <div class="tl-post-footer">
