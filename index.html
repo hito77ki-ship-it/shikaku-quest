@@ -1103,6 +1103,25 @@ body[data-theme="dark"] .wg-lock-note{color:var(--muted);}
   vertical-align:middle;
 }
 
+/* ── マイルストーン進捗バー ── */
+.wg-milestone-bar{display:flex;align-items:center;gap:6px;margin:10px 0 6px;}
+.wg-milestone-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;transition:all .3s;border:2px solid var(--border);}
+.wg-milestone-dot.reached{background:var(--accent);border-color:var(--accent);color:#fff;}
+.wg-milestone-dot.pending{background:var(--panel2);color:var(--muted);}
+.wg-milestone-line{flex:1;height:2px;background:var(--border);border-radius:2px;}
+.wg-milestone-line.reached{background:var(--accent);}
+.wg-share-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.wg-x-share-btn{background:none;border:1px solid #1d9bf0;border-radius:20px;padding:5px 14px;font-size:11px;color:#1d9bf0;cursor:pointer;transition:all .15s;}
+.wg-x-share-btn:hover{background:rgba(29,155,240,.08);}
+
+/* ── 紙吹雪アニメーション ── */
+.confetti-container{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;}
+@keyframes confetti-fall{
+  0%{transform:translateY(-10px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0;}
+}
+.confetti-piece{position:absolute;width:8px;height:8px;top:-10px;animation:confetti-fall linear forwards;}
+
 /* ════════════════════════════════════════
    グローバルナビゲーションバー
 ════════════════════════════════════════ */
@@ -4004,12 +4023,26 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
             </div>
             <!-- 設定済み：ロックバナー -->
             <div id="wgLocked" class="wg-locked-card" style="display:none;">
-              <div class="wg-lock-icon">🔒</div>
-              <div class="wg-lock-body">
+              <div class="wg-lock-icon" id="wgLockIcon">🔒</div>
+              <div class="wg-lock-body" style="flex:1;min-width:0;">
                 <div class="wg-lock-title">今週の目標：<span id="wgLockedHours"></span>時間</div>
                 <div class="wg-lock-sub" id="wgLockedSub"></div>
+                <!-- マイルストーン進捗バー -->
+                <div class="wg-milestone-bar" id="wgMilestoneBar">
+                  <div class="wg-milestone-dot pending" id="wgM10">10%</div>
+                  <div class="wg-milestone-line" id="wgML1"></div>
+                  <div class="wg-milestone-dot pending" id="wgM50">50%</div>
+                  <div class="wg-milestone-line" id="wgML2"></div>
+                  <div class="wg-milestone-dot pending" id="wgM90">90%</div>
+                  <div class="wg-milestone-line" id="wgML3"></div>
+                  <div class="wg-milestone-dot pending" id="wgM100">🎉</div>
+                </div>
                 <div class="wg-lock-note">日曜日が終わったら来週の目標を設定できます</div>
-                <button onclick="shareWeeklyGoalToX()" style="margin-top:10px;background:none;border:1px solid #1d9bf0;border-radius:20px;padding:5px 14px;font-size:11px;color:#1d9bf0;cursor:pointer;">𝕏 Xにシェア</button>
+                <!-- シェアボタン行 -->
+                <div class="wg-share-row">
+                  <button class="wg-x-share-btn" onclick="shareWeeklyGoalToX()">𝕏 目標をシェア</button>
+                  <button class="wg-x-share-btn" id="wgProgressShareBtn" onclick="shareGoalProgressToX()" style="display:none;">𝕏 進捗をシェア</button>
+                </div>
               </div>
             </div>
           </div>
@@ -6405,6 +6438,7 @@ async function addQuest(){
   await saveAll();renderAll();
   if(lv1>lv0){showLevelUp(lv1,smins1); checkClassChange(lv0,lv1,smins1);}
   if(currentUser) syncToCloud().catch(()=>{});
+  checkWeeklyGoalMilestones().catch(()=>{});
 
   // タイムラインに自動投稿
   if(currentType === 'study') {
@@ -7760,6 +7794,27 @@ function renderWeeklyGoal(){
     // ロック表示
     if(wgForm)   wgForm.style.display   = 'none';
     if(wgLocked) wgLocked.style.display = '';
+
+    // マイルストーンUI更新
+    const notified = (weeklyGoalData[ws]||{}).notifiedMilestones || [];
+    const pctNow   = Math.round(pct*100);
+    const mDots = {10:'wgM10',50:'wgM50',90:'wgM90',100:'wgM100'};
+    const mLines= {10:'wgML1',50:'wgML2',90:'wgML3'};
+    WG_MILESTONES.forEach((m,i)=>{
+      const dot = document.getElementById(mDots[m]);
+      if(dot){ dot.classList.toggle('reached', notified.includes(m)); dot.classList.toggle('pending', !notified.includes(m)); }
+    });
+    [10,50,90].forEach(m=>{
+      const line = document.getElementById(mLines[m]);
+      if(line) line.classList.toggle('reached', pctNow >= m);
+    });
+    // ロックアイコン切替
+    const lockIcon = document.getElementById('wgLockIcon');
+    if(lockIcon) lockIcon.textContent = pct>=1 ? '🏆' : '🔒';
+    // 進捗シェアボタン（1つでも到達したら表示）
+    const progressBtn = document.getElementById('wgProgressShareBtn');
+    if(progressBtn) progressBtn.style.display = notified.length > 0 ? '' : 'none';
+
     const lockedHours = document.getElementById('wgLockedHours');
     const lockedSub   = document.getElementById('wgLockedSub');
     if(lockedHours) lockedHours.textContent = goalHours;
@@ -7900,6 +7955,8 @@ async function postWeeklyGoalToTimeline(hours, d1, d2){
         rpg_log:      post.rpg_log,
         exp:          0,
         likes_count:  0,
+        is_weekly_goal: true,
+        goal_hours:   post.goal_hours || 0,
         avatar_url:   profileAvatarData || null,
         created_at:   post.created_at,
       });
@@ -7915,8 +7972,131 @@ function shareWeeklyGoalToX(){
   const d1  = ws.slice(5).replace('-','/');
   const d2  = sun.slice(5).replace('-','/');
   const hours = getThisWeekGoalHours();
-  const text = `今週の勉強目標を設定しました🎯\n\n📅 ${d1}〜${d2}\n⏱ 目標：${hours}時間\n\n達成まで頑張ります💪\n#スタディクエスト #study_quest #勉強垢\nhttps://hito77ki-ship-it.github.io/study-quest/`;
+  const text = `今週の勉強目標を設定しました🎯\n\n📅 ${d1}〜${d2}\n⏱ 目標：${hours}時間\n\n達成まで頑張ります💪\n#StudyQuest #勉強垢 #公認会計士試験\nhttps://hito77ki-ship-it.github.io/study-quest/`;
   window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
+}
+
+function shareGoalProgressToX(){
+  const goalHours = getThisWeekGoalHours();
+  const weekMins  = getThisWeekTotalMins();
+  const pct       = goalHours > 0 ? Math.min(100, Math.round(weekMins / (goalHours*60) * 100)) : 0;
+  const doneH     = Math.floor(weekMins/60);
+  const doneM     = weekMins % 60;
+  const doneStr   = doneH ? `${doneH}時間${doneM?doneM+'分':''}` : `${doneM}分`;
+  const emoji     = pct >= 100 ? '🎉🏆' : pct >= 90 ? '🔥' : pct >= 50 ? '💪' : '📚';
+  const text = `今週の学習進捗 ${emoji}\n\n目標${goalHours}時間に対して ${pct}% 達成！\n学習済み：${doneStr}\n\n#StudyQuest #勉強垢 #公認会計士試験\nhttps://hito77ki-ship-it.github.io/study-quest/`;
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
+}
+
+/* ════ 週間目標マイルストーン ════ */
+const WG_MILESTONES = [10, 50, 90, 100];
+
+async function checkWeeklyGoalMilestones(){
+  const ws = getWeekStart();
+  const goalHours = getThisWeekGoalHours();
+  if(!goalHours) return;
+  const goalMins  = goalHours * 60;
+  const weekMins  = getThisWeekTotalMins();
+  const pct       = weekMins / goalMins * 100;
+
+  const entry = weeklyGoalData[ws];
+  if(!entry) return;
+  if(!entry.notifiedMilestones) entry.notifiedMilestones = [];
+
+  for(const milestone of WG_MILESTONES){
+    if(pct >= milestone && !entry.notifiedMilestones.includes(milestone)){
+      entry.notifiedMilestones.push(milestone);
+      saveReportState();
+      await postGoalMilestoneToTimeline(milestone, weekMins, goalHours);
+      if(milestone === 100) showGoalCelebration();
+    }
+  }
+}
+
+async function postGoalMilestoneToTimeline(milestone, weekMins, goalHours){
+  const name   = char.name || '冒険者';
+  const doneH  = Math.floor(weekMins/60);
+  const doneM  = weekMins % 60;
+  const doneStr= doneH ? `${doneH}h${doneM?doneM+'m':''}` : `${doneM}m`;
+  const emoji  = milestone >= 100 ? '🎉' : milestone >= 90 ? '🔥' : milestone >= 50 ? '💪' : '📚';
+  const noteStr= milestone >= 100
+    ? `週間目標 ${goalHours}時間 を完全達成！ ${emoji}`
+    : `週間目標の ${milestone}% に到達！ ${emoji} ${doneStr} / ${goalHours}h`;
+  const rpgLog = milestone >= 100
+    ? `${name} は今週の目標 ${goalHours}時間 を完全に達成した！🎉`
+    : `${name} は週間目標の ${milestone}% に到達した！ ${emoji}`;
+
+  const smins = studyMins(sessions);
+  const lv    = computeLevel(smins);
+  const post  = {
+    id:           Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    user_id:      currentUser ? currentUser.id : 'guest',
+    user_name:    name,
+    user_level:   lv,
+    job_ids:      selectedJobIds || [],
+    subject_name: '週間目標',
+    minutes:      0,
+    note:         noteStr,
+    rpg_log:      rpgLog,
+    exp:          0,
+    is_achievement: true,
+    achievement_data: JSON.stringify({ type:'goal_progress', pct:milestone, goalHours, weekMins }),
+    created_at:   new Date().toISOString(),
+    is_own:       true,
+  };
+  const posts = loadLocalPosts();
+  posts.push(post);
+  saveLocalPosts(posts);
+
+  if(currentUser){
+    try {
+      await sb.from('timeline_posts').insert({
+        user_id:          currentUser.id,
+        user_name:        post.user_name,
+        user_level:       post.user_level,
+        job_ids:          post.job_ids,
+        subject_name:     post.subject_name,
+        minutes:          0,
+        note:             post.note,
+        rpg_log:          post.rpg_log,
+        exp:              0,
+        likes_count:      0,
+        is_achievement:   true,
+        achievement_data: post.achievement_data,
+        avatar_url:       profileAvatarData || null,
+        created_at:       post.created_at,
+      });
+    } catch(e){ console.warn('Goal milestone TL post failed:', e); }
+  }
+
+  const tlPanel = document.getElementById('panel-timeline');
+  if(tlPanel && tlPanel.style.display === 'block') loadTimeline();
+}
+
+function showGoalCelebration(){
+  // 紙吹雪
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+  const colors = ['#8CC63F','#FFD700','#FF6B6B','#4DB8FF','#A855F7','#FF9E4D'];
+  for(let i = 0; i < 80; i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const size  = 6 + Math.random() * 8;
+    piece.style.cssText = `
+      left:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      background:${color};
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation-duration:${1.5+Math.random()*2}s;
+      animation-delay:${Math.random()*.8}s;
+    `;
+    container.appendChild(piece);
+  }
+  // トースト
+  spawnDmgNumber('🎉 週間目標 100% 達成！', '#FFD700', true);
+  setTimeout(()=>{ container.remove(); }, 4000);
 }
 
 /* EXP連動バナー */
