@@ -2801,17 +2801,114 @@ body[data-theme="dark"] #mobileTabBar {
   .timer-goal-input { font-size: 16px !important; }
 
   /* ── モバイル記録タブ 2ステート ── */
-  /* デフォルト（教材グリッド表示） */
+  /* デフォルト（教材グリッド表示）: timer-panel と余計な要素を隠す */
   #panel-quest:not(.show-timer) .timer-panel { display: none !important; }
   #panel-quest:not(.show-timer) #quickMaterialSelect { display: none !important; }
   #panel-quest:not(.show-timer) #noMaterialBanner { display: none !important; }
   #panel-quest:not(.show-timer) .decl-card { display: none !important; }
   #panel-quest:not(.show-timer) > .section { display: none !important; }
-  /* タイマー表示状態 */
+  /* タイマー表示状態: mobileQuestMaterials を隠し、timer-panel も隠して mobileRecordUI に置き換え */
   #panel-quest.show-timer #mobileQuestMaterials { display: none !important; }
+  #panel-quest.show-timer .timer-panel { display: none !important; }
+  #panel-quest.show-timer #mobileRecordUI { display: flex !important; }
   /* ナビ・グリッド表示 */
   #mobileQuestMaterials { display: block; }
-  #mobileTimerNav { display: flex !important; }
+}
+
+/* ════ モバイル記録UI（3タブ）════ */
+#mobileRecordUI {
+  display: none;
+  flex-direction: column;
+  min-height: calc(100dvh - 160px);
+}
+.mrec-nav {
+  display: flex; align-items: center; gap: 10px;
+  padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  margin-bottom: 14px; flex-shrink: 0;
+}
+.mrec-nav-back {
+  background: transparent; border: none; color: var(--muted);
+  font-size: 22px; cursor: pointer; padding: 0 6px;
+  min-height: 44px; display: flex; align-items: center; line-height: 1;
+}
+.mrec-mat-info {
+  display: flex; align-items: center; gap: 8px;
+  flex: 1; min-width: 0; overflow: hidden;
+}
+.mrec-mat-cover {
+  width: 30px; height: 40px; border-radius: 4px; overflow: hidden;
+  flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+.mrec-mat-name {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+}
+.mrec-tabs {
+  display: flex; background: var(--panel2); border-radius: 10px;
+  padding: 3px; gap: 2px; margin-bottom: 16px; flex-shrink: 0;
+}
+.mrec-tab-btn {
+  flex: 1; border: none; background: transparent; border-radius: 8px;
+  padding: 9px 4px; font-size: 12px; font-weight: 600;
+  color: var(--muted); cursor: pointer; transition: all .15s;
+  min-height: 40px;
+}
+.mrec-tab-btn.active {
+  background: var(--panel); color: var(--text);
+  box-shadow: 0 1px 6px rgba(0,0,0,.1);
+}
+.mrec-pane { display: flex; flex-direction: column; flex: 1; }
+.mrec-row {
+  display: flex; align-items: center; min-height: 52px;
+  border-bottom: 1px solid var(--border); gap: 12px; padding: 0 2px;
+}
+.mrec-row-icon { font-size: 17px; width: 24px; text-align: center; flex-shrink: 0; color: var(--muted); }
+.mrec-row-label { font-size: 13px; color: var(--text); min-width: 36px; flex-shrink: 0; }
+.mrec-row-value { flex: 1; display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+.mrec-input {
+  background: transparent; border: none; font-size: 15px; font-weight: 600;
+  color: var(--text); text-align: right; width: 44px; padding: 0;
+  -webkit-appearance: none; appearance: none;
+}
+.mrec-input:focus { outline: none; }
+.mrec-select {
+  background: transparent; border: none; font-size: 14px;
+  color: var(--text); text-align: right; cursor: pointer; max-width: 160px;
+}
+.mrec-select:focus { outline: none; }
+.mrec-cover-large {
+  width: 80px; height: 106px; margin: 8px auto 4px;
+  border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; background: var(--panel2);
+}
+.mrec-cover-large img { width: 100%; height: 100%; object-fit: cover; }
+.mrec-timer-display {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 52px; color: var(--text); text-align: center;
+  letter-spacing: 2px; margin: 8px 0 12px; flex-shrink: 0;
+  transition: color .3s;
+}
+.mrec-timer-display.running { color: var(--accent2); }
+.mrec-action-btn {
+  width: 100%; padding: 16px; border: none; border-radius: 14px;
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  background: var(--accent); color: #000; margin-top: auto;
+  min-height: 52px; transition: opacity .15s;
+}
+.mrec-action-btn:active { opacity: .8; }
+.mrec-action-btn.pause { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
+.mrec-action-btn.stop { background: transparent; color: var(--accent2); border: 1px solid var(--accent-border); margin-top: 8px; padding: 12px; font-size: 14px; }
+.mrec-note-input {
+  width: 100%; background: transparent; border: none;
+  font-size: 14px; color: var(--text); padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mrec-note-input::placeholder { color: var(--muted); }
+.mrec-note-input:focus { outline: none; }
+.mrec-exam-mini {
+  font-family: 'Share Tech Mono', monospace; font-size: 10px;
+  color: var(--muted); text-align: right; flex-shrink: 0;
 }
 
 /* ════ 極小画面（〜375px iPhone SE等）════ */
@@ -3683,6 +3780,91 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         <button onclick="openMaterialForm()" style="background:var(--accent);color:#000;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;min-height:44px;">＋ 教材を追加</button>
       </div>
       <div id="mobileQuestMatList"></div>
+    </div>
+
+    <!-- モバイル専用：3タブ記録UI -->
+    <div id="mobileRecordUI">
+      <!-- ヘッダー：戻るボタン + 教材名 + 試験残日数 -->
+      <div class="mrec-nav">
+        <button class="mrec-nav-back" onclick="exitMobileTimerMode()">←</button>
+        <div class="mrec-mat-info">
+          <div class="mrec-mat-cover" id="mrecMatCover"><span style="font-size:22px;">📖</span></div>
+          <div class="mrec-mat-name" id="mrecMatName">教材を選択中</div>
+        </div>
+        <div class="mrec-exam-mini" id="mrecExamMini"></div>
+      </div>
+
+      <!-- タブ切り替え -->
+      <div class="mrec-tabs">
+        <button class="mrec-tab-btn active" id="mrecTab-manual"     onclick="switchMrecTab('manual')">手動入力</button>
+        <button class="mrec-tab-btn"        id="mrecTab-stopwatch"  onclick="switchMrecTab('stopwatch')">ストップウォッチ</button>
+        <button class="mrec-tab-btn"        id="mrecTab-timer"      onclick="switchMrecTab('timer')">タイマー</button>
+      </div>
+
+      <!-- ── 手動入力 ── -->
+      <div id="mrecPane-manual" class="mrec-pane">
+        <div class="mrec-row">
+          <span class="mrec-row-icon">📅</span>
+          <span class="mrec-row-label">日付</span>
+          <div class="mrec-row-value">
+            <input type="date" id="mrecDate" class="mrec-select" style="font-size:14px;width:auto;">
+          </div>
+        </div>
+        <div class="mrec-row">
+          <span class="mrec-row-icon">⏱</span>
+          <span class="mrec-row-label">時間</span>
+          <div class="mrec-row-value">
+            <input type="number" id="mrecHour" class="mrec-input" min="0" max="12" placeholder="0">
+            <span style="font-size:13px;color:var(--muted);">時間</span>
+            <input type="number" id="mrecMin"  class="mrec-input" min="0" max="59" placeholder="0">
+            <span style="font-size:13px;color:var(--muted);">分</span>
+          </div>
+        </div>
+        <div class="mrec-row">
+          <span class="mrec-row-icon">📖</span>
+          <span class="mrec-row-label">科目</span>
+          <div class="mrec-row-value">
+            <select id="mrecSubject" class="mrec-select"></select>
+          </div>
+        </div>
+        <div class="mrec-row" style="align-items:flex-start;padding-top:10px;padding-bottom:10px;min-height:auto;">
+          <span class="mrec-row-icon" style="padding-top:2px;">✏️</span>
+          <input type="text" id="mrecNote" class="mrec-note-input" placeholder="メモ（任意）" maxlength="100" style="margin-top:0;">
+        </div>
+        <div style="flex:1;"></div>
+        <button class="mrec-action-btn" onclick="mrecSubmitManual()">記録する</button>
+      </div>
+
+      <!-- ── ストップウォッチ ── -->
+      <div id="mrecPane-stopwatch" class="mrec-pane" style="display:none;">
+        <div class="mrec-cover-large" id="mrecCoverSW"><span>📖</span></div>
+        <div class="mrec-timer-display" id="mrecDisplaySW">00:00:00</div>
+        <input type="text" id="mrecNoteSW" class="mrec-note-input" placeholder="メモ（任意）" maxlength="100">
+        <div style="flex:1;"></div>
+        <button class="mrec-action-btn" id="mrecStartSW" onclick="mrecToggle()">▶ スタート</button>
+        <button class="mrec-action-btn stop" id="mrecStopSW" onclick="mrecFinish()" style="display:none;">✓ 記録して終了</button>
+      </div>
+
+      <!-- ── タイマー ── -->
+      <div id="mrecPane-timer" class="mrec-pane" style="display:none;">
+        <div class="mrec-cover-large" id="mrecCoverTimer"><span>📖</span></div>
+        <div class="mrec-row" style="margin-bottom:4px;">
+          <span class="mrec-row-icon">🎯</span>
+          <span class="mrec-row-label">目標</span>
+          <div class="mrec-row-value">
+            <input type="number" id="mrecGoalH" class="mrec-input" min="0" max="12" placeholder="0">
+            <span style="font-size:13px;color:var(--muted);">時間</span>
+            <input type="number" id="mrecGoalM" class="mrec-input" min="0" max="59" placeholder="0">
+            <span style="font-size:13px;color:var(--muted);">分</span>
+            <button onclick="mrecSetGoal()" style="background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text);cursor:pointer;min-height:36px;">SET</button>
+          </div>
+        </div>
+        <div class="mrec-timer-display" id="mrecDisplayTimer">00:00:00</div>
+        <input type="text" id="mrecNoteTimer" class="mrec-note-input" placeholder="メモ（任意）" maxlength="100">
+        <div style="flex:1;"></div>
+        <button class="mrec-action-btn" id="mrecStartTimer" onclick="mrecToggle()">▶ スタート</button>
+        <button class="mrec-action-btn stop" id="mrecStopTimer" onclick="mrecFinish()" style="display:none;">✓ 記録して終了</button>
+      </div>
     </div>
 
     <!-- 教材クイック選択 -->
@@ -6939,6 +7121,7 @@ function startTimer(){
     if(timerGoalMins>0 && timerSeconds===timerGoalMins*60) notifyGoalReached();
   },1000);
   showBgBadge(false);
+  syncMrecButtons();
 }
 
 function pauseTimer(){
@@ -6948,6 +7131,7 @@ function pauseTimer(){
   const breakBtn=document.getElementById('manualBreakBtn');
   if(btn){btn.textContent='▶ 再開';btn.classList.remove('running');}
   if(breakBtn)breakBtn.style.display='none';
+  syncMrecButtons();
 }
 
 function updateTimerDisplay(){
@@ -6959,6 +7143,7 @@ function updateTimerDisplay(){
     disp.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     disp.classList.toggle('running',timerRunning);
   }
+  updateMrecDisplay();
 }
 
 function updateDmgBar(){
@@ -13105,8 +13290,174 @@ function mobileStartRecord(materialId){
   const sel = document.getElementById('timerMaterial');
   if(sel){ sel.value = materialId; updateTimerMaterial(); }
   document.getElementById('panel-quest')?.classList.add('show-timer');
-  _updateMobileTimerMatInfo(materialId);
+  initMrecUI(materialId);
   window.scrollTo(0, 0);
+}
+
+/* ─────────────────────────────────────────────
+   モバイル3タブ記録UI
+───────────────────────────────────────────── */
+let currentMrecTab = 'manual';
+
+function initMrecUI(materialId){
+  // 教材情報をヘッダーに反映
+  const m = materials.find(x => x.id === materialId);
+  const nameEl = document.getElementById('mrecMatName');
+  const coverEl = document.getElementById('mrecMatCover');
+  const coverSW = document.getElementById('mrecCoverSW');
+  const coverTimer = document.getElementById('mrecCoverTimer');
+
+  if(m){
+    if(nameEl) nameEl.textContent = m.name;
+    const coverHtml = m.cover
+      ? `<img src="${m.cover}" alt="" style="width:100%;height:100%;object-fit:cover;">`
+      : `<span style="font-size:22px;">📖</span>`;
+    if(coverEl) coverEl.innerHTML = coverHtml;
+    if(coverSW) coverSW.innerHTML = m.cover
+      ? `<img src="${m.cover}" alt="" style="width:100%;height:100%;object-fit:cover;">`
+      : `<span style="font-size:40px;">📖</span>`;
+    if(coverTimer) coverTimer.innerHTML = coverSW?.innerHTML || '<span style="font-size:40px;">📖</span>';
+  }
+
+  // 試験残日数をヘッダーに表示
+  const examMini = document.getElementById('mrecExamMini');
+  if(examMini){
+    const goals = (typeof examGoals !== 'undefined') ? examGoals : [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = goals
+      .map(eg=>({...eg, days: Math.round((new Date(eg.date).setHours(0,0,0,0) - today) / 86400000)}))
+      .filter(eg=>eg.days >= 0).sort((a,b)=>a.days-b.days);
+    if(upcoming.length){
+      const n = upcoming[0];
+      examMini.innerHTML = `<span style="color:${n.days<=30?'var(--color-danger)':n.days<=60?'var(--color-warning)':'var(--muted)'}">📅 ${n.days}日</span>`;
+    } else { examMini.textContent = ''; }
+  }
+
+  // 科目セレクトを同期
+  const subjectSel = document.getElementById('mrecSubject');
+  if(subjectSel){
+    const currentSubj = document.getElementById('timerSubject')?.value || '';
+    subjectSel.innerHTML = '';
+    allSelectedSubjects().forEach(s=>{
+      const opt = document.createElement('option');
+      opt.value = s.key; opt.textContent = s.name;
+      subjectSel.appendChild(opt);
+    });
+    if(currentSubj) subjectSel.value = currentSubj;
+  }
+
+  // 日付を今日に設定
+  const dateEl = document.getElementById('mrecDate');
+  if(dateEl) dateEl.value = new Date().toISOString().slice(0,10);
+
+  // タブをデフォルト（手動入力）に戻す（タイマー未実行時）
+  if(!timerRunning && timerSeconds === 0){
+    switchMrecTab('manual');
+  } else {
+    // タイマー動作中はストップウォッチタブを表示
+    switchMrecTab('stopwatch');
+  }
+  updateMrecDisplay();
+  syncMrecButtons();
+}
+
+function switchMrecTab(tab){
+  if(tab !== currentMrecTab && timerRunning && (tab === 'manual')){
+    if(!confirm('タイマーが動いています。手動入力に切り替えますか？')) return;
+    pauseTimer();
+  }
+  currentMrecTab = tab;
+  ['manual','stopwatch','timer'].forEach(t=>{
+    document.getElementById('mrecTab-'+t)?.classList.toggle('active', t===tab);
+    const pane = document.getElementById('mrecPane-'+t);
+    if(pane) pane.style.display = t===tab ? 'flex' : 'none';
+  });
+}
+
+function mrecToggle(){
+  // メモを timerNote に同期してから toggleTimer
+  const noteEl = currentMrecTab === 'timer'
+    ? document.getElementById('mrecNoteTimer')
+    : document.getElementById('mrecNoteSW');
+  const timerNoteEl = document.getElementById('timerNote');
+  if(noteEl && timerNoteEl) timerNoteEl.value = noteEl.value;
+  toggleTimer();
+}
+
+function mrecFinish(){
+  // メモを timerNote に同期してから finishTimer
+  const noteEl = currentMrecTab === 'timer'
+    ? document.getElementById('mrecNoteTimer')
+    : document.getElementById('mrecNoteSW');
+  const timerNoteEl = document.getElementById('timerNote');
+  if(noteEl && timerNoteEl) timerNoteEl.value = noteEl.value;
+  finishTimer();
+}
+
+function mrecSetGoal(){
+  const h = document.getElementById('mrecGoalH')?.value || '0';
+  const m = document.getElementById('mrecGoalM')?.value || '0';
+  const setVal = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+  setVal('timerGoalHourInput', h);
+  setVal('timerGoalMinInput', m);
+  setTimerGoal();
+}
+
+async function mrecSubmitManual(){
+  const h = parseInt(document.getElementById('mrecHour')?.value) || 0;
+  const m = parseInt(document.getElementById('mrecMin')?.value) || 0;
+  if(h === 0 && m === 0){ alert('時間または分を入力してください'); return; }
+  const date    = document.getElementById('mrecDate')?.value || new Date().toISOString().slice(0,10);
+  const subject = document.getElementById('mrecSubject')?.value || '';
+  const note    = document.getElementById('mrecNote')?.value.trim() || '';
+  // 既存フォームに値をセット → addQuest() を呼ぶ
+  const setVal = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+  setVal('questAmountHour', h);
+  setVal('questAmountMin',  m);
+  setVal('questDate',       date);
+  setVal('questSubject',    subject);
+  setVal('questNote',       note);
+  // 教材IDも記録に含める
+  const matSel = document.getElementById('timerMaterial');
+  await addQuest();
+  // フォームをリセット
+  if(document.getElementById('mrecHour')) document.getElementById('mrecHour').value = '';
+  if(document.getElementById('mrecMin'))  document.getElementById('mrecMin').value  = '';
+  if(document.getElementById('mrecNote')) document.getElementById('mrecNote').value = '';
+  // モバイルなら教材グリッドへ戻る
+  if(window.innerWidth <= 600){
+    document.getElementById('panel-quest')?.classList.remove('show-timer');
+    renderMobileQuestMaterials && renderMobileQuestMaterials();
+    window.scrollTo(0, 0);
+  }
+}
+
+function updateMrecDisplay(){
+  const h = Math.floor(timerSeconds/3600);
+  const mn = Math.floor((timerSeconds%3600)/60);
+  const s = timerSeconds%60;
+  const str = `${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  ['mrecDisplaySW','mrecDisplayTimer'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){ el.textContent = str; el.classList.toggle('running', timerRunning); }
+  });
+}
+
+function syncMrecButtons(){
+  const isRunning = timerRunning;
+  const hasSecs   = timerSeconds > 0;
+  // ストップウォッチタブ
+  const startSW = document.getElementById('mrecStartSW');
+  const stopSW  = document.getElementById('mrecStopSW');
+  if(startSW) startSW.textContent = isRunning ? '⏸ 一時停止' : hasSecs ? '▶ 再開' : '▶ スタート';
+  if(startSW) startSW.className = 'mrec-action-btn' + (isRunning ? ' pause' : '');
+  if(stopSW)  stopSW.style.display = hasSecs ? '' : 'none';
+  // タイマータブ
+  const startT = document.getElementById('mrecStartTimer');
+  const stopT  = document.getElementById('mrecStopTimer');
+  if(startT) startT.textContent = isRunning ? '⏸ 一時停止' : hasSecs ? '▶ 再開' : '▶ スタート';
+  if(startT) startT.className = 'mrec-action-btn' + (isRunning ? ' pause' : '');
+  if(stopT)  stopT.style.display = hasSecs ? '' : 'none';
 }
 
 function _updateMobileTimerMatInfo(materialId){
