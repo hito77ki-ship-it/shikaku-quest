@@ -2484,6 +2484,8 @@ body[data-theme="dark"] .achieve-x-btn{background:#333;}
    教材管理システム
 ════════════════════════════════════════ */
 #quickMaterialList::-webkit-scrollbar{display:none;}
+#mobileQuestMaterials{display:none;}
+#mobileTimerNav{display:none;}
 .material-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
@@ -2797,6 +2799,19 @@ body[data-theme="dark"] #mobileTabBar {
 
   /* タブレット・モバイル共通: inputズーム防止 */
   .timer-goal-input { font-size: 16px !important; }
+
+  /* ── モバイル記録タブ 2ステート ── */
+  /* デフォルト（教材グリッド表示） */
+  #panel-quest:not(.show-timer) .timer-panel { display: none !important; }
+  #panel-quest:not(.show-timer) #quickMaterialSelect { display: none !important; }
+  #panel-quest:not(.show-timer) #noMaterialBanner { display: none !important; }
+  #panel-quest:not(.show-timer) .decl-card { display: none !important; }
+  #panel-quest:not(.show-timer) > .section { display: none !important; }
+  /* タイマー表示状態 */
+  #panel-quest.show-timer #mobileQuestMaterials { display: none !important; }
+  /* ナビ・グリッド表示 */
+  #mobileQuestMaterials { display: block; }
+  #mobileTimerNav { display: flex !important; }
 }
 
 /* ════ 極小画面（〜375px iPhone SE等）════ */
@@ -3412,6 +3427,10 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <span class="gnav-item-icon">🏆</span>
       <div class="gnav-item-body"><div class="gnav-item-label">RANKING</div><div class="gnav-item-desc">週間・全体ランキング</div></div>
     </div>
+    <div class="gnav-item" onclick="closeDrawer();switchTab('materials')">
+      <span class="gnav-item-icon">📚</span>
+      <div class="gnav-item-body"><div class="gnav-item-label">教材・参考書</div><div class="gnav-item-desc">教材の管理・追加・編集</div></div>
+    </div>
     <div class="gnav-item" onclick="closeDrawer();switchTab('score')">
       <span class="gnav-item-icon">📊</span>
       <div class="gnav-item-body"><div class="gnav-item-label">SCORE</div><div class="gnav-item-desc">試験スコア・記録</div></div>
@@ -3664,6 +3683,15 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <button onclick="switchTab('materials')" style="background:var(--accent);color:#000;border:none;border-radius:20px;padding:8px 20px;font-size:12px;font-weight:700;cursor:pointer;">＋ 教材を登録する</button>
     </div>
 
+    <!-- モバイル専用：教材グリッド（記録タブのメイン画面） -->
+    <div id="mobileQuestMaterials">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:16px;font-weight:700;color:var(--text);">記録する</div>
+        <button onclick="openMaterialForm()" style="background:var(--accent);color:#000;border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;min-height:44px;">＋ 教材を追加</button>
+      </div>
+      <div id="mobileQuestMatList"></div>
+    </div>
+
     <!-- 教材クイック選択 -->
     <div id="quickMaterialSelect" style="display:none;margin-bottom:12px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -3675,6 +3703,13 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
 
     <!-- TIMER BATTLE -->
     <div class="timer-panel">
+      <!-- モバイル：戻るナビ + 選択教材表示 -->
+      <div id="mobileTimerNav" style="align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+        <button onclick="exitMobileTimerMode()" style="background:transparent;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:0 8px;min-height:44px;display:flex;align-items:center;line-height:1;">←</button>
+        <div id="mobileTimerMatInfo" style="display:flex;align-items:center;gap:8px;flex:1;overflow:hidden;min-width:0;">
+          <div style="font-size:13px;color:var(--muted);">教材未選択</div>
+        </div>
+      </div>
       <!-- 通知許可バナー -->
       <div class="notif-banner" id="notifBanner">
         <span>⏰ 目標時間達成を通知で受け取る</span>
@@ -4486,9 +4521,9 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
 
 <!-- ════ モバイル固定底部タブバー ════ -->
 <nav id="mobileTabBar">
-  <button class="m-tab-btn" data-tab="materials" onclick="switchTab('materials')">
-    <span class="m-tab-icon">📚</span>
-    <span class="m-tab-label">教材</span>
+  <button class="m-tab-btn" data-tab="status" onclick="switchTab('status')">
+    <span class="m-tab-icon">⚔</span>
+    <span class="m-tab-label">STATUS</span>
   </button>
   <button class="m-tab-btn" data-tab="quest" onclick="switchTab('quest')">
     <span class="m-tab-icon">📋</span>
@@ -6572,7 +6607,15 @@ function switchTab(tab){
   });
   if(tab==='ranking') { if(typeof currentRankTab!=='undefined'&&currentRankTab==='weekly') loadWeeklyRanking(); else loadRanking(); }
   if(tab==='score')   renderScoreTab();
-  if(tab==='quest')    { renderQuestLogStats&&renderQuestLogStats(); renderSessions&&renderSessions(allSelectedSubjects()); renderDeclCard&&renderDeclCard(); checkNoMaterialBanner(); }
+  if(tab==='quest')    { renderQuestLogStats&&renderQuestLogStats(); renderSessions&&renderSessions(allSelectedSubjects()); renderDeclCard&&renderDeclCard(); checkNoMaterialBanner();
+    // モバイル：タイマー未実行なら教材グリッド表示
+    if(window.innerWidth <= 600 && !timerRunning){
+      document.getElementById('panel-quest')?.classList.remove('show-timer');
+      renderMobileQuestMaterials();
+    } else if(window.innerWidth <= 600 && timerRunning){
+      document.getElementById('panel-quest')?.classList.add('show-timer');
+    }
+  }
   if(tab==='timeline') requestAnimationFrame(()=>{ loadTimeline(); subscribeTlRealtime(); });
   else unsubscribeTlRealtime();
   if(tab==='report')  requestAnimationFrame(()=>renderReportTab());
@@ -7121,6 +7164,14 @@ async function finishTimer(){
   if(declData && declData.date===getTodayStr()) updateDeclDisplay(declData);
   clearBgTimerState();
   showBgBadge(false);
+  // モバイル：記録完了後に教材グリッドへ戻る
+  if(window.innerWidth <= 600){
+    setTimeout(()=>{
+      document.getElementById('panel-quest')?.classList.remove('show-timer');
+      renderMobileQuestMaterials && renderMobileQuestMaterials();
+      window.scrollTo(0,0);
+    }, 1200);
+  }
 }
 let scoreRecords = []; // [{id, name, date, scores:{key:{score,max}}}]
 let scoreChartInstances = {};
@@ -12831,6 +12882,7 @@ function checkNoMaterialBanner(){
   loadMaterials();
   banner.style.display = materials.length === 0 ? '' : 'none';
   renderQuickMaterialSelect();
+  renderMobileQuestMaterials();
 }
 
 function renderQuickMaterialSelect(){
@@ -12875,6 +12927,118 @@ function quickSelectMaterial(materialId){
   if(sel){ sel.value = materialId; updateTimerMaterial(); }
   renderQuickMaterialSelect(); // 選択状態を更新
   document.querySelector('.timer-panel')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ─────────────────────────────────────────────
+   モバイル記録タブ：教材グリッド + タイマー 2ステート
+───────────────────────────────────────────── */
+
+const CAT_COLORS = ['#e74c3c','#3498db','#2ecc71','#9b59b6','#f39c12','#1abc9c','#e67e22','#34495e'];
+
+function renderMobileQuestMaterials(){
+  if(window.innerWidth > 600) return;
+  const container = document.getElementById('mobileQuestMatList');
+  if(!container) return;
+  loadMaterials();
+
+  if(!materials.length){
+    container.innerHTML = `
+      <div style="text-align:center;padding:48px 20px;">
+        <div style="font-size:52px;margin-bottom:14px;">📚</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;">まず教材を登録しよう！</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px;">教科書・参考書を登録すると<br>タイマーで学習時間を記録できます</div>
+        <button onclick="openMaterialForm()" style="background:var(--accent);color:#000;border:none;border-radius:24px;padding:13px 30px;font-size:14px;font-weight:700;cursor:pointer;min-height:48px;">＋ 教材を登録する</button>
+      </div>`;
+    return;
+  }
+
+  // 科目別グループ
+  const groups = {};
+  materials.forEach(m => {
+    const subj = allSelectedSubjects().find(s => s.key === m.subjectKey);
+    const catName = subj ? subj.name : 'カテゴリなし';
+    if(!groups[catName]) groups[catName] = [];
+    groups[catName].push(m);
+  });
+
+  // 各教材の累計時間
+  const materialMins = {};
+  materials.forEach(m => {
+    materialMins[m.id] = sessions.filter(s => s.material_id === m.id).reduce((a,s) => a + s.amount, 0);
+  });
+
+  container.innerHTML = Object.entries(groups).map(([cat, mats], gi) => {
+    const color = CAT_COLORS[gi % CAT_COLORS.length];
+    return `
+      <div style="margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:13px;height:20px;background:${color};border-radius:2px 2px 3px 3px;flex-shrink:0;"></div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);">${escHtml(cat)}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          ${mats.map(m => {
+            const mins = materialMins[m.id] || 0;
+            const h = Math.floor(mins/60), min = mins%60;
+            const timeStr = h > 0 ? `${h}h${min>0?min+'m':''}` : mins > 0 ? `${mins}m` : '';
+            const coverHtml = m.cover
+              ? `<img src="${m.cover}" alt="" style="width:100%;height:100%;object-fit:cover;">`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--panel2);">📖</div>`;
+            return `
+              <div onclick="mobileStartRecord('${m.id}')" style="cursor:pointer;-webkit-tap-highlight-color:transparent;" oncontextmenu="mobileMatLongPress(event,'${m.id}');return false;">
+                <div style="aspect-ratio:3/4;border-radius:6px;overflow:hidden;margin-bottom:6px;box-shadow:0 2px 8px rgba(0,0,0,.15);">${coverHtml}</div>
+                <div style="font-size:10px;font-weight:600;color:var(--text);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;word-break:break-all;">${escHtml(m.name)}</div>
+                ${timeStr ? `<div style="font-size:9px;color:var(--muted);margin-top:2px;">⏱ ${timeStr}</div>` : ''}
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function mobileStartRecord(materialId){
+  if(window.innerWidth > 600){ quickSelectMaterial(materialId); return; }
+  const sel = document.getElementById('timerMaterial');
+  if(sel){ sel.value = materialId; updateTimerMaterial(); }
+  document.getElementById('panel-quest')?.classList.add('show-timer');
+  _updateMobileTimerMatInfo(materialId);
+  window.scrollTo(0, 0);
+}
+
+function _updateMobileTimerMatInfo(materialId){
+  const info = document.getElementById('mobileTimerMatInfo');
+  if(!info) return;
+  const m = materials.find(x => x.id === materialId);
+  if(!m){ info.innerHTML = '<div style="font-size:13px;color:var(--muted);">教材未選択</div>'; return; }
+  const coverHtml = m.cover
+    ? `<img src="${m.cover}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:3px;">`
+    : '📖';
+  info.innerHTML = `
+    <div style="width:30px;height:40px;border-radius:4px;overflow:hidden;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.2);">${coverHtml}</div>
+    <div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;">${escHtml(m.name)}</div>
+  `;
+}
+
+function exitMobileTimerMode(){
+  if(timerRunning){
+    if(!confirm('タイマーが動いています。記録せずに戻りますか？')) return;
+    pauseTimer();
+  }
+  document.getElementById('panel-quest')?.classList.remove('show-timer');
+  renderMobileQuestMaterials();
+  window.scrollTo(0, 0);
+}
+
+function mobileMatLongPress(e, materialId){
+  // 長押しメニュー（編集・削除）
+  e.preventDefault();
+  const m = materials.find(x => x.id === materialId);
+  if(!m) return;
+  if(confirm(`「${escHtml(m.name)}」を編集しますか？\nキャンセルで削除の確認に進みます`)){
+    openMaterialForm(materialId);
+  } else {
+    deleteMaterial(materialId);
+  }
 }
 
 function loadMaterials(){
@@ -12994,6 +13158,7 @@ function saveMaterial(){
   renderMaterials();
   updateTimerMaterialSelect();
   renderQuickMaterialSelect();
+  renderMobileQuestMaterials();
   checkNoMaterialBanner();
   showNotifToast('📚', editId ? '教材を更新しました' : '教材を追加しました', name);
 }
@@ -13009,6 +13174,7 @@ function deleteMaterial(id){
   renderMaterials();
   updateTimerMaterialSelect();
   renderQuickMaterialSelect();
+  renderMobileQuestMaterials();
   checkNoMaterialBanner();
   showNotifToast('🗑', '教材を削除しました', m.name);
 }
