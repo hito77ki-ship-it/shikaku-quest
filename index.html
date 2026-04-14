@@ -3603,6 +3603,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         </div>
         <div class="decl-subj-list" id="declSubjList"></div>
         <div class="decl-share-row">
+          <button class="decl-share-btn" onclick="postDeclToTimeline(null, true)">📣 TLに投稿</button>
           <button class="decl-share-btn" onclick="shareDeclToX()">𝕏 宣言をXに投稿</button>
           <button class="decl-result-btn" onclick="shareDeclResultToX()" id="declResultBtn" style="display:none;">🏆 結果をXに投稿</button>
         </div>
@@ -3621,6 +3622,15 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         </div>
         <div class="decl-form-label" style="margin-bottom:6px;">科目別目標（任意）</div>
         <div id="declSubjInputs"></div>
+        <div class="decl-form-row" style="margin-top:12px;display:flex;align-items:center;gap:12px;">
+          <span class="decl-form-label" style="font-size:11px;white-space:nowrap;">タイムライン投稿</span>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--text);">
+            <input type="radio" name="declTlMode" id="declTlAuto" value="auto" checked> 自動投稿
+          </label>
+          <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--text);">
+            <input type="radio" name="declTlMode" id="declTlManual" value="manual"> 投稿しない
+          </label>
+        </div>
         <div class="decl-form-actions">
           <button class="decl-cancel-btn" id="declCancelBtn" onclick="closeDeclForm()" style="display:none;">キャンセル</button>
           <button class="decl-submit-btn" onclick="submitDecl()">⚔ 宣言する！</button>
@@ -8631,6 +8641,10 @@ function submitDecl(){
   const decl = { date: getTodayStr(), totalMins, subjects, createdAt: new Date().toISOString() };
   saveDecl(decl);
   showDeclDisplay(decl);
+
+  // タイムライン投稿モードを確認
+  const tlMode = document.querySelector('input[name="declTlMode"]:checked')?.value || 'auto';
+  if(tlMode === 'auto') postDeclToTimeline(decl, false);
 }
 
 function updateDeclDisplay(decl){
@@ -8679,6 +8693,65 @@ function updateDeclDisplay(decl){
   // 100%達成したら「結果をXに投稿」ボタン表示
   const resultBtn = document.getElementById('declResultBtn');
   if(resultBtn) resultBtn.style.display = pct>=100 ? '' : 'none';
+}
+
+/* タイムラインへの宣言投稿 */
+async function postDeclToTimeline(declArg, showAlert){
+  const decl = declArg || loadDecl();
+  if(!decl){ if(showAlert) alert('今日の宣言を設定してください'); return; }
+
+  const goalH = Math.floor(decl.totalMins/60), goalM = decl.totalMins%60;
+  const goalStr = goalH ? `${goalH}時間${goalM?goalM+'分':''}` : `${goalM}分`;
+  const subjs = allSelectedSubjects().filter(s => decl.subjects[s.key]);
+  const subjLines = subjs.map(s => {
+    const m = decl.subjects[s.key];
+    return `${s.name} ${m>=60?Math.floor(m/60)+'h'+(m%60?m%60+'m':''):m+'m'}`;
+  }).join(' / ');
+
+  const post = {
+    id:             Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    user_id:        currentUser ? currentUser.id : 'guest_' + (char.name||'anonymous'),
+    user_name:      char.name || '冒険者',
+    user_level:     char.level || 1,
+    job_ids:        selectedJobIds,
+    subject_name:   subjLines || '総合',
+    minutes:        0,
+    note:           `目標：${goalStr}${subjLines?' ／ '+subjLines:''}`,
+    rpg_log:        `${char.name||'冒険者'}が今日の冒険を宣言した！目標：${goalStr}`,
+    exp:            0,
+    likes_count:    0,
+    is_declaration: true,
+    avatar_url:     profileAvatarData || null,
+    created_at:     new Date().toISOString(),
+  };
+
+  const posts = loadLocalPosts();
+  posts.push(post);
+  saveLocalPosts(posts);
+
+  if(currentUser){
+    try {
+      await sb.from('timeline_posts').insert({
+        user_id:        post.user_id,
+        user_name:      post.user_name,
+        user_level:     post.user_level,
+        job_ids:        post.job_ids,
+        subject_name:   post.subject_name,
+        minutes:        0,
+        note:           post.note,
+        rpg_log:        post.rpg_log,
+        exp:            0,
+        likes_count:    0,
+        is_declaration: true,
+        avatar_url:     post.avatar_url,
+        created_at:     post.created_at,
+      });
+    } catch(e){ console.warn('Decl TL post failed:', e); }
+  }
+
+  const tlPanel = document.getElementById('panel-timeline');
+  if(tlPanel && tlPanel.style.display === 'block') loadTimeline();
+  if(showAlert) alert('タイムラインに投稿しました！');
 }
 
 /* Xへの宣言投稿 */
@@ -11086,8 +11159,13 @@ function renderPostHTML(post, likes){
       <div class="tl-post-lv">Lv.${post.user_level || 1}</div>
     </div>
 
-    <!-- 自由投稿の場合はシンプルテキストのみ -->
-    ${post.is_free_post ? `
+    <!-- 宣言投稿 -->
+    ${post.is_declaration ? `
+    <div style="background:linear-gradient(135deg,rgba(140,198,63,.08),rgba(255,215,0,.05));border:1px solid rgba(140,198,63,.3);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:11px;color:var(--accent2);font-family:'Cinzel',serif;letter-spacing:.1em;margin-bottom:6px;">📣 TODAY'S DECLARATION</div>
+      <div style="font-size:13px;color:var(--text);font-weight:600;">${escHtml(post.note||'')}</div>
+    </div>
+    ` : post.is_free_post ? `
     ${post.post_image ? `<img src="${post.post_image}" alt="" style="max-width:100%;border-radius:8px;margin-bottom:10px;display:block;">` : ''}
     ${post.note ? `<div style="font-size:14px;color:var(--text);line-height:1.7;padding:2px 0 10px;">${escHtml(post.note)}</div>` : ''}
     ` : `
