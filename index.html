@@ -12249,10 +12249,9 @@ async function openUserCard(userId, userName, level, avatarUrl, jobIdsStr){
     }
     // プロフィール公開設定
     const { data: prof } = await sb.from('profiles')
-      .select('is_public, bio').eq('id', userId).maybeSingle();
+      .select('is_public').eq('id', userId).maybeSingle();
     if(prof){
       isPublic = prof.is_public !== false;
-      bio = prof.bio || '';
     }
   } catch(e){}
 
@@ -12336,14 +12335,14 @@ async function followToggleFromCard(userId, userName, btn){
 async function loadFollowCountsFromSupabase(){
   if(!currentUser) return;
   try {
-    const [{ count: fc }, { count: fr }] = await Promise.all([
-      sb.from('follows').select('*', {count:'exact',head:true}).eq('follower_id', currentUser.id),
-      sb.from('follows').select('*', {count:'exact',head:true}).eq('following_id', currentUser.id),
+    const [{ data: followingData }, { data: followerData }] = await Promise.all([
+      sb.from('follows').select('id').eq('follower_id', currentUser.id),
+      sb.from('follows').select('id').eq('following_id', currentUser.id),
     ]);
     const followCountEl = document.getElementById('profFollowCount');
     const followerCountEl = document.getElementById('profFollowerCount');
-    if(followCountEl) followCountEl.textContent = fc || 0;
-    if(followerCountEl) followerCountEl.textContent = fr || 0;
+    if(followCountEl) followCountEl.textContent = (followingData||[]).length;
+    if(followerCountEl) followerCountEl.textContent = (followerData||[]).length;
   } catch(e){}
 }
 
