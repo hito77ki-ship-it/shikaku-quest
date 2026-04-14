@@ -5876,7 +5876,8 @@ async function loadRanking(){
     const bars=topSubjs.map(([k,s])=>`<div class="rank-bar-row"><span class="rank-bar-label">${(s.name||k).slice(0,4)}</span><div class="rank-bar-track"><div class="rank-bar-fill" style="width:${s.pct||0}%;background:${SCOLORS[k]||'#c9a84c'}"></div></div></div>`).join('');
     const item=document.createElement('div');
     item.className='ranking-item'+(isMe?' me':'');
-    item.innerHTML=`<div class="rank-pos ${posClass}">${posDisp}</div><div class="rank-avatar">${p.avatar_url?`<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="">`:escHtml(p.avatar_emoji||'📚')}</div><div class="rank-info"><div class="rank-name">${escHtml(p.display_name||'名無し')}${isMe?' <span style="font-size:9px;color:var(--gold)">← YOU</span>':''}</div><div class="rank-title-text">${escHtml(p.char_title||'—')}</div>${bars?`<div class="rank-bars">${bars}</div>`:''}</div><div class="rank-right"><div class="rank-level">Lv.${p.level||1}</div><div class="rank-hours">${hours}h</div><div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted)">🔥${p.streak||0}日</div></div>`;
+    const _rankClick = !isMe && p.id ? `onclick="openUserCard('${p.id}','${(p.display_name||'').replace(/'/g,'')}',${p.level||1},'${(p.avatar_url||'').replace(/'/g,'')}','${(p.job_ids||[]).join(',')}')" style="cursor:pointer;"` : '';
+    item.innerHTML=`<div class="rank-pos ${posClass}">${posDisp}</div><div class="rank-avatar" ${_rankClick}>${p.avatar_url?`<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="">`:escHtml(p.avatar_emoji||'📚')}</div><div class="rank-info" ${_rankClick}><div class="rank-name">${escHtml(p.display_name||'名無し')}${isMe?' <span style="font-size:9px;color:var(--gold)">← YOU</span>':''}</div><div class="rank-title-text">${escHtml(p.char_title||'—')}</div>${bars?`<div class="rank-bars">${bars}</div>`:''}</div><div class="rank-right"><div class="rank-level">Lv.${p.level||1}</div><div class="rank-hours">${hours}h</div><div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted)">🔥${p.streak||0}日</div></div>`;
     listEl.appendChild(item);
   });
   if(!data.find(p=>currentUser&&p.id===currentUser.id)){
@@ -5954,10 +5955,11 @@ async function loadWeeklyRanking(){
 
     const item = document.createElement('div');
     item.className = 'ranking-item' + (isMe?' me':'');
+    const _wkClick = !isMe && p.id ? `onclick="openUserCard('${p.id}','${(p.display_name||'').replace(/'/g,'')}',${p.level||1},'${(p.avatar_url||'').replace(/'/g,'')}','${(p.job_ids||[]).join(',')}')" style="cursor:pointer;"` : '';
     item.innerHTML = `
       <div class="rank-pos ${posClass}">${posDisp}</div>
-      <div class="rank-avatar">${p.avatar_url ? `<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="">` : escHtml(p.avatar_emoji||'📚')}</div>
-      <div class="rank-info">
+      <div class="rank-avatar" ${_wkClick}>${p.avatar_url ? `<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="">` : escHtml(p.avatar_emoji||'📚')}</div>
+      <div class="rank-info" ${_wkClick}>
         <div class="rank-name">${escHtml(p.display_name||'名無し')}${isMe?' <span style="font-size:9px;color:var(--accent)">← YOU</span>':''}<span style="font-size:9px;color:var(--muted);margin-left:4px;">${job}</span></div>
         <div class="rank-title-text">${escHtml(p.char_title||'—')}</div>
         <div class="rank-week-bar">
