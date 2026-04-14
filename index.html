@@ -12302,14 +12302,20 @@ async function followToggleFromCard(userId, userName, btn){
   btn.disabled = true;
   try {
     if(isNowFollowing){
-      await sb.from('follows').delete().eq('follower_id', currentUser.id).eq('following_id', userId);
+      const { error } = await sb.from('follows').delete()
+        .eq('follower_id', currentUser.id).eq('following_id', userId);
+      if(error) throw new Error(error.message || JSON.stringify(error));
       btn.textContent = 'フォローする';
       btn.style.background = 'var(--accent)';
       btn.style.color = '#000';
       btn.style.border = '1px solid var(--accent)';
       showNotifToast('👋', `${userName}のフォローを解除`, '');
     } else {
-      await sb.from('follows').insert({ follower_id: currentUser.id, following_id: userId });
+      const { error } = await sb.from('follows').insert({
+        follower_id: currentUser.id,
+        following_id: userId
+      });
+      if(error) throw new Error(error.message || JSON.stringify(error));
       btn.textContent = 'フォロー中';
       btn.style.background = 'transparent';
       btn.style.color = 'var(--muted)';
@@ -12324,10 +12330,10 @@ async function followToggleFromCard(userId, userName, btn){
       data.following.push({ id: userId, name: userName });
     }
     saveFollowData(data);
-    // プロフィール画面のカウント更新
     await loadFollowCountsFromSupabase();
   } catch(e){
-    showNotifToast('❌', 'エラーが発生しました', e.message||'');
+    showNotifToast('❌', 'フォロー失敗: ' + (e.message||'不明なエラー'), '');
+    console.error('followToggleFromCard error:', e);
   }
   btn.disabled = false;
 }
