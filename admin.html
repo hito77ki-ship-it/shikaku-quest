@@ -710,6 +710,7 @@ body {
               <tr>
                 <th>#</th>
                 <th>名前</th>
+                <th>メール</th>
                 <th>Lv</th>
                 <th>累計学習</th>
                 <th>連続日数</th>
@@ -1059,6 +1060,7 @@ function renderTable(data) {
       <td>
         <div style="font-weight:600;font-size:13px;">${escHtml(u.display_name || '名無し')}</div>
       </td>
+      <td style="font-size:11px;color:var(--muted)">${escHtml(u.email || '—')}</td>
       <td class="td-mono"><b>Lv.${u.level || 1}</b></td>
       <td class="td-mono">${hours}h</td>
       <td class="td-mono">🔥 ${u.streak || 0}日</td>
