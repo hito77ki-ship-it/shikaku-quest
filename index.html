@@ -12240,20 +12240,24 @@ async function openUserCard(userId, userName, level, avatarUrl, jobIdsStr){
   // フォロー状態をSupabaseから取得
   let isFollowing = false;
   let isPublic = true;
-  let bio = '';
-  try {
-    if(currentUser){
-      const { data: followRow } = await sb.from('follows')
+  // ローカルのフォローデータでまず確認（Supabaseが失敗しても動く）
+  const localFollowData = loadFollowData();
+  isFollowing = localFollowData.following.some(f => f.id === userId);
+
+  if(currentUser){
+    try {
+      const { data: followRow, error: ferr } = await sb.from('follows')
         .select('id').eq('follower_id', currentUser.id).eq('following_id', userId).maybeSingle();
-      isFollowing = !!followRow;
-    }
-    // プロフィール公開設定
-    const { data: prof } = await sb.from('profiles')
-      .select('is_public').eq('id', userId).maybeSingle();
-    if(prof){
-      isPublic = prof.is_public !== false;
-    }
-  } catch(e){}
+      if(!ferr) isFollowing = !!followRow;
+      else console.warn('follows select error:', ferr);
+    } catch(e){ console.warn('follows fetch error:', e); }
+
+    try {
+      const { data: prof } = await sb.from('profiles')
+        .select('is_public').eq('id', userId).maybeSingle();
+      if(prof) isPublic = prof.is_public !== false;
+    } catch(e){}
+  }
 
   const jobIds = jobIdsStr ? jobIdsStr.split(',').filter(Boolean) : [];
   const jobLabels = jobIds.map(j => {
