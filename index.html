@@ -4262,6 +4262,13 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
           <span class="prof-info-label">📝 自己紹介</span>
           <input type="text" class="prof-info-input" id="profBio" placeholder="一言自己紹介..." onchange="saveProfileInfo()" maxlength="60">
         </div>
+        <div class="prof-info-row">
+          <span class="prof-info-label">🔒 プロフィール公開</span>
+          <select class="prof-info-select" id="profIsPublic" onchange="saveProfileInfo()">
+            <option value="true">公開（誰でも見れる）</option>
+            <option value="false">非公開</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -4468,6 +4475,16 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
 </div><!-- /wrap -->
 </div><!-- /pc-main-area -->
 
+
+<!-- ユーザーカードモーダル -->
+<div id="userCardModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;" onclick="if(event.target===this)closeUserCard()">
+  <div style="background:var(--panel);border-radius:var(--radius);padding:24px 20px;max-width:300px;width:88%;box-shadow:var(--shadow-md);position:relative;">
+    <button onclick="closeUserCard()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;">✕</button>
+    <div id="userCardContent" style="text-align:center;">
+      <div style="font-size:12px;color:var(--muted);">読み込み中...</div>
+    </div>
+  </div>
+</div>
 
 <!-- EXAM MODAL -->
 <div class="modal-overlay" id="examModal">
@@ -9617,12 +9634,20 @@ function renderProfileTab(){
     tagsEl.innerHTML = tags.map(t=>`<span class="player-card-tag">${t}</span>`).join('');
   }
 
-  // フォロー数（localStorage）
+  // フォロー数（Supabase優先、fallback: localStorage）
   const followData = loadFollowData();
   const followCountEl = document.getElementById('profFollowCount');
   const followerCountEl = document.getElementById('profFollowerCount');
   if(followCountEl) followCountEl.textContent = followData.following.length;
   if(followerCountEl) followerCountEl.textContent = followData.followers.length;
+  loadFollowCountsFromSupabase(); // 非同期で上書き
+
+  // プロフィール公開設定を復元
+  const profIsPublicEl = document.getElementById('profIsPublic');
+  if(profIsPublicEl){
+    const info = loadProfileInfo();
+    profIsPublicEl.value = (info.isPublic === false) ? 'false' : 'true';
+  }
   const streakEl = document.getElementById('profStreakCount');
   if(streakEl) streakEl.textContent = char.streak || 0;
 
@@ -9794,6 +9819,7 @@ function getTodayGoalMins(baseWeeklyMins){
 }
 
 function saveProfileInfo(){
+  const isPublicVal = document.getElementById('profIsPublic')?.value;
   const info = {
     pref:         document.getElementById('profPref')?.value || '',
     grade:        document.getElementById('profGrade')?.value || '',
@@ -9801,8 +9827,13 @@ function saveProfileInfo(){
     weekendHours: document.getElementById('profWeekendHours')?.value || '',
     birthday:     document.getElementById('profBirthday')?.value || '',
     bio:          document.getElementById('profBio')?.value || '',
+    isPublic:     isPublicVal !== 'false',
   };
   try{ localStorage.setItem(PROF_INFO_KEY, JSON.stringify(info)); }catch{}
+  // Supabaseにも反映
+  if(currentUser){
+    sb.from('profiles').upsert({ id: currentUser.id, is_public: info.isPublic }).catch(()=>{});
+  }
   // タグを即時更新
   renderProfileTab();
 }
@@ -11144,17 +11175,22 @@ function renderPostHTML(post, likes){
     ? `<div class="tl-avatar" style="background:none;padding:0;"><img src="${post.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`
     : `<div class="tl-avatar" style="background:${avatarColor(post.user_name)}">${avatarChar}</div>`;
 
+  const _cardClick = !isOwn && post.user_id
+    ? `onclick="openUserCard('${post.user_id}','${(post.user_name||'').replace(/'/g,'')}',${post.user_level||1},'${(post.avatar_url||'').replace(/'/g,'')}','${(post.job_ids||[]).join(',')}')" style="cursor:pointer;"`
+    : '';
   return `
   <div class="timeline-post" id="tl-post-${post.id}">
     <!-- ヘッダー -->
     <div class="tl-post-header">
-      ${avatarHtml}
-      <div class="tl-post-meta">
-        <div class="tl-post-name">
-          ${escHtml(post.user_name || '名無し')}
-          ${isOwn ? '<span style="font-size:9px;color:var(--accent2);margin-left:4px;border:1px solid rgba(140,198,63,.3);padding:1px 5px;border-radius:8px;">YOU</span>' : ''}
+      <div ${_cardClick} style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+        ${avatarHtml}
+        <div class="tl-post-meta">
+          <div class="tl-post-name">
+            ${escHtml(post.user_name || '名無し')}
+            ${isOwn ? '<span style="font-size:9px;color:var(--accent2);margin-left:4px;border:1px solid rgba(140,198,63,.3);padding:1px 5px;border-radius:8px;">YOU</span>' : ''}
+          </div>
+          <div class="tl-post-time">${timeStr}</div>
         </div>
-        <div class="tl-post-time">${timeStr}</div>
       </div>
       <div class="tl-post-lv">Lv.${post.user_level || 1}</div>
     </div>
@@ -12190,6 +12226,126 @@ function followUserFromPost(userId, userName){
   if(countEl) countEl.textContent = data.following.length;
 }
 
+
+/* ════════════════════════════════════════
+   ユーザーカードポップアップ
+════════════════════════════════════════ */
+async function openUserCard(userId, userName, level, avatarUrl, jobIdsStr){
+  const modal = document.getElementById('userCardModal');
+  const content = document.getElementById('userCardContent');
+  if(!modal || !content) return;
+  modal.style.display = 'flex';
+  content.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:16px 0;">読み込み中...</div>';
+
+  // フォロー状態をSupabaseから取得
+  let isFollowing = false;
+  let isPublic = true;
+  let bio = '';
+  try {
+    if(currentUser){
+      const { data: followRow } = await sb.from('follows')
+        .select('id').eq('follower_id', currentUser.id).eq('following_id', userId).maybeSingle();
+      isFollowing = !!followRow;
+    }
+    // プロフィール公開設定
+    const { data: prof } = await sb.from('profiles')
+      .select('is_public, bio').eq('id', userId).maybeSingle();
+    if(prof){
+      isPublic = prof.is_public !== false;
+      bio = prof.bio || '';
+    }
+  } catch(e){}
+
+  const jobIds = jobIdsStr ? jobIdsStr.split(',').filter(Boolean) : [];
+  const jobLabels = jobIds.map(j => {
+    const job = JOBS.find(x => x.id === j);
+    return job ? `<span style="font-size:10px;background:rgba(140,198,63,.12);color:var(--accent2);border:1px solid rgba(140,198,63,.25);border-radius:20px;padding:2px 8px;">${job.icon} ${job.name}</span>` : '';
+  }).join('');
+
+  const avatarHtml = avatarUrl
+    ? `<img src="${avatarUrl}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);">`
+    : `<div style="width:64px;height:64px;border-radius:50%;background:${avatarColor(userName)};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;border:2px solid var(--accent);">${(userName||'？')[0]}</div>`;
+
+  const isOwn = currentUser && currentUser.id === userId;
+  const followBtn = isOwn ? '' : currentUser ? `
+    <button id="userCardFollowBtn"
+      onclick="followToggleFromCard('${userId}','${userName.replace(/'/g,'')}', this)"
+      style="margin-top:14px;padding:8px 24px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;
+             background:${isFollowing ? 'transparent' : 'var(--accent)'};
+             color:${isFollowing ? 'var(--muted)' : '#000'};
+             border:1px solid ${isFollowing ? 'var(--border)' : 'var(--accent)'};">
+      ${isFollowing ? 'フォロー中' : 'フォローする'}
+    </button>` : `<div style="font-size:11px;color:var(--muted);margin-top:12px;">ログインするとフォローできます</div>`;
+
+  const privateNotice = !isPublic && !isOwn
+    ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;">🔒 非公開プロフィール</div>` : '';
+
+  content.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      ${avatarHtml}
+      <div style="font-size:15px;font-weight:700;color:var(--text);">${escHtml(userName)}</div>
+      ${isPublic || isOwn ? `<div style="font-size:11px;color:var(--muted);">Lv.${level}</div>` : ''}
+      ${isPublic || isOwn ? `<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:4px;">${jobLabels}</div>` : ''}
+      ${bio && (isPublic || isOwn) ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">${escHtml(bio)}</div>` : ''}
+      ${privateNotice}
+      ${followBtn}
+    </div>`;
+}
+
+function closeUserCard(){
+  const modal = document.getElementById('userCardModal');
+  if(modal) modal.style.display = 'none';
+}
+
+async function followToggleFromCard(userId, userName, btn){
+  if(!currentUser){ showNotifToast('ℹ️','ログインが必要です',''); return; }
+  const isNowFollowing = btn.textContent.trim() === 'フォロー中';
+  btn.disabled = true;
+  try {
+    if(isNowFollowing){
+      await sb.from('follows').delete().eq('follower_id', currentUser.id).eq('following_id', userId);
+      btn.textContent = 'フォローする';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = '#000';
+      btn.style.border = '1px solid var(--accent)';
+      showNotifToast('👋', `${userName}のフォローを解除`, '');
+    } else {
+      await sb.from('follows').insert({ follower_id: currentUser.id, following_id: userId });
+      btn.textContent = 'フォロー中';
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--muted)';
+      btn.style.border = '1px solid var(--border)';
+      showNotifToast('✅', `${userName}をフォローしました`, '');
+    }
+    // ローカルデータも更新
+    const data = loadFollowData();
+    if(isNowFollowing){
+      data.following = data.following.filter(f => f.id !== userId);
+    } else {
+      data.following.push({ id: userId, name: userName });
+    }
+    saveFollowData(data);
+    // プロフィール画面のカウント更新
+    await loadFollowCountsFromSupabase();
+  } catch(e){
+    showNotifToast('❌', 'エラーが発生しました', e.message||'');
+  }
+  btn.disabled = false;
+}
+
+async function loadFollowCountsFromSupabase(){
+  if(!currentUser) return;
+  try {
+    const [{ count: fc }, { count: fr }] = await Promise.all([
+      sb.from('follows').select('*', {count:'exact',head:true}).eq('follower_id', currentUser.id),
+      sb.from('follows').select('*', {count:'exact',head:true}).eq('following_id', currentUser.id),
+    ]);
+    const followCountEl = document.getElementById('profFollowCount');
+    const followerCountEl = document.getElementById('profFollowerCount');
+    if(followCountEl) followCountEl.textContent = fc || 0;
+    if(followerCountEl) followerCountEl.textContent = fr || 0;
+  } catch(e){}
+}
 
 /* ════════════════════════════════════════
    PC サイドバー ナビゲーション
