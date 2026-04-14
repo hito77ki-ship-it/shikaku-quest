@@ -1011,7 +1011,7 @@ body[data-theme="dark"] .rpt-streak-card{background:linear-gradient(135deg,#1a0a
 .timer-goal-input:focus{border-color:var(--accent);}
 .timer-goal-set{
   background:none;border:1px solid var(--exp);color:var(--exp2);
-  font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:.1em;
+  font-size:9px;padding:8px 12px;cursor:pointer;letter-spacing:.1em;min-height:36px;
 }
 
 /* ── 週間目標 新デザイン ── */
@@ -2677,7 +2677,7 @@ body[data-theme="dark"] #mobileTabBar {
 }
 .m-tab-label {
   font-family: 'Cinzel', serif;
-  font-size: 8.5px; letter-spacing: .04em; line-height: 1;
+  font-size: 10px; letter-spacing: .04em; line-height: 1;
 }
 .m-tab-btn.active { color: var(--accent2); }
 .m-tab-btn.active .m-tab-icon { transform: translateY(-3px) scale(1.2); }
@@ -2778,6 +2778,24 @@ body[data-theme="dark"] #mobileTabBar {
 
   /* タイムブロック */
   #rpt-sub-timeblock .rpt-section { padding: 12px; }
+
+  /* フォーム2列 → 1列（モバイルで入力欄が狭くなるのを防ぐ） */
+  .form-row-2 { grid-template-columns: 1fr; }
+
+  /* タップ領域を44px以上に統一 */
+  .plan-dow-btn { min-height: 44px; }
+  .timer-goal-set { min-height: 40px; padding: 10px 14px; font-size: 11px; }
+  #manualBreakBtn { padding: 12px !important; font-size: 12px !important; }
+
+  /* モーダルのpadding削減 */
+  .modal-box { padding: 20px 16px; }
+
+  /* 宣言フォームの科目別入力を読みやすく */
+  .decl-form-label { font-size: 10px; }
+  .decl-form-row { margin-bottom: 12px; }
+
+  /* タブレット・モバイル共通: inputズーム防止 */
+  .timer-goal-input { font-size: 16px !important; }
 }
 
 /* ════ 極小画面（〜375px iPhone SE等）════ */
@@ -2787,7 +2805,7 @@ body[data-theme="dark"] #mobileTabBar {
   .char-name-disp { font-size: 15px; }
   .section { padding: 12px 10px; }
   .m-tab-icon { font-size: 20px; }
-  .m-tab-label { font-size: 7.5px; }
+  .m-tab-label { font-size: 8.5px; }
   .wrap { padding: 10px 10px 86px !important; }
 }
 
