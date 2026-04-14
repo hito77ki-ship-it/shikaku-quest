@@ -5828,15 +5828,33 @@ async function syncToCloud(){
     const syncAt = new Date().toISOString();
     char.lastSyncAt = syncAt;
     localStorage.setItem('sq2_char', JSON.stringify(char));
+
+    // 教材・スコア・週間計画・プロフィール詳細を取得
+    loadMaterials();
+    const materialsJson    = JSON.stringify(materials);
+    const scoresJson       = JSON.stringify(scoreRecords);
+    const planJson         = localStorage.getItem('sq2_weekly_plan') || '[]';
+    const profileInfoJson  = localStorage.getItem('sq2_profile_info') || '{}';
+
     await sb.from('profiles').upsert({
       id: currentUser.id,
-      sessions_backup: JSON.stringify(sessions),
-      bosses_backup:   JSON.stringify(bosses),
-      exams_backup:    JSON.stringify(examGoals),
-      char_backup:     JSON.stringify(char),
-      subjects_backup: JSON.stringify(selectedSubjectKeys),
-      jobs_backup:     JSON.stringify(selectedJobIds),
+      sessions_backup:      JSON.stringify(sessions),
+      bosses_backup:        JSON.stringify(bosses),
+      exams_backup:         JSON.stringify(examGoals),
+      char_backup:          JSON.stringify(char),
+      subjects_backup:      JSON.stringify(selectedSubjectKeys),
+      jobs_backup:          JSON.stringify(selectedJobIds),
+      materials_backup:     materialsJson,
+      scores_backup:        scoresJson,
+      plan_backup:          planJson,
+      profile_info_backup:  profileInfoJson,
     }, {onConflict:'id'});
+
+    console.log('[SQ] syncToCloud 完了:', {
+      sessions: sessions.length,
+      materials: materials.length,
+      scores: scoreRecords.length,
+    });
   }
 
   const el = document.getElementById('userBarSync');
@@ -5851,7 +5869,12 @@ async function restoreFromCloud(){
   if(!currentUser || isGuest) return false;
   try {
     const {data, error} = await sb.from('profiles')
-      .select('sessions_backup,bosses_backup,exams_backup,char_backup,subjects_backup,jobs_backup,updated_at,avatar_url')
+      .select([
+        'sessions_backup','bosses_backup','exams_backup',
+        'char_backup','subjects_backup','jobs_backup',
+        'materials_backup','scores_backup','plan_backup','profile_info_backup',
+        'updated_at','avatar_url'
+      ].join(','))
       .eq('id', currentUser.id)
       .single();
     if(error || !data) return false;
@@ -5859,54 +5882,104 @@ async function restoreFromCloud(){
     // クラウドの更新日時とローカルの更新日時を比較
     const cloudUpdatedAt = data.updated_at ? new Date(data.updated_at).getTime() : 0;
     const localUpdatedAt = char.lastSyncAt ? new Date(char.lastSyncAt).getTime() : 0;
-    // クラウドが新しい、またはローカルにデータがない場合はクラウドを優先
     const cloudIsNewer = cloudUpdatedAt > localUpdatedAt;
 
     let restored = false;
 
+    // ── 学習セッション ──
     if(data.sessions_backup){
       const s = JSON.parse(data.sessions_backup);
-      // クラウドが新しい or クラウドのセッション数がローカルより多い場合に復元
       if(s && (cloudIsNewer ? s.length >= sessions.length : s.length > sessions.length)){
         sessions = s; restored = true;
       }
     }
+    // ── ボス ──
     if(data.bosses_backup){
       const b = JSON.parse(data.bosses_backup);
       if(b && b.length > 0 && (bosses.length === 0 || cloudIsNewer)){
         bosses = b; restored = true;
       }
     }
+    // ── 試験目標 ──
     if(data.exams_backup){
       const e = JSON.parse(data.exams_backup);
       if(e && e.length > 0 && (examGoals.length === 0 || cloudIsNewer)){
         examGoals = e; restored = true;
       }
     }
+    // ── キャラクター ──
     if(data.char_backup){
       const ch = JSON.parse(data.char_backup);
       if(ch && ch.name && (!char.name || cloudIsNewer)){
         char = {...char, ...ch}; restored = true;
       }
     }
+    // ── 選択科目 ──
     if(data.subjects_backup){
       const skeys = JSON.parse(data.subjects_backup);
       if(skeys && skeys.length > 0 && (selectedSubjectKeys.length === 0 || cloudIsNewer)){
         selectedSubjectKeys = skeys; restored = true;
       }
     }
+    // ── ジョブ ──
     if(data.jobs_backup){
       const jids = JSON.parse(data.jobs_backup);
       if(jids && jids.length > 0 && (selectedJobIds.length === 0 || cloudIsNewer)){
         selectedJobIds = jids; restored = true;
       }
     }
-    // アバター画像をクラウドから復元
+    // ── アバター画像 ──
     if(data.avatar_url && (cloudIsNewer || !profileAvatarData)){
       profileAvatarData = data.avatar_url;
       saveReportState();
     }
+
+    // ── 教材・参考書 ──
+    if(data.materials_backup){
+      const mats = JSON.parse(data.materials_backup);
+      loadMaterials();
+      if(mats && mats.length > 0 && (materials.length === 0 || cloudIsNewer)){
+        materials = mats;
+        saveMaterials();
+        restored = true;
+        console.log('[SQ] 教材をクラウドから復元:', mats.length, '件');
+      }
+    }
+    // ── スコア記録 ──
+    if(data.scores_backup){
+      const sc = JSON.parse(data.scores_backup);
+      await loadScores();
+      if(sc && sc.length > 0 && (scoreRecords.length === 0 || cloudIsNewer)){
+        scoreRecords = sc;
+        await saveScores();
+        restored = true;
+        console.log('[SQ] スコアをクラウドから復元:', sc.length, '件');
+      }
+    }
+    // ── 週間計画 ──
+    if(data.plan_backup){
+      const plan = JSON.parse(data.plan_backup);
+      const localPlan = JSON.parse(localStorage.getItem('sq2_weekly_plan') || '[]');
+      if(plan && plan.length > 0 && (localPlan.length === 0 || cloudIsNewer)){
+        localStorage.setItem('sq2_weekly_plan', JSON.stringify(plan));
+        restored = true;
+        console.log('[SQ] 週間計画をクラウドから復元:', plan.length, '件');
+      }
+    }
+    // ── プロフィール詳細（学年・目標時間・都道府県等）──
+    if(data.profile_info_backup){
+      const pi = JSON.parse(data.profile_info_backup);
+      const localPi = JSON.parse(localStorage.getItem('sq2_profile_info') || '{}');
+      const localHasData = Object.keys(localPi).some(k => localPi[k]);
+      if(pi && Object.keys(pi).length > 0 && (!localHasData || cloudIsNewer)){
+        localStorage.setItem('sq2_profile_info', JSON.stringify(pi));
+        restored = true;
+        console.log('[SQ] プロフィール詳細をクラウドから復元');
+      }
+    }
+
     if(restored) await saveAll();
+    console.log('[SQ] restoreFromCloud 完了 restored=', restored, 'cloudIsNewer=', cloudIsNewer);
     return restored;
   } catch(e) {
     console.warn('restoreFromCloud error:', e);
@@ -7178,6 +7251,14 @@ let scoreChartInstances = {};
 
 async function saveScores(){
   try{localStorage.setItem('sq2_scores', JSON.stringify(scoreRecords));}catch(e){}
+  // ログイン中はクラウドにも即時反映
+  if(currentUser && !isGuest){
+    sb.from('profiles').upsert({
+      id: currentUser.id,
+      scores_backup: JSON.stringify(scoreRecords),
+      updated_at: new Date().toISOString(),
+    }, {onConflict:'id'}).then(()=>{}, ()=>{});
+  }
 }
 async function loadScores(){
   try{const v=localStorage.getItem('sq2_scores');if(v)scoreRecords=JSON.parse(v);}catch{}
@@ -8531,6 +8612,14 @@ function loadPlans(){
 }
 function savePlans(arr){
   try{ localStorage.setItem(PLAN_KEY, JSON.stringify(arr)); }catch(e){}
+  // ログイン中はクラウドにも即時反映
+  if(currentUser && !isGuest){
+    sb.from('profiles').upsert({
+      id: currentUser.id,
+      plan_backup: JSON.stringify(arr),
+      updated_at: new Date().toISOString(),
+    }, {onConflict:'id'}).then(()=>{}, ()=>{});
+  }
 }
 
 function renderWeekPlan(){
@@ -9932,9 +10021,13 @@ function saveProfileInfo(){
     isPublic:     isPublicVal !== 'false',
   };
   try{ localStorage.setItem(PROF_INFO_KEY, JSON.stringify(info)); }catch{}
-  // Supabaseにも反映
+  // Supabaseにも反映（is_public + profile_info_backup）
   if(currentUser){
-    sb.from('profiles').upsert({ id: currentUser.id, is_public: info.isPublic }).then(()=>{}, ()=>{});
+    sb.from('profiles').upsert({
+      id: currentUser.id,
+      is_public: info.isPublic,
+      profile_info_backup: JSON.stringify(info),
+    }).then(()=>{}, ()=>{});
   }
   // タグを即時更新
   renderProfileTab();
@@ -13050,6 +13143,14 @@ function loadMaterials(){
 
 function saveMaterials(){
   try { localStorage.setItem(MATERIAL_KEY, JSON.stringify(materials)); } catch {}
+  // ログイン中はクラウドにも即時反映
+  if(currentUser && !isGuest){
+    sb.from('profiles').upsert({
+      id: currentUser.id,
+      materials_backup: JSON.stringify(materials),
+      updated_at: new Date().toISOString(),
+    }, {onConflict:'id'}).then(()=>{}, ()=>{});
+  }
 }
 
 /* ── 教材追加モーダルを開く ── */
