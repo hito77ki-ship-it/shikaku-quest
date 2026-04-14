@@ -2483,6 +2483,7 @@ body[data-theme="dark"] .achieve-x-btn{background:#333;}
 /* ════════════════════════════════════════
    教材管理システム
 ════════════════════════════════════════ */
+#quickMaterialList::-webkit-scrollbar{display:none;}
 .material-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
@@ -3661,6 +3662,15 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:6px;">📚 まず教材を登録しよう！</div>
       <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:10px;">教科書・参考書を登録すると<br>タイマーで学習時間を記録できるようになります。</div>
       <button onclick="switchTab('materials')" style="background:var(--accent);color:#000;border:none;border-radius:20px;padding:8px 20px;font-size:12px;font-weight:700;cursor:pointer;">＋ 教材を登録する</button>
+    </div>
+
+    <!-- 教材クイック選択 -->
+    <div id="quickMaterialSelect" style="display:none;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;">📚 教材を選んで記録開始</div>
+        <button onclick="openMaterialForm()" style="background:transparent;border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--muted);cursor:pointer;">＋ 追加</button>
+      </div>
+      <div id="quickMaterialList" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;"></div>
     </div>
 
     <!-- TIMER BATTLE -->
@@ -12820,6 +12830,51 @@ function checkNoMaterialBanner(){
   if(!banner) return;
   loadMaterials();
   banner.style.display = materials.length === 0 ? '' : 'none';
+  renderQuickMaterialSelect();
+}
+
+function renderQuickMaterialSelect(){
+  const wrap = document.getElementById('quickMaterialSelect');
+  const list = document.getElementById('quickMaterialList');
+  if(!wrap || !list) return;
+  loadMaterials();
+  if(!materials.length){ wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+
+  // 各教材の累計学習時間を計算
+  const materialMins = {};
+  materials.forEach(m => {
+    materialMins[m.id] = sessions.filter(s => s.material_id === m.id).reduce((a,s) => a + s.amount, 0);
+  });
+
+  const currentMatId = document.getElementById('timerMaterial')?.value || '';
+
+  list.innerHTML = materials.map(m => {
+    const mins = materialMins[m.id] || 0;
+    const h = Math.floor(mins/60), min = mins%60;
+    const timeStr = h > 0 ? `${h}h${min>0?min+'m':''}` : mins > 0 ? `${mins}m` : '';
+    const isSelected = m.id === currentMatId;
+    const coverHtml = m.cover
+      ? `<img src="${m.cover}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`
+      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:26px;background:var(--panel2);border-radius:8px;">📖</div>`;
+    return `<div onclick="quickSelectMaterial('${m.id}')" style="
+        flex:0 0 auto;width:80px;cursor:pointer;text-align:center;
+        border-radius:10px;padding:6px;transition:background .15s;
+        background:${isSelected ? 'rgba(140,198,63,.18)' : 'transparent'};
+        border:2px solid ${isSelected ? 'var(--accent)' : 'transparent'};
+      ">
+      <div style="width:68px;height:68px;margin:0 auto 4px;">${coverHtml}</div>
+      <div style="font-size:10px;font-weight:600;color:var(--text);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-all;">${escHtml(m.name)}</div>
+      ${timeStr ? `<div style="font-size:9px;color:var(--muted);margin-top:2px;">⏱${timeStr}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function quickSelectMaterial(materialId){
+  const sel = document.getElementById('timerMaterial');
+  if(sel){ sel.value = materialId; updateTimerMaterial(); }
+  renderQuickMaterialSelect(); // 選択状態を更新
+  document.querySelector('.timer-panel')?.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function loadMaterials(){
@@ -12938,6 +12993,8 @@ function saveMaterial(){
   document.getElementById('materialModal').classList.remove('show');
   renderMaterials();
   updateTimerMaterialSelect();
+  renderQuickMaterialSelect();
+  checkNoMaterialBanner();
   showNotifToast('📚', editId ? '教材を更新しました' : '教材を追加しました', name);
 }
 
@@ -12951,6 +13008,8 @@ function deleteMaterial(id){
   saveMaterials();
   renderMaterials();
   updateTimerMaterialSelect();
+  renderQuickMaterialSelect();
+  checkNoMaterialBanner();
   showNotifToast('🗑', '教材を削除しました', m.name);
 }
 
