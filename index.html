@@ -493,29 +493,47 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 
 
 /* EXAM BANNER */
-.exam-banner{background:linear-gradient(135deg,#f0fff0,#f8fff8);border:1px solid #c6e8c6;border-left:3px solid var(--accent);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s;}
-.exam-banner:hover{border-color:var(--accent2);box-shadow:0 4px 16px rgba(140,198,63,.15);}
-.exam-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(140,198,63,.06),transparent 60%);pointer-events:none;}
-.exam-banner.urgent{border-left-color:#EF4444;border-color:#FCA5A5;background:linear-gradient(135deg,#fff5f5,#fffafa);}
-.exam-banner.passed{border-left-color:#9CA3AF;opacity:.7;background:#f9fafb;}
+/* ── 試験バナー：ライトモード ── */
+.exam-banner{
+  background:#C6F6D5;
+  border:1px solid #9ae6b4;border-left:3px solid #276749;
+  padding:14px 18px;margin-bottom:14px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s,box-shadow .2s;
+}
+.exam-banner:hover{border-color:#276749;box-shadow:0 4px 16px rgba(39,103,73,.2);}
+.exam-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(39,103,73,.08),transparent 60%);pointer-events:none;}
+.exam-banner.urgent{border-left-color:#EF4444;border-color:#feb2b2;background:#fed7d7;}
+.exam-banner.passed{border-left-color:#9CA3AF;opacity:.7;background:#e2e8f0;}
 .eb-icon{font-size:28px;flex-shrink:0;}
 .eb-main{flex:1;min-width:120px;}
-.eb-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.25em;color:#2d6a00;margin-bottom:3px;text-shadow:1px 1px 0 rgba(0,0,0,.25);}
-.eb-name{font-size:13px;color:#1a4200;font-weight:700;margin-bottom:2px;text-shadow:1px 1px 0 rgba(0,0,0,.3);}
-.eb-date{font-family:'Share Tech Mono',monospace;font-size:10px;color:#2d5a00;text-shadow:1px 1px 0 rgba(0,0,0,.25);}
-body[data-theme="dark"] .eb-label{color:#aaa;text-shadow:1px 1px 0 rgba(0,0,0,.9);}
-body[data-theme="dark"] .eb-name{color:#fff;text-shadow:1px 1px 0 rgba(0,0,0,.9);}
-body[data-theme="dark"] .eb-date{color:#ddd;text-shadow:1px 1px 0 rgba(0,0,0,.9);}
+.eb-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.25em;color:#276749;margin-bottom:3px;text-shadow:1px 1px 0 rgba(0,0,0,.15);}
+.eb-name{font-size:13px;color:#1A202C;font-weight:700;margin-bottom:2px;text-shadow:1px 1px 0 rgba(0,0,0,.15);}
+.eb-date{font-family:'Share Tech Mono',monospace;font-size:10px;color:#2D3748;text-shadow:1px 1px 0 rgba(0,0,0,.15);}
+/* ── 試験バナー：ダークモード ── */
+body[data-theme="dark"] .exam-banner{background:#22543D;border-color:#2f855a;border-left-color:#68d391;}
+body[data-theme="dark"] .exam-banner:hover{border-color:#68d391;box-shadow:0 4px 16px rgba(104,211,145,.2);}
+body[data-theme="dark"] .exam-banner::before{background:radial-gradient(ellipse 60% 80% at 0% 50%,rgba(104,211,145,.08),transparent 60%);}
+body[data-theme="dark"] .exam-banner.urgent{background:#742a2a;border-color:#fc8181;border-left-color:#fc8181;}
+body[data-theme="dark"] .exam-banner.passed{background:#1a202c;border-color:#4a5568;border-left-color:#718096;}
+body[data-theme="dark"] .eb-label{color:#9ae6b4;text-shadow:1px 1px 0 rgba(0,0,0,.9);}
+body[data-theme="dark"] .eb-name{color:#F7FAFC;text-shadow:1px 1px 0 rgba(0,0,0,.9);}
+body[data-theme="dark"] .eb-date{color:#e2e8f0;text-shadow:1px 1px 0 rgba(0,0,0,.9);}
 .eb-days{text-align:right;flex-shrink:0;}
-.eb-days-num{font-family:'Cinzel',serif;font-size:38px;color:var(--accent2);line-height:1;text-shadow:none;}
+.eb-days-num{font-family:'Cinzel',serif;font-size:38px;color:#276749;line-height:1;text-shadow:none;}
+body[data-theme="dark"] .eb-days-num{color:#68d391;}
 .exam-banner.urgent .eb-days-num{color:#EF4444;}
 .exam-banner.passed .eb-days-num{color:var(--gold);}
-.eb-days-unit{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.15em;}
+.eb-days-unit{font-family:'Share Tech Mono',monospace;font-size:9px;color:#4a5568;letter-spacing:.15em;}
+body[data-theme="dark"] .eb-days-unit{color:#9ae6b4;}
 .eb-progress-row{width:100%;margin-top:10px;}
-.eb-prog-track{height:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);overflow:hidden;}
-.eb-prog-fill{height:100%;background:linear-gradient(to right,var(--accent),var(--gold2));transition:width .8s;}
+.eb-prog-track{height:5px;background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.1);overflow:hidden;}
+body[data-theme="dark"] .eb-prog-track{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1);}
+.eb-prog-fill{height:100%;background:linear-gradient(to right,#276749,#68d391);transition:width .8s;}
+body[data-theme="dark"] .eb-prog-fill{background:linear-gradient(to right,#276749,#9ae6b4);}
 .exam-banner.urgent .eb-prog-fill{background:linear-gradient(to right,#8b0000,#ff4444);}
-.eb-prog-labels{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);margin-top:3px;}
+.eb-prog-labels{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:8px;color:#4a5568;margin-top:3px;}
+body[data-theme="dark"] .eb-prog-labels{color:#9ae6b4;}
 .eb-set-hint{font-size:11px;color:var(--muted);text-align:center;padding:14px;border:1px dashed var(--border);margin-bottom:14px;cursor:pointer;transition:all .2s;}
 .eb-set-hint:hover{border-color:var(--gold);color:var(--gold);}
 
