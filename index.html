@@ -47,6 +47,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
 <style>
 /* ================================================================
    STUDY QUEST — デザイントークン（CSS変数）
@@ -1574,7 +1575,16 @@ body[data-theme="dark"] .theme-toggle {
   margin-bottom: 10px;
   display: flex; align-items: center; gap: 12px;
 }
-.tl-post-card-icon { font-size: 22px; flex-shrink: 0; }
+.tl-post-card-icon { font-size: 20px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background:rgba(140,198,63,.1); }
+/* Font Awesome 単色アイコン — ライトモード */
+.tl-icon { color:#276749; font-size:16px; }
+.tl-post-card-icon .tl-icon { font-size:18px; }
+.tl-rpg-icon { color:#276749; font-size:12px; margin-right:4px; }
+.tl-badge-icon { font-size:11px; margin-right:4px; }
+/* ダークモード上書き */
+body[data-theme="dark"] .tl-icon { color:#68d391; }
+body[data-theme="dark"] .tl-rpg-icon { color:#68d391; }
+body[data-theme="dark"] .tl-badge-icon { color:#68d391; }
 .tl-post-card-info { flex: 1; }
 .tl-post-card-title { font-size: 12px; font-weight: 700; color: var(--text); }
 .tl-post-card-sub { font-size: 11px; color: var(--muted); }
@@ -11804,7 +11814,7 @@ function renderPostHTML(post, likes){
     <!-- 宣言投稿 -->
     ${post.is_declaration ? `
     <div style="background:linear-gradient(135deg,rgba(140,198,63,.08),rgba(255,215,0,.05));border:1px solid rgba(140,198,63,.3);border-radius:10px;padding:12px 14px;">
-      <div style="font-size:11px;color:var(--accent2);font-family:'Cinzel',serif;letter-spacing:.1em;margin-bottom:6px;">📣 TODAY'S DECLARATION</div>
+      <div style="font-size:11px;color:var(--accent2);font-family:'Cinzel',serif;letter-spacing:.1em;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-bullhorn tl-icon" style="font-size:11px;"></i> TODAY'S DECLARATION</div>
       <div style="font-size:13px;color:var(--text);font-weight:600;">${escHtml(post.note||'')}</div>
     </div>
     ` : post.is_free_post ? `
@@ -11814,7 +11824,7 @@ function renderPostHTML(post, likes){
 
     <!-- RPG戦闘ログ -->
     <div style="background:linear-gradient(135deg,rgba(140,198,63,.06),transparent);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--text);line-height:1.6;">
-      ⚔ ${escHtml(post.rpg_log || '')}
+      <i class="fa-solid fa-shield-halved tl-rpg-icon"></i>${escHtml(post.rpg_log || '')}
     </div>
 
     <!-- 投稿画像 -->
@@ -11822,7 +11832,7 @@ function renderPostHTML(post, likes){
 
     <!-- 週間目標 or 達成報告カード or 学習カード -->
     ${post.is_weekly_goal ? `<div class="tl-post-card">
-      <div class="tl-post-card-icon">🎯</div>
+      <div class="tl-post-card-icon"><i class="fa-solid fa-bullseye tl-icon"></i></div>
       <div class="tl-post-card-info">
         <div class="tl-post-card-title">今週の目標を設定</div>
         <div class="tl-post-card-sub">${escHtml(post.note||'')}</div>
@@ -11830,17 +11840,23 @@ function renderPostHTML(post, likes){
       <div class="tl-post-card-hours">${post.goal_hours||0}h</div>
     </div>` : post.is_achievement ? (() => {
       const ach = post.achievement_data ? (()=>{try{return JSON.parse(post.achievement_data);}catch{return {};}})() : {};
-      const typeLabel = {pass:'🎓 資格合格',exam:'📝 模試・答練',hours:'⏱ 時間達成',goal_progress:'🎯 週間目標',other:'✨ その他'}[ach.type||'other'];
+      const typeLabel = {
+        pass:          '<i class="fa-solid fa-graduation-cap tl-badge-icon"></i> 資格合格',
+        exam:          '<i class="fa-solid fa-pencil        tl-badge-icon"></i> 模試・答練',
+        hours:         '<i class="fa-solid fa-clock         tl-badge-icon"></i> 時間達成',
+        goal_progress: '<i class="fa-solid fa-bullseye      tl-badge-icon"></i> 週間目標',
+        other:         '<i class="fa-solid fa-star          tl-badge-icon"></i> その他',
+      }[ach.type||'other'] || '<i class="fa-solid fa-star tl-badge-icon"></i> その他';
       // 週間目標マイルストーン専用カード
       if(ach.type === 'goal_progress'){
         const pct     = ach.pct || 0;
-        const emoji   = pct >= 100 ? '🎉' : pct >= 90 ? '🔥' : pct >= 50 ? '💪' : '📚';
+        const faIcon  = pct >= 100 ? 'fa-trophy' : pct >= 90 ? 'fa-fire' : pct >= 50 ? 'fa-bolt' : 'fa-book-open';
         const barColor= pct >= 100 ? '#F59E0B' : pct >= 90 ? '#EF4444' : '#8CC63F';
         const doneStr = ach.doneStr || (()=>{ const h=Math.floor((ach.weekMins||0)/60),m=(ach.weekMins||0)%60; return h?`${h}時間${m?m+'分':''}`:`${m}分`; })();
         const goalStr = ach.goalStr || (ach.goalHours ? `${ach.goalHours}時間` : '目標未設定');
         return `<div class="tl-achieve-card" style="background:rgba(140,198,63,.06);border-color:rgba(140,198,63,.3);">
           <div class="tl-achieve-badge" style="background:rgba(140,198,63,.15);color:#3a7d00;">${typeLabel}</div>
-          <div class="tl-achieve-title" style="font-size:14px;">${escHtml(ach.title||`週間目標 ${pct}% 達成`)} ${emoji}</div>
+          <div class="tl-achieve-title" style="font-size:14px;display:flex;align-items:center;gap:6px;"><i class="fa-solid ${faIcon} tl-icon" style="font-size:14px;"></i>${escHtml(ach.title||`週間目標 ${pct}% 達成`)}</div>
           <div style="margin:8px 0 4px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">
             <span>目標：${escHtml(goalStr)}</span>
             <span>達成：${escHtml(doneStr)}</span>
@@ -11868,7 +11884,7 @@ function renderPostHTML(post, likes){
         ${ach.comment ? `<div style="margin-top:8px;font-size:12px;color:var(--muted);">${escHtml(ach.comment)}</div>` : ''}
       </div>`;
     })() : `<div class="tl-post-card">
-      <div class="tl-post-card-icon">📚</div>
+      <div class="tl-post-card-icon"><i class="fa-solid fa-book-open tl-icon"></i></div>
       <div class="tl-post-card-info">
         <div class="tl-post-card-title">${escHtml(post.subject_name || '学習')}</div>
         ${post.note ? `<div class="tl-post-card-sub">${escHtml(post.note)}</div>` : ''}
