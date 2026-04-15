@@ -6108,6 +6108,7 @@ async function restoreFromCloud(){
         'sessions_backup','bosses_backup','exams_backup',
         'char_backup','subjects_backup','jobs_backup',
         'materials_backup','scores_backup','plan_backup','profile_info_backup',
+        'report_backup',
         'updated_at','avatar_url'
       ].join(','))
       .eq('id', currentUser.id)
@@ -6214,23 +6215,28 @@ async function restoreFromCloud(){
     }
     // ── 週間目標データ ──
     if(data.report_backup){
-      const cloudGoal = JSON.parse(data.report_backup);
-      const localGoalKeys = Object.keys(weeklyGoalData || {});
-      const cloudGoalKeys = Object.keys(cloudGoal || {});
-      if(cloudGoal && cloudGoalKeys.length > 0 && (localGoalKeys.length === 0 || cloudIsNewer)){
-        weeklyGoalData = cloudGoal;
-        // localStorageにも書き戻し（avatarDataは現状維持）
-        const current = JSON.parse(localStorage.getItem('sq2_report') || '{}');
-        localStorage.setItem('sq2_report', JSON.stringify({
-          ...current,
-          weeklyGoalData: cloudGoal,
-        }));
-        restored = true;
-        console.log('[SQ] 週間目標をクラウドから復元:', cloudGoalKeys.length, '週分');
-      }
+      try {
+        const cloudGoal = JSON.parse(data.report_backup);
+        const localGoalKeys = Object.keys(weeklyGoalData || {});
+        const cloudGoalKeys = Object.keys(cloudGoal || {});
+        // ローカルに今週分がない、またはクラウドが新しい場合に上書き
+        const localHasThisWeek = !!weeklyGoalData[getWeekStart()];
+        if(cloudGoal && cloudGoalKeys.length > 0 && (!localHasThisWeek || cloudIsNewer)){
+          weeklyGoalData = cloudGoal;
+          // localStorage にも書き戻す
+          const cur = JSON.parse(localStorage.getItem('sq2_report') || '{}');
+          localStorage.setItem('sq2_report', JSON.stringify({ ...cur, weeklyGoalData: cloudGoal }));
+          restored = true;
+          console.log('[SQ] 週間目標をクラウドから復元:', cloudGoalKeys.length, '週分');
+        }
+      } catch(e) { console.warn('report_backup parse error', e); }
     }
 
-    if(restored) await saveAll();
+    if(restored){
+      await saveAll();
+      // 週間目標UIを即時更新（reportパネルが閉じていても反映）
+      try{ renderWeeklyGoal && renderWeeklyGoal(); }catch(e){}
+    }
     console.log('[SQ] restoreFromCloud 完了 restored=', restored, 'cloudIsNewer=', cloudIsNewer);
     return restored;
   } catch(e) {
