@@ -500,9 +500,12 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .exam-banner.passed{border-left-color:#9CA3AF;opacity:.7;background:#f9fafb;}
 .eb-icon{font-size:28px;flex-shrink:0;}
 .eb-main{flex:1;min-width:120px;}
-.eb-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.25em;color:var(--muted);margin-bottom:3px;}
-.eb-name{font-size:13px;color:var(--text);font-weight:700;margin-bottom:2px;}
-.eb-date{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);}
+.eb-label{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.25em;color:#555;margin-bottom:3px;}
+.eb-name{font-size:13px;color:#111;font-weight:700;margin-bottom:2px;}
+.eb-date{font-family:'Share Tech Mono',monospace;font-size:10px;color:#444;}
+body[data-theme="dark"] .eb-label{color:#aaa;}
+body[data-theme="dark"] .eb-name{color:#eee;}
+body[data-theme="dark"] .eb-date{color:#bbb;}
 .eb-days{text-align:right;flex-shrink:0;}
 .eb-days-num{font-family:'Cinzel',serif;font-size:38px;color:var(--accent2);line-height:1;text-shadow:none;}
 .exam-banner.urgent .eb-days-num{color:#EF4444;}
