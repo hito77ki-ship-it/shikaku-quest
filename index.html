@@ -8111,21 +8111,28 @@ function renderWeekBar(){
   // Y軸最大値：合計の最大値に上部ラベル用の余白（25%）を加算
   const yMax=maxTotal>0 ? Math.ceil((maxTotal*1.25)*4)/4 : 2;
 
+  // モバイル判定（幅480px未満をモバイル扱い）
+  const isMobile=window.innerWidth<480;
+  const labelFontSize=isMobile?8:9;
+
   // 棒頂上に合計時間を常時表示するカスタムプラグイン
+  // afterDraw を使うことでChart.jsのクリップ領域外（上部余白）にも描画できる
   const stackTopLabelPlugin={
     id:'stackTopLabel',
-    afterDatasetsDraw(chart){
-      const{ctx,data,scales:{x,y}}=chart;
+    afterDraw(chart){
+      const{ctx,scales:{x,y}}=chart;
       ctx.save();
-      data.labels.forEach((_,i)=>{
-        const total=dayTotals[i];
+      // クリップを解除して上部パディング領域にも描画可能にする
+      ctx.restore();
+      ctx.save();
+      dayTotals.forEach((total,i)=>{
         if(total<=0) return;
         const h=Math.floor(total);
         const m=Math.round((total-h)*60);
         const label=h>0?(m>0?`${h}h ${m}m`:`${h}h`):(m+'m');
         const xPos=x.getPixelForValue(i);
-        const yPos=y.getPixelForValue(total)-7;
-        ctx.font='600 9px "Hiragino Maru Gothic ProN","Hiragino Rounded Gothic Pro","Rounded Mplus 1c",sans-serif';
+        const yPos=y.getPixelForValue(total)-5;
+        ctx.font=`600 ${labelFontSize}px "Hiragino Maru Gothic ProN","Hiragino Rounded Gothic Pro","Rounded Mplus 1c",sans-serif`;
         ctx.fillStyle='rgba(255,255,255,0.92)';
         ctx.textAlign='center';
         ctx.textBaseline='bottom';
@@ -8145,6 +8152,7 @@ function renderWeekBar(){
     plugins:[stackTopLabelPlugin],
     options:{
       responsive:true, maintainAspectRatio:false,
+      layout:{padding:{top:18,left:isMobile?2:4,right:isMobile?2:4}},
       plugins:{
         legend:{display:false},
         tooltip:{
@@ -8169,7 +8177,7 @@ function renderWeekBar(){
         }
       },
       scales:{
-        x:{stacked:true,grid:{display:false},ticks:{font:{size:9},color:'#999',maxRotation:0}},
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:isMobile?8:9},color:'#999',maxRotation:0}},
         y:{stacked:true,grid:{color:'rgba(255,255,255,.05)'},
           ticks:{font:{size:9},color:'#bbb',callback:v=>v===0?'0':v+'h'},
           beginAtZero:true,
