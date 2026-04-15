@@ -1247,6 +1247,8 @@ body[data-theme="dark"] .wg-lock-note{color:var(--muted);}
 .gnav-item:last-child{border-bottom:none;}
 .gnav-item:hover{color:var(--accent2);background:rgba(140,198,63,.06);padding-left:8px;}
 .gnav-item-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0;}
+.nav-icon{color:#276749;font-size:15px;}
+body[data-theme="dark"] .nav-icon{color:#68d391;}
 .gnav-item-body{flex:1;}
 .gnav-item-label{font-size:13px;font-weight:500;}
 .gnav-item-desc{font-size:10px;color:var(--muted);margin-top:1px;}
@@ -2281,7 +2283,10 @@ body[data-theme="light"] .medal-item{background:var(--panel2);border-color:var(-
     text-align: center;
     flex-shrink: 0;
     opacity: .85;
+    color: #276749;
   }
+  body[data-theme="dark"] .pc-nav-icon { color: #68d391; }
+  .pc-nav-item.active .pc-nav-icon { color: var(--accent2); }
   .pc-nav-item.active .pc-nav-icon { opacity: 1; }
   .pc-nav-item:hover .pc-nav-icon { opacity: 1; }
 
@@ -3475,22 +3480,22 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
   </div>
   <nav class="pc-sidebar-nav">
     <div class="pc-sidebar-section-label">メニュー</div>
-    <div class="pc-nav-item active" id="pcnav-status" onclick="pcNavSwitch('status')"><span class="pc-nav-icon">⚔</span>STATUS</div>
-    <div class="pc-nav-item" id="pcnav-quest" onclick="pcNavSwitch('quest')"><span class="pc-nav-icon">📋</span>タイマー / 記録</div>
-    <div class="pc-nav-item" id="pcnav-timeline" onclick="pcNavSwitch('timeline')"><span class="pc-nav-icon">📱</span>タイムライン</div>
-    <div class="pc-nav-item" id="pcnav-score" onclick="pcNavSwitch('score')"><span class="pc-nav-icon">📊</span>SCORE</div>
-    <div class="pc-nav-item" id="pcnav-boss" onclick="pcNavSwitch('boss')"><span class="pc-nav-icon">💀</span>BOSS</div>
-    <div class="pc-nav-item" id="pcnav-ranking" onclick="pcNavSwitch('ranking')"><span class="pc-nav-icon">🏆</span>RANKING</div>
-    <div class="pc-nav-item" id="pcnav-titles" onclick="pcNavSwitch('titles')"><span class="pc-nav-icon">🏅</span>TITLES</div>
-    <div class="pc-nav-item" id="pcnav-report" onclick="pcNavSwitch('report')"><span class="pc-nav-icon">📈</span>レポート</div>
-    <div class="pc-nav-item" id="pcnav-profile" onclick="pcNavSwitch('profile')"><span class="pc-nav-icon">👤</span>プロフィール</div>
+    <div class="pc-nav-item active" id="pcnav-status" onclick="pcNavSwitch('status')"><span class="pc-nav-icon"><i class="fa-solid fa-shield-halved"></i></span>STATUS</div>
+    <div class="pc-nav-item" id="pcnav-quest" onclick="pcNavSwitch('quest')"><span class="pc-nav-icon"><i class="fa-solid fa-stopwatch"></i></span>タイマー / 記録</div>
+    <div class="pc-nav-item" id="pcnav-timeline" onclick="pcNavSwitch('timeline')"><span class="pc-nav-icon"><i class="fa-solid fa-timeline"></i></span>タイムライン</div>
+    <div class="pc-nav-item" id="pcnav-score" onclick="pcNavSwitch('score')"><span class="pc-nav-icon"><i class="fa-solid fa-chart-bar"></i></span>SCORE</div>
+    <div class="pc-nav-item" id="pcnav-boss" onclick="pcNavSwitch('boss')"><span class="pc-nav-icon"><i class="fa-solid fa-skull"></i></span>BOSS</div>
+    <div class="pc-nav-item" id="pcnav-ranking" onclick="pcNavSwitch('ranking')"><span class="pc-nav-icon"><i class="fa-solid fa-ranking-star"></i></span>RANKING</div>
+    <div class="pc-nav-item" id="pcnav-titles" onclick="pcNavSwitch('titles')"><span class="pc-nav-icon"><i class="fa-solid fa-medal"></i></span>TITLES</div>
+    <div class="pc-nav-item" id="pcnav-report" onclick="pcNavSwitch('report')"><span class="pc-nav-icon"><i class="fa-solid fa-chart-line"></i></span>レポート</div>
+    <div class="pc-nav-item" id="pcnav-profile" onclick="pcNavSwitch('profile')"><span class="pc-nav-icon"><i class="fa-solid fa-user"></i></span>プロフィール</div>
 
     <div class="pc-sidebar-section-label" style="margin-top:8px;">ツール</div>
-    <div class="pc-nav-item" onclick="openDmWindow()"><span class="pc-nav-icon">✉️</span>作戦会議室 DM</div>
-    <div class="pc-nav-item" onclick="switchTab('score');pcNavSwitch('score');openAchieveModal()"><span class="pc-nav-icon">🏆</span>達成報告</div>
-    <div class="pc-nav-item" onclick="openFeedback()"><span class="pc-nav-icon">💬</span>改善要望</div>
-    <div class="pc-nav-item" onclick="openHelp('guide')"><span class="pc-nav-icon">❓</span>ヘルプ</div>
-    <div class="pc-nav-item" onclick="restartTutorial()"><span class="pc-nav-icon">🎓</span>チュートリアル</div>
+    <div class="pc-nav-item" onclick="openDmWindow()"><span class="pc-nav-icon"><i class="fa-solid fa-envelope"></i></span>作戦会議室 DM</div>
+    <div class="pc-nav-item" onclick="switchTab('score');pcNavSwitch('score');openAchieveModal()"><span class="pc-nav-icon"><i class="fa-solid fa-trophy"></i></span>達成報告</div>
+    <div class="pc-nav-item" onclick="openFeedback()"><span class="pc-nav-icon"><i class="fa-solid fa-comment-dots"></i></span>改善要望</div>
+    <div class="pc-nav-item" onclick="openHelp('guide')"><span class="pc-nav-icon"><i class="fa-solid fa-circle-question"></i></span>ヘルプ</div>
+    <div class="pc-nav-item" onclick="restartTutorial()"><span class="pc-nav-icon"><i class="fa-solid fa-graduation-cap"></i></span>チュートリアル</div>
 
   </nav>
   <div class="pc-sidebar-bottom">
@@ -3628,23 +3633,23 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
   <div class="gnav-drawer-section mobile-nav-section" style="display:none;">
     <div class="gnav-drawer-section-title">MORE TABS</div>
     <div class="gnav-item" onclick="closeDrawer();switchTab('status')">
-      <span class="gnav-item-icon">⚔</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-shield-halved nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">STATUS</div><div class="gnav-item-desc">キャラ・宣言・ミッション</div></div>
     </div>
     <div class="gnav-item" onclick="closeDrawer();switchTab('ranking')">
-      <span class="gnav-item-icon">🏆</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-ranking-star nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">RANKING</div><div class="gnav-item-desc">週間・全体ランキング</div></div>
     </div>
     <div class="gnav-item" onclick="closeDrawer();switchTab('score')">
-      <span class="gnav-item-icon">📊</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-chart-bar nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">SCORE</div><div class="gnav-item-desc">試験スコア・記録</div></div>
     </div>
     <div class="gnav-item" onclick="closeDrawer();switchTab('boss')">
-      <span class="gnav-item-icon">💀</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-skull nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">BOSS</div><div class="gnav-item-desc">科目ボスに挑戦</div></div>
     </div>
     <div class="gnav-item" onclick="closeDrawer();switchTab('titles')">
-      <span class="gnav-item-icon">🏅</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-medal nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">TITLES</div><div class="gnav-item-desc">称号・実績一覧</div></div>
     </div>
   </div>
@@ -3653,20 +3658,20 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
   <div class="gnav-drawer-section">
     <div class="gnav-drawer-section-title">HELP &amp; SUPPORT</div>
     <div class="gnav-item" onclick="closeDrawer();openHelp('guide')">
-      <span class="gnav-item-icon">📖</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-book-open nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">はじめかた</div><div class="gnav-item-desc">初期設定〜タイマー開始まで</div></div>
       <span class="gnav-item-badge">NEW</span>
     </div>
     <div class="gnav-item" onclick="closeDrawer();openHelp('faq')">
-      <span class="gnav-item-icon">❓</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-circle-question nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">よくある質問</div><div class="gnav-item-desc">機能の使い方・トラブル</div></div>
     </div>
     <div class="gnav-item" onclick="closeDrawer();openHelp('features')">
-      <span class="gnav-item-icon">✨</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-list-check nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">機能一覧</div><div class="gnav-item-desc">全機能の説明</div></div>
     </div>
     <div class="gnav-item" onclick="closeDrawer();document.getElementById('feedbackModal').classList.add('show')">
-      <span class="gnav-item-icon">💬</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-comment-dots nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">改善要望</div><div class="gnav-item-desc">ご意見・ご要望</div></div>
     </div>
   </div>
@@ -3675,20 +3680,20 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
   <div class="gnav-drawer-section" style="margin-top:8px;padding-bottom:24px;">
     <div class="gnav-drawer-section-title">ACCOUNT</div>
     <div class="gnav-item dm-nav-btn" onclick="closeDrawer();openDmWindow()" style="position:relative;">
-      <span class="gnav-item-icon">✉️</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-envelope nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">作戦会議室（DM）</div><div class="gnav-item-desc">相互フォロー限定メッセージ</div></div>
       <span class="dm-nav-badge" id="dmNavBadge">0</span>
     </div>
     <div class="gnav-item" id="gnavSyncItem" onclick="closeDrawer();syncToCloud()">
-      <span class="gnav-item-icon">☁</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-cloud-arrow-up nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">クラウド同期</div><div class="gnav-item-desc">Supabaseに保存</div></div>
     </div>
     <div class="gnav-item" onclick="closeDrawer();exportData()">
-      <span class="gnav-item-icon">💾</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-floppy-disk nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">データを保存</div><div class="gnav-item-desc">JSONファイルでバックアップ</div></div>
     </div>
     <div class="gnav-item" onclick="closeDrawer();signOut()" style="color:#ff6e6e;">
-      <span class="gnav-item-icon">🚪</span>
+      <span class="gnav-item-icon"><i class="fa-solid fa-right-from-bracket nav-icon"></i></span>
       <div class="gnav-item-body"><div class="gnav-item-label">ログアウト</div></div>
     </div>
   </div>
