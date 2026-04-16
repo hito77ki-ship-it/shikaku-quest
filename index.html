@@ -548,6 +548,31 @@ body[data-theme="dark"] .eb-prog-fill{background:linear-gradient(to right,#27674
 .eb-prog-labels{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:8px;color:#4a5568;margin-top:3px;}
 body[data-theme="dark"] .eb-prog-labels{color:#9ae6b4;}
 .eb-set-hint{font-size:11px;color:var(--muted);text-align:center;padding:14px;border:1px dashed var(--border);margin-bottom:14px;cursor:pointer;transition:all .2s;}
+/* フェーズバッジ */
+.eb-phase-badge{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.1em;padding:2px 7px;border-radius:20px;margin-bottom:3px;font-family:'Share Tech Mono',monospace;}
+.eb-phase-tanto{background:rgba(201,168,76,.15);color:#c9a84c;}
+.eb-phase-ronbun{background:rgba(124,77,255,.15);color:#8b5cf6;}
+/* 昇格お祝いモーダル */
+.sinsho-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;}
+.sinsho-overlay.show{opacity:1;pointer-events:auto;}
+.sinsho-box{background:linear-gradient(135deg,#0d0820,#1a0535,#0d1520);border:2px solid #c9a84c;border-radius:16px;padding:36px 28px;max-width:360px;width:90%;text-align:center;box-shadow:0 0 80px rgba(201,168,76,.5),0 0 160px rgba(124,77,255,.2);animation:sinshoIn .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes sinshoIn{from{transform:scale(.7) translateY(30px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+.sinsho-star{font-size:48px;animation:starSpin 1.5s ease-out;display:block;margin-bottom:8px;}
+@keyframes starSpin{from{transform:rotate(-180deg) scale(0);}to{transform:rotate(0deg) scale(1);}}
+.sinsho-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.3em;color:#c9a84c;margin-bottom:16px;}
+.sinsho-name{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;}
+.sinsho-desc{font-size:13px;color:#a0aec0;line-height:1.8;margin-bottom:24px;}
+.sinsho-unlock{background:linear-gradient(135deg,rgba(124,77,255,.12),rgba(201,168,76,.08));border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:#c9a84c;text-align:left;}
+.sinsho-btn{background:linear-gradient(135deg,#c9a84c,#e6c35a);color:#000;border:none;border-radius:24px;padding:12px 32px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cinzel',serif;letter-spacing:.08em;}
+/* 論文式偏差値入力 */
+.ronbun-score-grid{display:grid;gap:10px;}
+.ronbun-subj-item{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.ronbun-subj-name{font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.ronbun-hensa-row{display:flex;align-items:center;gap:8px;}
+.ronbun-hensa-input{width:60px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:16px;font-weight:700;color:var(--accent2);}
+.ronbun-hensa-bar{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.ronbun-hensa-fill{height:100%;border-radius:4px;transition:width .4s;background:linear-gradient(to right,#ef4444,#f59e0b,#22c55e);}
+.ronbun-pass-line{font-size:9px;color:var(--muted);font-family:'Share Tech Mono',monospace;}
 .eb-set-hint:hover{border-color:var(--gold);color:var(--gold);}
 
 /* MODAL */
@@ -4335,7 +4360,15 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         </div>
         <div class="form-group">
           <label class="form-label">科目別スコア（点数 / 満点）</label>
+          <!-- 論文式モード切替 -->
+          <div id="ronbunModeWrap" style="display:none;margin-bottom:8px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);cursor:pointer;">
+              <input type="checkbox" id="ronbunMode" onchange="toggleRonbunMode()" style="accent-color:var(--accent);">
+              論文式モード（偏差値入力）
+            </label>
+          </div>
           <div class="score-subj-grid" id="scoreSubjInputs"></div>
+          <div id="ronbunSubjInputs" class="ronbun-score-grid" style="display:none;"></div>
           <!-- TOEIC詳細モード -->
           <div id="scoreToeicDetail" style="display:none;">
             <label class="score-detail-toggle">
@@ -4954,6 +4987,22 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
   </div>
 </div>
 
+<!-- 昇格お祝いモーダル -->
+<div class="sinsho-overlay" id="sinshoOverlay">
+  <div class="sinsho-box">
+    <span class="sinsho-star" id="sinshoStar">🏆</span>
+    <div class="sinsho-title">QUEST CLEARED !</div>
+    <div class="sinsho-name" id="sinshoName">短答式 合格！</div>
+    <div class="sinsho-desc" id="sinshoDesc">短答式試験を突破した！<br>次のステージが解放される！</div>
+    <div class="sinsho-unlock" id="sinshoUnlock" style="display:none;">
+      <div style="font-size:10px;letter-spacing:.1em;font-family:'Share Tech Mono',monospace;margin-bottom:6px;">🔓 NEW QUEST UNLOCKED</div>
+      <div id="sinshoUnlockName" style="font-size:13px;font-weight:700;">論文式クエスト</div>
+      <div id="sinshoUnlockDate" style="font-size:11px;color:var(--muted);margin-top:2px;"></div>
+    </div>
+    <button class="sinsho-btn" onclick="closeSinshoModal()">冒険を続ける ⚔</button>
+  </div>
+</div>
+
 <!-- EXAM MODAL -->
 <div class="modal-overlay" id="examModal">
   <div class="modal-box" style="max-width:440px;">
@@ -4964,7 +5013,17 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <!-- 追加フォーム -->
       <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--muted);margin-bottom:10px;" id="examFormLabel">＋ 新しい試験日を追加</div>
       <input type="hidden" id="examEditId" value="">
-      <div class="form-group"><label class="form-label">試験名</label><input class="form-input" id="examTitle" type="text" placeholder="公認会計士 第〇回短答式試験" oninput="calcExamTargetHours()"></div>
+      <div class="form-group"><label class="form-label">試験名</label><input class="form-input" id="examTitle" type="text" placeholder="公認会計士 第〇回短答式試験" oninput="calcExamTargetHours();autoDetectPhase()"></div>
+      <!-- 試験フェーズ（任意） -->
+      <div class="form-group">
+        <label class="form-label">試験フェーズ（任意）</label>
+        <div style="display:flex;gap:6px;">
+          <button type="button" class="score-tmpl-btn" id="phaseBtn-none"   onclick="selectExamPhase(null)"    style="flex:1;">なし</button>
+          <button type="button" class="score-tmpl-btn active" id="phaseBtn-tanto"  onclick="selectExamPhase('tanto')"  style="flex:1;">短答式</button>
+          <button type="button" class="score-tmpl-btn" id="phaseBtn-ronbun" onclick="selectExamPhase('ronbun')" style="flex:1;">論文式</button>
+        </div>
+      </div>
+      <input type="hidden" id="examPhase" value="tanto">
       <div class="form-group"><label class="form-label">試験日</label><input class="form-input" id="examTargetDate" type="date"></div>
       <div class="form-group"><label class="form-label">勉強開始日（任意）</label><input class="form-input" id="examStartDate" type="date"></div>
       <!-- 現在地・目標スコア（パーソナライズ計算用） -->
@@ -7846,6 +7905,13 @@ function buildScoreSubjInputs(){
   // TOEICの詳細モード表示切替
   const detailWrap = document.getElementById('scoreToeicDetail');
   if(detailWrap) detailWrap.style.display = currentScoreTemplate === 'toeic' ? 'block' : 'none';
+
+  // 論文式モード表示切替（CPAやジョブが多段階試験の場合に表示）
+  const ronbunWrap = document.getElementById('ronbunModeWrap');
+  const activeJobId = (typeof selectedJobIds !== 'undefined') ? selectedJobIds[0] : null;
+  if(ronbunWrap){
+    ronbunWrap.style.display = (activeJobId && MULTIPHASE_EXAMS[activeJobId]) ? 'block' : 'none';
+  }
   if(currentScoreTemplate !== 'toeic'){
     const cb = document.getElementById('toeicDetailMode');
     if(cb){ cb.checked = false; }
@@ -7957,6 +8023,37 @@ async function addScoreRecord(){
   await saveScores();
   renderScoreTab();
   renderScoreBossCard(newRecord, prevRecord);
+
+  // ── 合格判定 → 昇格イベント ──
+  const activeJobId = (selectedJobIds||[])[0];
+  if(activeJobId && MULTIPHASE_EXAMS[activeJobId]){
+    const multiphase = MULTIPHASE_EXAMS[activeJobId];
+    // 短答式合格チェック
+    if(currentScoreTemplate.includes('tanto') || currentScoreTemplate === 'cpa_tanto'){
+      if(checkPassedScore(scores, activeJobId, 'tanto')){
+        const totalScore = Object.values(scores).reduce((a,v)=>a+v.score,0);
+        const totalMax   = Object.values(scores).reduce((a,v)=>a+v.max,0);
+        // 論文式クエストを自動生成
+        const ronbunId = genId();
+        const newRonbun = {
+          id: ronbunId,
+          title: `${multiphase.name} 論文式`,
+          date: '',
+          phase: 'ronbun',
+          linkedTantoId: newRecord.id,
+        };
+        examGoals.push(newRonbun);
+        await saveAll();
+        showSinshoModal({
+          star: '🎊',
+          name: `${multiphase.name} 短答式 合格！`,
+          desc: `合計 ${totalScore}/${totalMax}点\n短答式を突破した！\n論文式クエストが解放された！`,
+          unlockName: `${multiphase.name} 論文式クエスト`,
+          unlockDate: '試験日を設定しよう（試験日 → 管理から）',
+        });
+      }
+    }
+  }
 
   // タイムライン投稿（チェックが入っている場合のみ）
   const doPost = document.getElementById('scorePostToTl')?.checked;
@@ -11698,8 +11795,9 @@ function renderExamBanner(){
       <span class="eb-icon">${icon}</span>
       <div class="eb-main">
         <div class="eb-label">FINAL EXAM TARGET</div>
+        ${eg.phase ? `<div class="eb-phase-badge ${eg.phase==='tanto'?'eb-phase-tanto':'eb-phase-ronbun'}">${eg.phase==='tanto'?'STEP1・短答式':'STEP2・論文式'}</div>` : ''}
         <div class="eb-name">${eg.title||'試験日'}</div>
-        <div class="eb-date">${eg.date} ${daysLeft>=0?'('+Math.floor(daysDisp/7)+'週'+daysDisp%7+'日前)':'(終了)'}</div>
+        <div class="eb-date">${eg.date?eg.date+' '+( daysLeft>=0?'('+Math.floor(daysDisp/7)+'週'+daysDisp%7+'日前)':'(終了)'):'試験日未設定'}</div>
         ${prog}
       </div>
       <div class="eb-days">
@@ -11772,6 +11870,139 @@ function calcExamTargetHours(){
   hoursEl.value = hours;
 }
 
+/* ── 多段階試験マスターデータ ── */
+const MULTIPHASE_EXAMS = {
+  cpa: {
+    name: '公認会計士',
+    tanto: {
+      label: '短答式',
+      scorePreset: 'cpa_tanto',
+      pass: { total: 350, totalMax: 500, minPerSubj: 40 },
+    },
+    ronbun: {
+      label: '論文式',
+      subjects: [
+        {key:'r_kaikei',  name:'会計学',  passHensa: 52},
+        {key:'r_kansa',   name:'監査論',  passHensa: 52},
+        {key:'r_kigyou',  name:'企業法',  passHensa: 52},
+        {key:'r_zeimu',   name:'租税法',  passHensa: 52},
+        {key:'r_sentaku', name:'選択科目', passHensa: 52},
+      ],
+      passNote: '偏差値52以上が目安の合格ライン'
+    }
+  },
+  zeirishi: {
+    name: '税理士',
+    tanto: { label: '科目試験', pass: { total: 60, totalMax: 100 } },
+    ronbun: {
+      label: '税理士試験（論述）',
+      subjects: [
+        {key:'z_r_ronbun', name:'理論問題', passHensa: 52},
+        {key:'z_r_keisan', name:'計算問題', passHensa: 52},
+      ],
+    }
+  },
+};
+
+function autoDetectPhase(){
+  const title = document.getElementById('examTitle')?.value || '';
+  const t = title.toLowerCase();
+  if(t.includes('短答') || t.includes('tanto')) selectExamPhase('tanto');
+  else if(t.includes('論文') || t.includes('ronbun')) selectExamPhase('ronbun');
+}
+
+function selectExamPhase(phase){
+  document.getElementById('examPhase').value = phase || '';
+  ['none','tanto','ronbun'].forEach(p=>{
+    document.getElementById('phaseBtn-'+p)?.classList.toggle('active', (phase||'none')===p || (!phase&&p==='none'));
+  });
+}
+
+/* 昇格お祝いモーダル */
+function showSinshoModal(opts = {}){
+  document.getElementById('sinshoStar').textContent = opts.star || '🏆';
+  document.getElementById('sinshoName').textContent = opts.name || '合格！';
+  document.getElementById('sinshoDesc').textContent = opts.desc || 'おめでとう！';
+  const unlockEl = document.getElementById('sinshoUnlock');
+  if(opts.unlockName){
+    unlockEl.style.display = 'block';
+    document.getElementById('sinshoUnlockName').textContent = opts.unlockName;
+    document.getElementById('sinshoUnlockDate').textContent = opts.unlockDate || '試験日を設定しよう';
+  } else {
+    unlockEl.style.display = 'none';
+  }
+  document.getElementById('sinshoOverlay').classList.add('show');
+  // 紙吹雪
+  if(typeof showGoalCelebration === 'function') setTimeout(showGoalCelebration, 300);
+}
+function closeSinshoModal(){
+  document.getElementById('sinshoOverlay').classList.remove('show');
+}
+
+/* スコアが合格ラインを超えているか判定 */
+function checkPassedScore(scores, qualId, phase){
+  const multiphase = MULTIPHASE_EXAMS[qualId];
+  if(!multiphase) return false;
+  const phaseData = multiphase[phase || 'tanto'];
+  if(!phaseData?.pass) return false;
+  const { total, totalMax, minPerSubj } = phaseData.pass;
+  const totalScore = Object.values(scores).reduce((a,v)=>a+v.score,0);
+  const pct = totalScore / totalMax * 100;
+  if(pct < total / totalMax * 100) return false;
+  if(minPerSubj){
+    for(const v of Object.values(scores)){
+      if(v.score < minPerSubj) return false;
+    }
+  }
+  return true;
+}
+
+/* 論文式モード切替 */
+function toggleRonbunMode(){
+  const on = document.getElementById('ronbunMode')?.checked;
+  document.getElementById('scoreSubjInputs').style.display = on ? 'none' : '';
+  const ronbunGrid = document.getElementById('ronbunSubjInputs');
+  if(on){
+    ronbunGrid.style.display = 'block';
+    buildRonbunInputs();
+  } else {
+    ronbunGrid.style.display = 'none';
+  }
+}
+
+function buildRonbunInputs(){
+  const grid = document.getElementById('ronbunSubjInputs');
+  if(!grid) return;
+  // 選択中ジョブから論文科目を検出
+  let subjects = [];
+  for(const jid of (selectedJobIds||[])){
+    const ronbun = MULTIPHASE_EXAMS[jid]?.ronbun;
+    if(ronbun?.subjects){ subjects = ronbun.subjects; break; }
+  }
+  if(!subjects.length){
+    subjects = [{key:'r_total', name:'総合偏差値', passHensa:52}];
+  }
+  grid.innerHTML = subjects.map(s=>`
+    <div class="ronbun-subj-item">
+      <div class="ronbun-subj-name">${s.name}</div>
+      <div class="ronbun-hensa-row">
+        <input type="number" min="30" max="80" class="ronbun-hensa-input form-input" id="rhensa_${s.key}"
+          placeholder="偏差値" oninput="updateRonbunBar('${s.key}',${s.passHensa||52})">
+        <div class="ronbun-hensa-bar">
+          <div class="ronbun-hensa-fill" id="rhensaBar_${s.key}" style="width:0%"></div>
+        </div>
+        <span class="ronbun-pass-line">合格目安 ${s.passHensa||52}</span>
+      </div>
+    </div>`).join('');
+}
+
+function updateRonbunBar(key, passHensa){
+  const val = parseFloat(document.getElementById('rhensa_'+key)?.value) || 0;
+  const pct = Math.min(100, Math.max(0, (val-30)/(80-30)*100));
+  const bar = document.getElementById('rhensaBar_'+key);
+  if(bar) bar.style.width = pct+'%';
+}
+
 function openExamModal(){
   const listEl = document.getElementById('examModalList');
   if(listEl){
@@ -11798,6 +12029,7 @@ function openExamModal(){
   document.getElementById('examTargetHours').value='';
   const resultEl = document.getElementById('examCalcResult');
   if(resultEl) resultEl.style.display='none';
+  selectExamPhase('tanto');
   const lbl=document.getElementById('examFormLabel');
   if(lbl) lbl.textContent='＋ 新しい試験日を追加';
   document.getElementById('examModal').classList.add('show');
@@ -11810,6 +12042,7 @@ async function saveExamGoal(){
   const curScore = parseFloat(document.getElementById('examCurrentScore')?.value);
   const tgtScore = parseFloat(document.getElementById('examTargetScore')?.value);
   const tgtHours = parseFloat(document.getElementById('examTargetHours')?.value);
+  const phase = document.getElementById('examPhase')?.value || null;
   const entry={
     id: document.getElementById('examEditId').value || genId(),
     title: document.getElementById('examTitle').value.trim()||'試験日',
@@ -11818,6 +12051,7 @@ async function saveExamGoal(){
     targetHours:  isNaN(tgtHours) ? 0 : tgtHours,
     currentScore: isNaN(curScore) ? null : curScore,
     targetScore:  isNaN(tgtScore) ? null : tgtScore,
+    phase:        phase || null,
   };
   const existIdx=examGoals.findIndex(e=>e.id===entry.id);
   if(existIdx>=0) examGoals[existIdx]=entry;
