@@ -4490,6 +4490,8 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
               <div style="font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace;">今日の冒険はこれからだ！</div>
             </div>
           </div>
+          <!-- 凡例 -->
+          <div id="rptBarLegend" style="display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;padding:0 2px;"></div>
         </div>
 
         <!-- 時間配分円グラフ -->
@@ -8826,9 +8828,14 @@ function renderWeekBar(){
     afterDraw(chart){
       const{ctx,scales:{x,y}}=chart;
       ctx.save();
-      // クリップを解除して上部パディング領域にも描画可能にする
       ctx.restore();
       ctx.save();
+      ctx.font=`600 ${labelFontSize}px "Hiragino Maru Gothic ProN","Hiragino Rounded Gothic Pro","Rounded Mplus 1c",sans-serif`;
+      ctx.fillStyle='rgba(255,255,255,0.92)';
+      ctx.textAlign='center';
+      ctx.textBaseline='bottom';
+      let lastXPos = -999;
+      const minGap = labelFontSize * 5; // 文字間の最小距離（重なり防止）
       dayTotals.forEach((total,i)=>{
         if(total<=0) return;
         const h=Math.floor(total);
@@ -8836,11 +8843,10 @@ function renderWeekBar(){
         const label=h>0?(m>0?`${h}h ${m}m`:`${h}h`):(m+'m');
         const xPos=x.getPixelForValue(i);
         const yPos=y.getPixelForValue(total)-5;
-        ctx.font=`600 ${labelFontSize}px "Hiragino Maru Gothic ProN","Hiragino Rounded Gothic Pro","Rounded Mplus 1c",sans-serif`;
-        ctx.fillStyle='rgba(255,255,255,0.92)';
-        ctx.textAlign='center';
-        ctx.textBaseline='bottom';
+        // 直前のラベルと近すぎる場合はスキップ
+        if(Math.abs(xPos - lastXPos) < minGap) return;
         ctx.fillText(label,xPos,yPos);
+        lastXPos = xPos;
       });
       ctx.restore();
     }
@@ -8861,21 +8867,26 @@ function renderWeekBar(){
         legend:{display:false},
         tooltip:{
           mode:'index', intersect:false,
-          backgroundColor:'rgba(15,8,32,.95)',
-          titleColor:'#c9a84c',bodyColor:'#aaa',
-          borderColor:'rgba(201,168,76,.3)',borderWidth:1,
+          backgroundColor:'rgba(15,8,32,.97)',
+          titleColor:'#c9a84c',bodyColor:'#ddd',
+          borderColor:'rgba(201,168,76,.35)',borderWidth:1,
+          padding:10,
           callbacks:{
             label:ctx=>{
+              if(ctx.raw<=0) return null; // 0の科目は非表示
               const h=Math.floor(ctx.raw);
               const m=Math.round((ctx.raw-h)*60);
-              return ctx.dataset.label+': '+(h?h+'h':'')+(m?m+'m':'0m');
+              const timeStr=(h?h+'h':'')+(m?m+'m':'0m');
+              const total=dayTotals[ctx.dataIndex];
+              const pct=total>0?Math.round(ctx.raw/total*100):0;
+              return ` ${ctx.dataset.label}：${timeStr}（${pct}%）`;
             },
             footer:items=>{
               const total=dayTotals[items[0].dataIndex];
               if(total<=0) return '';
               const h=Math.floor(total);
               const m=Math.round((total-h)*60);
-              return '合計: '+(h?h+'h':'')+(m?m+'m':'0m');
+              return '合計：'+(h?h+'h':'')+(m?m+'m':'0m');
             }
           }
         }
@@ -8890,6 +8901,22 @@ function renderWeekBar(){
       }
     }
   });
+
+  // 凡例をHTMLで描画（科目カラー × 科目名）
+  const legendEl = document.getElementById('rptBarLegend');
+  if(legendEl){
+    const legendDatasets = datasets.filter(ds=>ds.label&&ds.label!=='学習時間'&&ds.backgroundColor!=='transparent');
+    if(legendDatasets.length > 0){
+      legendEl.style.display = 'flex';
+      legendEl.innerHTML = legendDatasets.map(ds=>`
+        <div style="display:flex;align-items:center;gap:4px;">
+          <div style="width:10px;height:10px;border-radius:2px;background:${ds.backgroundColor};flex-shrink:0;"></div>
+          <span style="font-size:9px;color:var(--muted);white-space:nowrap;">${ds.label}</span>
+        </div>`).join('');
+    } else {
+      legendEl.style.display = 'none';
+    }
+  }
 }
 
 /* 科目別円グラフ */
