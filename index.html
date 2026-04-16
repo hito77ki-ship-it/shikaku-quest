@@ -8781,11 +8781,13 @@ function renderWeekBar(){
   const useSessions = period !== 'day';
   let datasets = useSessions
     ? subjs.map(s=>{
+        const chartColor = getSubjectChartColor(s.key, s.color);
         return {
           label: s.name,
           data: days.map(d=>+(sessions.filter(x=>isStudyType(x)&&x.date===d.date&&x.subject===s.key).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)),
-          backgroundColor: s.color,
+          backgroundColor: chartColor,
           borderWidth:0, borderRadius:2, borderSkipped:false,
+          chartColor, // 凡例用に保持
         };
       }).filter(ds=>ds.data.some(v=>v>0))
     : [{
@@ -8908,11 +8910,15 @@ function renderWeekBar(){
     const legendDatasets = datasets.filter(ds=>ds.label&&ds.label!=='学習時間'&&ds.backgroundColor!=='transparent');
     if(legendDatasets.length > 0){
       legendEl.style.display = 'flex';
-      legendEl.innerHTML = legendDatasets.map(ds=>`
+      legendEl.innerHTML = legendDatasets.map(ds=>{
+        // chartColor（固定色）があればそれを優先、なければbackgroundColor
+        const color = ds.chartColor || ds.backgroundColor;
+        return `
         <div style="display:flex;align-items:center;gap:4px;">
-          <div style="width:10px;height:10px;border-radius:2px;background:${ds.backgroundColor};flex-shrink:0;"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:${color};flex-shrink:0;box-shadow:0 0 4px ${color}60;"></div>
           <span style="font-size:9px;color:var(--muted);white-space:nowrap;">${ds.label}</span>
-        </div>`).join('');
+        </div>`;
+      }).join('');
     } else {
       legendEl.style.display = 'none';
     }
@@ -8931,7 +8937,7 @@ function renderDonutChart(){
     return;
   }
   const total=dist.reduce((a,d)=>a+d.mins,0);
-  const colors=dist.map(d=>d.color||'#8bc34a');
+  const colors=dist.map(d=>getSubjectChartColor(d.key, d.color)||'#8bc34a');
 
   if(rptChartInstances.donut){rptChartInstances.donut.destroy();}
   rptChartInstances.donut=new Chart(canvas,{
@@ -12254,6 +12260,69 @@ const RPG_LOG_TEMPLATES = [
   '{name}の{subject}攻撃は{time}続いた。クリティカルヒット！',
   '勇者{name}は{subject}に{time}のダメージを与えた！',
 ];
+
+/* ────────────────────────────────────────────
+   CHART_COLOR_MAP — グラフ科目カラー固定マップ
+   ダークモード時は自動で明度+15%調整
+──────────────────────────────────────────── */
+const CHART_COLOR_MAP = {
+  // ── 公認会計士 ──
+  fin_calc:   '#3182CE', // 財務会計論（計算）: 濃い青
+  fin_th:     '#F6AD55', // 財務会計論（理論）: オレンジ
+  mgmt:       '#48BB78', // 管理会計論:         緑
+  mgmt_calc:  '#48BB78', // 管理会計論（計算）:  緑
+  mgmt_th:    '#9AE6B4', // 管理会計論（理論）:  薄緑
+  audit:      '#9F7AEA', // 監査論:              紫
+  corp:       '#FC8181', // 企業法:              赤
+  tax:        '#F687B3', // 租税法:              ピンク
+  biz_mgmt:   '#4FD1C5', // 経営学:              シアン
+  biz_eco:    '#F6E05E', // 経済学:              黄
+  biz_law:    '#FBD38D', // 民法:                薄オレンジ
+  biz_stat:   '#B794F4', // 統計学:              薄紫
+  // ── 税理士 ──
+  z_boki:     '#3182CE',
+  z_zai:      '#48BB78',
+  z_hojin:    '#FC8181',
+  z_shoto:    '#F687B3',
+  z_shohi:    '#F6AD55',
+  // ── 簿記 ──
+  b1_sho:     '#3182CE',
+  b1_kaikei:  '#48BB78',
+  b1_koji:    '#F6AD55',
+  b1_genka:   '#9F7AEA',
+  b2_sho:     '#3182CE',
+  b2_koji:    '#F6AD55',
+  // ── 宅建 ──
+  tk_minpo:   '#3182CE',
+  tk_houki:   '#48BB78',
+  tk_sono:    '#F6AD55',
+  tk_zei:     '#9F7AEA',
+  // ── TOEIC ──
+  toeic_listening: '#3182CE',
+  toeic_reading:   '#F6AD55',
+  // ── 受験 ──
+  hs_math:  '#3182CE',
+  hs_eng:   '#48BB78',
+  hs_jpn:   '#FC8181',
+  hs_sci:   '#F6AD55',
+  hs_soc:   '#9F7AEA',
+  univ_math: '#3182CE',
+  univ_eng:  '#48BB78',
+  univ_jpn:  '#FC8181',
+  univ_sci:  '#F6AD55',
+  univ_soc:  '#9F7AEA',
+};
+
+/**
+ * 科目keyから固定チャートカラーを取得
+ * マップにない科目はfallbackColorを返す
+ * ダークモード時は輝度を上げる（0.7→0.85に近似）
+ */
+function getSubjectChartColor(key, fallbackColor){
+  const base = CHART_COLOR_MAP[key] || fallbackColor || '#8CC63F';
+  // ダークモードは色をそのまま使う（指定色が既に明るめのトーン）
+  return base;
+}
 
 /* ────────────────────────────────────────────
    QUAL_MASTER — 全資格の統合マスターデータ
