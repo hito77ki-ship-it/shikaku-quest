@@ -4483,8 +4483,12 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         <!-- 棒グラフ -->
         <div class="rpt-section">
           <div class="rpt-section-title" id="rptChartTitle">学習推移（直近7日）</div>
-          <div class="rpt-chart-wrap">
+          <div class="rpt-chart-wrap" style="position:relative;">
             <canvas id="rptWeekChart" height="160"></canvas>
+            <div id="rptChartEmpty" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;pointer-events:none;">
+              <div style="font-size:22px;">⚔</div>
+              <div style="font-size:11px;color:var(--muted);font-family:'Share Tech Mono',monospace;">今日の冒険はこれからだ！</div>
+            </div>
           </div>
         </div>
 
@@ -8714,11 +8718,22 @@ function getPeriodChartDays(){
 
   if(period === 'day'){
     // 今日の時間帯別（3時間ブロック × 8）
+    // startedAt（ISO文字列）からローカル時間の時を取得して振り分け
     const t = getTodayStr();
     return Array.from({length:8},(_,i)=>{
       const hFrom = i*3, hTo = hFrom+3;
       const label = `${hFrom}〜${hTo}時`;
-      const mins = sessions.filter(s=>isStudyType(s)&&s.date===t&&s.hour!=null&&s.hour>=hFrom&&s.hour<hTo).reduce((a,s)=>a+s.amount,0);
+      const mins = sessions.filter(s=>{
+        if(!isStudyType(s)||s.date!==t) return false;
+        // startedAt から時間帯を判定（ローカル時間）
+        if(s.startedAt){
+          const h = new Date(s.startedAt).getHours();
+          return h >= hFrom && h < hTo;
+        }
+        // startedAt がない手動記録は現在時刻の時間帯に入れる
+        const nowH = new Date().getHours();
+        return nowH >= hFrom && nowH < hTo;
+      }).reduce((a,s)=>a+s.amount,0);
       return {date:null,label,mins,hourBlock:true};
     });
   }
@@ -8760,9 +8775,9 @@ function renderWeekBar(){
   const period = rptPeriod || 'week';
   const subjs=allSelectedSubjects();
 
-  // 科目ごとのデータ（DAYの時間ブロックはhour情報がないので科目分割なし）
+  // 科目ごとのデータ
   const useSessions = period !== 'day';
-  const datasets = useSessions
+  let datasets = useSessions
     ? subjs.map(s=>{
         return {
           label: s.name,
@@ -8774,9 +8789,13 @@ function renderWeekBar(){
     : [{
         label:'学習時間',
         data: days.map(d=>+(d.mins/60).toFixed(2)),
-        backgroundColor:'#8CC63F',
+        backgroundColor:'rgba(140,198,63,.7)',
         borderWidth:0, borderRadius:2, borderSkipped:false,
-      }].filter(ds=>ds.data.some(v=>v>0));
+      }];
+  // データが全0でもグラフ軸は維持（空datasetsだとChart.jsが何も描画しないため最低1つ保持）
+  if(datasets.length === 0){
+    datasets = [{label:'',data:days.map(()=>0),backgroundColor:'transparent',borderWidth:0}];
+  }
 
   // 各日の合計（時間単位）— day/period共通
   const dayTotals=days.map(d=>
@@ -8785,6 +8804,13 @@ function renderWeekBar(){
       : +(sessions.filter(x=>isStudyType(x)&&x.date===d.date).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)
   );
   const maxTotal=Math.max(...dayTotals,0);
+
+  // 空データ時のメッセージ表示制御
+  const emptyEl = document.getElementById('rptChartEmpty');
+  if(emptyEl){
+    const hasData = dayTotals.some(v=>v>0);
+    emptyEl.style.display = (!hasData && period==='day') ? 'flex' : 'none';
+  }
 
   // Y軸最大値：合計の最大値に上部ラベル用の余白（25%）を加算
   const yMax=maxTotal>0 ? Math.ceil((maxTotal*1.25)*4)/4 : 2;
