@@ -881,14 +881,20 @@ body[data-theme="dark"] .rpt-header-tabs{border-bottom-color:rgba(255,255,255,.1
 
 /* 統計カード3枚 */
 /* 期間セレクター */
-.rpt-period-bar{display:flex;gap:0;padding:10px 14px 0;background:var(--panel);}
-.rpt-period-btn{flex:1;background:none;border:1px solid var(--border);color:var(--muted);
-  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.08em;
-  padding:7px 4px;cursor:pointer;transition:all .18s;border-right:none;}
-.rpt-period-btn:last-child{border-right:1px solid var(--border);}
-.rpt-period-btn:first-child{border-radius:6px 0 0 6px;}
-.rpt-period-btn:last-child{border-radius:0 6px 6px 0;}
-.rpt-period-btn.active{background:rgba(140,198,63,.15);border-color:var(--accent);color:var(--accent2);font-weight:700;}
+.rpt-period-bar{display:flex;gap:6px;padding:12px 14px 4px;background:var(--panel);}
+.rpt-period-btn{
+  flex:1;background:none;border:1px solid var(--border);color:var(--muted);
+  font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.04em;
+  padding:8px 4px;cursor:pointer;transition:all .18s;border-radius:8px;
+  white-space:nowrap;min-width:0;
+}
+.rpt-period-btn.active{
+  background:rgba(140,198,63,.18);border-color:var(--accent);
+  color:var(--accent2);font-weight:700;
+  box-shadow:0 2px 8px rgba(140,198,63,.2);
+}
+.rpt-period-btn:hover:not(.active){background:var(--panel2);color:var(--text);}
+@media(max-width:360px){.rpt-period-btn{font-size:10px;padding:7px 2px;}}
 /* 期間サマリーカード */
 .rpt-period-summary{padding:12px 14px 0;display:flex;align-items:center;gap:10px;}
 .rpt-period-total{font-family:'Share Tech Mono',monospace;font-size:26px;font-weight:700;color:var(--text);line-height:1;}
@@ -4345,10 +4351,10 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
 
         <!-- 期間セレクター -->
         <div class="rpt-period-bar">
-          <button class="rpt-period-btn" id="rpb-day"   onclick="switchRptPeriod('day')">D</button>
-          <button class="rpt-period-btn active" id="rpb-week"  onclick="switchRptPeriod('week')">W</button>
-          <button class="rpt-period-btn" id="rpb-month" onclick="switchRptPeriod('month')">M</button>
-          <button class="rpt-period-btn" id="rpb-year"  onclick="switchRptPeriod('year')">Y</button>
+          <button class="rpt-period-btn" id="rpb-day"   onclick="switchRptPeriod('day')">Day</button>
+          <button class="rpt-period-btn active" id="rpb-week"  onclick="switchRptPeriod('week')">Week</button>
+          <button class="rpt-period-btn" id="rpb-month" onclick="switchRptPeriod('month')">Month</button>
+          <button class="rpt-period-btn" id="rpb-year"  onclick="switchRptPeriod('year')">Year</button>
         </div>
         <!-- 期間サマリー -->
         <div class="rpt-period-summary" id="rptPeriodSummary">
