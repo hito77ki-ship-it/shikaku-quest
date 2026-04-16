@@ -6392,7 +6392,7 @@ async function loadRanking(){
   const listEl=document.getElementById('rankingList');
   if(!currentUser||isGuest){listEl.innerHTML='<div class="no-data">ランキングを見るにはGoogleログインが必要です<br><small style="color:var(--muted)">ゲストはランキングに参加できません</small></div>';return;}
   listEl.innerHTML='<div class="no-data">読み込み中...</div>';
-  const {data,error}=await sb.from('profiles').select('*').order('level',{ascending:false}).order('total_study_mins',{ascending:false}).limit(50);
+  const {data,error}=await sb.from('profiles').select('*').gt('total_study_mins',0).order('level',{ascending:false}).order('total_study_mins',{ascending:false}).limit(50);
   if(error||!data||!data.length){
     listEl.innerHTML=error?'<div class="no-data" style="color:#ff6e6e">読み込み失敗</div>':'<div class="no-data">まだ誰もランキングに参加していません<br><small>「☁ 同期」ボタンを押して参加しよう！</small></div>';
     return;
@@ -6439,6 +6439,7 @@ async function loadWeeklyRanking(){
   const {data, error} = await sb.from('profiles')
     .select('id,display_name,level,avatar_emoji,char_title,streak,week_study_mins,week_start,job_ids')
     .eq('week_start', ws)
+    .gt('week_study_mins', 0)
     .order('week_study_mins', {ascending:false})
     .limit(20);
 
