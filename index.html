@@ -9505,6 +9505,26 @@ function tbName(subject){
   return allSelectedSubjects().find(s=>s.key===subject)?.name || subject;
 }
 
+/* タイムブロック整合性チェック（コンソールから auditTimeblock() で実行可能）*/
+function auditTimeblock(){
+  const SLOT_MIN = 5;
+  const issues = [];
+  (sessions||[]).filter(s=>isStudyType(s)&&s.startedAt).forEach(s=>{
+    const start = new Date(s.startedAt);
+    if(isNaN(start.getTime())){ issues.push({id:s.date+s.subject,issue:'無効なstartedAt',s}); return; }
+    const startMins = start.getHours()*60 + Math.floor(start.getMinutes()/SLOT_MIN)*SLOT_MIN;
+    const expected  = Math.ceil((s.amount||0)/SLOT_MIN);
+    const capped    = Math.min(expected, Math.ceil((1440-startMins)/SLOT_MIN));
+    if(expected !== capped){
+      issues.push({date:s.date,subject:s.subject,amount:s.amount,
+        expected,capped,note:'深夜0時をまたぐ（一部カット）'});
+    }
+  });
+  if(issues.length===0){ console.log('✅ タイムブロック整合性: 問題なし'); }
+  else { console.warn('⚠ タイムブロック問題あり:',issues); }
+  return issues;
+}
+
 function tbPrevDay(){
   if(!tbCurrentDate) tbCurrentDate = getTodayStr();
   const d = new Date(tbCurrentDate + 'T00:00:00');
@@ -9580,40 +9600,44 @@ function renderTimeBlock(dateStr){
       </div>`).join('');
   }
 
-  // グリッド表示範囲：startedAt と amount から終了時刻を計算して決定
-  let minH = 23, maxH = 0;
-  daySessions.forEach(s=>{
-    const sh = new Date(s.startedAt).getHours();
-    // 終了時刻 = 開始時刻 + amount（実経過ではなく記録分数）
-    const endMs = new Date(s.startedAt).getTime() + (s.amount||0)*60000;
-    const eh = new Date(endMs).getHours();
-    if(sh < minH) minH = sh;
-    if(eh > maxH) maxH = eh;
-  });
-  // 余白を1時間ずつ
-  minH = Math.max(0, minH-1);
-  maxH = Math.min(23, maxH+1);
-
-  // 5分スロット（12マス/時間）に科目を割り当て
-  // ★ スロット数は s.amount を基準に決定（startedAt→endedAt の実経過に依存しない）
+  /* ──────────────────────────────────────────────────────
+     スロット割り当て（汎用・全エッジケース対応）
+     KEY = 深夜0時からの経過分（0〜1439）→ 日付またぎ・長時間セッション・null全対応
+     スロット数は s.amount ÷ SLOT_MIN の切り上げで決定
+     （startedAt/endedAt の実経過時間に一切依存しない）
+  ────────────────────────────────────────────────────── */
   const SLOT_MIN = 5;
-  const slots = {};
-  daySessions.forEach(s=>{
-    const start = new Date(s.startedAt);
-    // 開始スロットを5分単位に切り捨て
-    const slotStart = new Date(start);
-    slotStart.setSeconds(0, 0);
-    slotStart.setMinutes(Math.floor(slotStart.getMinutes() / SLOT_MIN) * SLOT_MIN);
+  const slots = {}; // key: 0〜1439 (minutesSinceMidnight)
 
-    // 塗るスロット数 = amount を SLOT_MIN で割って切り上げ（1分でも1マス）
-    const numSlots = Math.ceil((s.amount || 0) / SLOT_MIN);
+  daySessions.forEach(s=>{
+    if(!s.startedAt) return; // startedAt が補完されていない場合はスキップ
+
+    const start = new Date(s.startedAt);
+    if(isNaN(start.getTime())) return; // 不正な日時をスキップ
+
+    // 開始分（深夜0時基準）を5分単位に切り捨て
+    const startMins = start.getHours() * 60 + Math.floor(start.getMinutes() / SLOT_MIN) * SLOT_MIN;
+
+    // スロット数（1分でも1マス・上限は当日24:00まで）
+    const numSlots = Math.min(
+      Math.ceil((s.amount || 0) / SLOT_MIN),
+      Math.ceil((1440 - startMins) / SLOT_MIN) // 0時をまたがない
+    );
 
     for(let i = 0; i < numSlots; i++){
-      const cur = new Date(slotStart.getTime() + i * SLOT_MIN * 60000);
-      const key = cur.getHours() + ':' + cur.getMinutes();
-      if(!slots[key]) slots[key] = s.subject; // 先に来たセッション優先
+      const slotMins = startMins + i * SLOT_MIN;
+      if(slotMins >= 1440) break; // 念のため24:00以降はスキップ
+      if(!slots[slotMins]) slots[slotMins] = s.subject; // 先着優先
     }
   });
+
+  // グリッド表示範囲（分単位で算出 → 時間に変換）
+  const usedMins = Object.keys(slots).map(Number);
+  let minMinutes = usedMins.length ? Math.min(...usedMins) : 480; // デフォルト8時
+  let maxMinutes = usedMins.length ? Math.max(...usedMins) : 600; // デフォルト10時
+  let minH = Math.max(0,  Math.floor(minMinutes / 60) - 1);
+  let maxH = Math.min(23, Math.ceil(maxMinutes  / 60));
+  if(minH > maxH){ minH = 0; maxH = 23; } // フォールバック（深夜またぎ等）
 
   // ラベルとグリッド描画
   if(labels) labels.innerHTML='';
@@ -9635,7 +9659,6 @@ function renderTimeBlock(dateStr){
       row.style.cssText=`display:flex;height:${ROW_H}px;border-bottom:1px solid var(--border);`;
       for(let m=0; m<60; m+=SLOT_MIN){
         const cell = document.createElement('div');
-        // 15分区切り（3,6,9マス目）は線を太く・濃く
         const is15 = m % 15 === 0 && m > 0;
         const is30 = m === 30;
         const borderR = is30
@@ -9644,11 +9667,13 @@ function renderTimeBlock(dateStr){
             ? '1px solid rgba(255,255,255,.15)'
             : '1px solid var(--border)';
         cell.style.cssText=`flex:1;border-right:${borderR};min-width:0;`;
-        const sub = slots[h+':'+m];
+        // スロットキーは「深夜0時からの経過分」
+        const slotKey = h * 60 + m;
+        const sub = slots[slotKey];
         if(sub){
           cell.style.background = tbColor(sub);
           cell.style.opacity = '0.88';
-          cell.title = `${tbName(sub)} ${h}:${String(m).padStart(2,'0')}〜${h}:${String(m+SLOT_MIN).padStart(2,'0')}`;
+          cell.title = `${tbName(sub)} ${h}:${String(m).padStart(2,'0')}〜${String(m+SLOT_MIN<60?h:h+1).padStart(2,'0')}:${String((m+SLOT_MIN)%60).padStart(2,'0')}`;
         }
         row.appendChild(cell);
       }
