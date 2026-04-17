@@ -9529,8 +9529,18 @@ function renderTimeBlock(dateStr){
   const dow = ['日','月','火','水','木','金','土'][d.getDay()];
   if(label) label.textContent = dateStr.slice(5).replace('-','/') + '（' + dow + '）';
 
-  // その日のセッションを抽出（startedAt/endedAtがあるもの）
-  const daySessions = (sessions||[]).filter(s=>s.date===dateStr && s.startedAt && s.endedAt);
+  // その日の全セッションを抽出（手動記録も含む）
+  // startedAt/endedAt がない場合は記録時刻から逆算して補完
+  const daySessions = (sessions||[])
+    .filter(s=>isStudyType(s)&&s.date===dateStr)
+    .map(s=>{
+      if(s.startedAt && s.endedAt) return s;
+      // 手動記録: 現在時刻(または記録時刻)から amount 分遡って補完
+      const refTime = s.createdAt ? new Date(s.createdAt) : new Date();
+      const endedAt   = refTime.toISOString();
+      const startedAt = new Date(refTime.getTime() - (s.amount||0)*60000).toISOString();
+      return {...s, startedAt, endedAt, _estimated:true};
+    });
 
   const noData = document.getElementById('tbNoData');
   const grid   = document.getElementById('tbGrid');
