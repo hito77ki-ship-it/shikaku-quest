@@ -427,6 +427,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .session-item{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;animation:fadeIn .3s ease;box-shadow:0 1px 4px rgba(0,0,0,.06);}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 .session-date{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);white-space:nowrap;}
+.session-time{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent2);white-space:nowrap;background:rgba(140,198,63,.1);border:1px solid rgba(140,198,63,.25);border-radius:4px;padding:1px 5px;}
 .session-subj{font-size:12px;white-space:nowrap;}
 .session-desc{flex:1;font-size:11px;color:var(--muted);}
 .session-exp{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--exp2);white-space:nowrap;}
@@ -11306,6 +11307,14 @@ function toggleEditMode(){
 }
 
 /* ── セッション削除ボタン付きレンダリング ── */
+/* ISO文字列 → "HH:mm" ローカル時間フォーマット */
+function fmtHHmm(isoStr){
+  if(!isoStr) return null;
+  const d = new Date(isoStr);
+  if(isNaN(d.getTime())) return null;
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
 function renderSessions(subjs){
   const smap={};subjs.forEach(s=>smap[s.key]=s);
   const list=document.getElementById('sessionList');
@@ -11317,11 +11326,20 @@ function renderSessions(subjs){
     const realIdx = sessions.length - 1 - revIdx; // 実際のindexに変換
     const sub=smap[s.subject]||{name:s.subject||'—',color:'#606080'};
     const tl=s.type==='study'?s.amount+'分':s.type==='calc'?s.amount+'問':s.type==='exam'?'答練 '+s.amount+'分':'答練';
+    // 開始〜終了時刻（startedAt/endedAt がある場合のみ表示）
+    const t0 = fmtHHmm(s.startedAt);
+    const t1 = fmtHHmm(s.endedAt);
+    const timeHtml = (t0 && t1)
+      ? `<span class="session-time">${t0}〜${t1}</span>`
+      : t0
+        ? `<span class="session-time">${t0}〜</span>`
+        : '';
     const item=document.createElement('div');
     item.className='session-item'+(editMode?' edit-mode':'');
     item.innerHTML=`
       <button class="session-delete-btn" onclick="confirmDeleteSession(${realIdx})" title="削除">🗑</button>
       <span class="session-date">${s.date||'—'}</span>
+      ${timeHtml}
       <span class="session-subj" style="color:${sub.color}">${sub.name}</span>
       <span class="session-desc">${tl}${s.note?' · '+escHtml(s.note):''}</span>
       <span class="session-exp">+${s.exp} EXP</span>`;
@@ -11331,13 +11349,13 @@ function renderSessions(subjs){
 
 /* ── 統計ミニバー ── */
 function renderQuestLogStats(){
-  const today = new Date().toISOString().slice(0,10);
+  const today = getTodayStr(); // ローカル日付（UTC誤差修正済み）
   const weekStart = (()=>{
     const d=new Date(); d.setHours(0,0,0,0);
     const day=d.getDay(); d.setDate(d.getDate()-(day===0?6:day-1));
-    return d.toISOString().slice(0,10);
+    return toLocalDateStr(d);
   })();
-  const month = new Date().toISOString().slice(0,7);
+  const month = getTodayStr().slice(0,7);
 
   const isStudy = s => s.type==='study'||s.type==='exam';
   const todayM  = sessions.filter(s=>isStudy(s)&&s.date===today).reduce((a,s)=>a+s.amount,0);
