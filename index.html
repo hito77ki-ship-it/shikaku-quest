@@ -4657,10 +4657,10 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
           <!-- 科目リスト -->
           <div id="tbSubjectList" style="margin-bottom:16px;display:flex;flex-direction:column;gap:6px;"></div>
           <!-- グリッド -->
-          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+          <div id="tbScrollWrap" style="overflow-x:auto;overflow-y:auto;max-height:468px;-webkit-overflow-scrolling:touch;border-radius:6px;border:1px solid var(--border);">
             <div style="display:flex;gap:0;min-width:280px;">
               <!-- 時刻ラベル -->
-              <div id="tbHourLabels" style="display:flex;flex-direction:column;flex-shrink:0;width:28px;"></div>
+              <div id="tbHourLabels" style="display:flex;flex-direction:column;flex-shrink:0;width:28px;position:sticky;left:0;background:var(--panel);z-index:1;"></div>
               <!-- ブロックグリッド -->
               <div id="tbGrid" style="flex:1;display:flex;flex-direction:column;min-width:220px;"></div>
             </div>
@@ -9631,13 +9631,10 @@ function renderTimeBlock(dateStr){
     }
   });
 
-  // グリッド表示範囲（分単位で算出 → 時間に変換）
+  // グリッドは常に0:00〜23:55（24時間フル表示）
   const usedMins = Object.keys(slots).map(Number);
-  let minMinutes = usedMins.length ? Math.min(...usedMins) : 480; // デフォルト8時
-  let maxMinutes = usedMins.length ? Math.max(...usedMins) : 600; // デフォルト10時
-  let minH = Math.max(0,  Math.floor(minMinutes / 60) - 1);
-  let maxH = Math.min(23, Math.ceil(maxMinutes  / 60));
-  if(minH > maxH){ minH = 0; maxH = 23; } // フォールバック（深夜またぎ等）
+  const minH = 0;
+  const maxH = 23;
 
   // ラベルとグリッド描画
   if(labels) labels.innerHTML='';
@@ -9679,6 +9676,14 @@ function renderTimeBlock(dateStr){
       }
       grid.appendChild(row);
     }
+  }
+
+  // 最初の記録時刻の1時間前にスクロール（夜の頑張りも見逃さない）
+  const scrollWrap = document.getElementById('tbScrollWrap');
+  if(scrollWrap && usedMins.length > 0){
+    const firstMin = Math.min(...usedMins);
+    const scrollToH = Math.max(0, Math.floor(firstMin / 60) - 1);
+    scrollWrap.scrollTop = scrollToH * ROW_H;
   }
 }
 
