@@ -9610,33 +9610,46 @@ function renderTimeBlock(dateStr){
   }
 
   /* ──────────────────────────────────────────────────────
-     スロット割り当て（汎用・全エッジケース対応）
-     KEY = 深夜0時からの経過分（0〜1439）→ 日付またぎ・長時間セッション・null全対応
-     スロット数は s.amount ÷ SLOT_MIN の切り上げで決定
-     （startedAt/endedAt の実経過時間に一切依存しない）
+     スロット割り当て（実測データ最優先・完全版）
+     KEY = 深夜0時からの経過分（0〜1439）
+     優先順位：推定セッション(_estimated) → 実測セッション(timer/manual)
+       推定を先に描いてから実測で上書きすることで、タイマー記録が必ず見える。
+     終了時刻：endedAt が存在すれば startedAt〜endedAt の実区間を使用
+              なければ startedAt + amount 分で算出（従来通り）
   ────────────────────────────────────────────────────── */
   const SLOT_MIN = 5;
   const slots = {}; // key: 0〜1439 (minutesSinceMidnight)
 
-  daySessions.forEach(s=>{
-    if(!s.startedAt) return; // startedAt が補完されていない場合はスキップ
+  // ① 推定セッション → ② 実測セッション の順に処理（実測が後から上書き）
+  const estimatedSessions = daySessions.filter(s =>  s._estimated);
+  const realSessions      = daySessions.filter(s => !s._estimated);
+
+  [...estimatedSessions, ...realSessions].forEach(s=>{
+    if(!s.startedAt) return;
 
     const start = new Date(s.startedAt);
-    if(isNaN(start.getTime())) return; // 不正な日時をスキップ
+    if(isNaN(start.getTime())) return;
 
-    // 開始分（深夜0時基準）を5分単位に切り捨て
+    // 開始分（5分単位に切り捨て）
     const startMins = start.getHours() * 60 + Math.floor(start.getMinutes() / SLOT_MIN) * SLOT_MIN;
 
-    // スロット数（1分でも1マス・上限は当日24:00まで）
-    const numSlots = Math.min(
-      Math.ceil((s.amount || 0) / SLOT_MIN),
-      Math.ceil((1440 - startMins) / SLOT_MIN) // 0時をまたがない
-    );
+    // 終了分：endedAt があれば実時間、なければ amount から算出
+    let endMins;
+    if(s.endedAt && !s._estimated){
+      const end = new Date(s.endedAt);
+      if(!isNaN(end.getTime())){
+        const rawEnd = end.getHours() * 60 + Math.ceil(end.getMinutes() / SLOT_MIN) * SLOT_MIN;
+        // 深夜またぎ（endedAt が startedAt より前）は amount ベースにフォールバック
+        endMins = rawEnd > startMins ? rawEnd : null;
+      }
+    }
+    if(!endMins){
+      endMins = startMins + Math.ceil((s.amount || 0) / SLOT_MIN) * SLOT_MIN;
+    }
+    endMins = Math.min(endMins, 1440); // 24:00 を超えない
 
-    for(let i = 0; i < numSlots; i++){
-      const slotMins = startMins + i * SLOT_MIN;
-      if(slotMins >= 1440) break; // 念のため24:00以降はスキップ
-      if(!slots[slotMins]) slots[slotMins] = s.subject; // 先着優先
+    for(let slotMins = startMins; slotMins < endMins; slotMins += SLOT_MIN){
+      slots[slotMins] = s.subject; // 後着優先（実測セッションが推定を上書き）
     }
   });
 
