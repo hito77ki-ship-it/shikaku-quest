@@ -9603,10 +9603,10 @@ function renderTimeBlock(dateStr){
   }
 
   /* ──────────────────────────────────────────────────────
-     スロット割り当て（amount 基準・推定→実測の順で後着優先）
-     KEY = 深夜0時からの経過分（0〜1439）
-     推定セッション(_estimated)は先に配置し、実測が上書きする。
-     推定セルは opacity 0.35 で薄く表示（時刻は近似値）。
+     スロット割り当て（2パス）
+     Pass1: 実測セッション（startedAt あり）を正確な位置に配置
+     Pass2: 推定セッション（startedAt なし）を実測の直後に連続配置
+       → 推定同士が衝突しない・実測を上書きしない・全記録が必ず表示される
   ────────────────────────────────────────────────────── */
   const SLOT_MIN = 5;
   const slots    = {}; // key → subject
@@ -9615,23 +9615,41 @@ function renderTimeBlock(dateStr){
   const estimated = daySessions.filter(s =>  s._estimated);
   const real      = daySessions.filter(s => !s._estimated);
 
-  [...estimated, ...real].forEach(s => {
+  // Pass1: 実測セッションを実時刻に配置
+  real.forEach(s => {
     if(!s.startedAt) return;
     const start = new Date(s.startedAt);
     if(isNaN(start.getTime())) return;
-
     const startMins = start.getHours() * 60 + Math.floor(start.getMinutes() / SLOT_MIN) * SLOT_MIN;
     const numSlots  = Math.min(
       Math.ceil((s.amount || 0) / SLOT_MIN),
       Math.ceil((1440 - startMins) / SLOT_MIN)
     );
-
     for(let i = 0; i < numSlots; i++){
       const slotMins = startMins + i * SLOT_MIN;
       if(slotMins >= 1440) break;
       slots[slotMins]   = s.subject;
-      slotEst[slotMins] = !!s._estimated; // 後着優先で更新
+      slotEst[slotMins] = false;
     }
+  });
+
+  // Pass2: 推定セッションを実測の直後から連続配置（衝突なし・薄く表示）
+  const realKeys = Object.keys(slots).map(Number);
+  let estCursor  = realKeys.length > 0 ? Math.max(...realKeys) + SLOT_MIN : 0;
+
+  estimated.forEach(s => {
+    if(estCursor >= 1440) return;
+    const numSlots = Math.min(
+      Math.ceil((s.amount || 0) / SLOT_MIN),
+      Math.ceil((1440 - estCursor) / SLOT_MIN)
+    );
+    for(let i = 0; i < numSlots; i++){
+      const slotMins = estCursor + i * SLOT_MIN;
+      if(slotMins >= 1440) break;
+      slots[slotMins]   = s.subject;
+      slotEst[slotMins] = true;
+    }
+    estCursor += numSlots * SLOT_MIN;
   });
 
   /* ─── 表示範囲：最初の記録の1時間前〜最後のスロットの1時間後（動的） ─── */
