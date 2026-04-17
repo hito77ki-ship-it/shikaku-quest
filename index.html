@@ -9631,10 +9631,17 @@ function renderTimeBlock(dateStr){
     }
   });
 
-  // グリッドは常に0:00〜23:55（24時間フル表示）
+  // グリッド表示範囲：最初の記録1時間前〜最後の記録1時間後（データなし時は8〜20時）
   const usedMins = Object.keys(slots).map(Number);
-  const minH = 0;
-  const maxH = 23;
+  let minH, maxH;
+  if(usedMins.length > 0){
+    const firstMin = Math.min(...usedMins);
+    const lastMin  = Math.max(...usedMins);
+    minH = Math.max(0,  Math.floor(firstMin / 60) - 1);
+    maxH = Math.min(23, Math.ceil(lastMin   / 60) + 1);
+  } else {
+    minH = 8; maxH = 20;
+  }
 
   // ラベルとグリッド描画
   if(labels) labels.innerHTML='';
@@ -9643,17 +9650,37 @@ function renderTimeBlock(dateStr){
   const ROW_H = 26; // px（タップしやすさを確保）
 
   for(let h=minH; h<=maxH; h++){
-    // 時刻ラベル（:00と:30を表示）
+    // 時刻ラベル
     if(labels){
       const lbl = document.createElement('div');
-      lbl.style.cssText=`height:${ROW_H}px;font-size:9px;color:var(--muted);display:flex;align-items:center;justify-content:flex-end;padding-right:4px;flex-shrink:0;font-family:"Share Tech Mono",monospace;`;
+      // 3の倍数時間（0,3,6,9…）を強調、それ以外は少し薄め
+      const isKey = h % 3 === 0;
+      lbl.style.cssText = [
+        `height:${ROW_H}px`,
+        `font-size:${isKey ? 11 : 9}px`,
+        `color:${isKey ? 'var(--text)' : 'var(--muted)'}`,
+        `font-weight:${isKey ? '700' : '400'}`,
+        `display:flex`,
+        `align-items:center`,
+        `justify-content:flex-end`,
+        `padding-right:4px`,
+        `flex-shrink:0`,
+        `font-family:"Share Tech Mono",monospace`,
+        isKey ? `text-shadow:0 0 6px rgba(255,255,255,.35)` : '',
+      ].filter(Boolean).join(';');
       lbl.textContent = String(h).padStart(2,'0');
       labels.appendChild(lbl);
     }
     // 1行（12マス）
     if(grid){
       const row = document.createElement('div');
-      row.style.cssText=`display:flex;height:${ROW_H}px;border-bottom:1px solid var(--border);`;
+      const isKey = h % 3 === 0;
+      row.style.cssText = [
+        `display:flex`,
+        `height:${ROW_H}px`,
+        `border-bottom:${isKey ? '1px solid rgba(255,255,255,.18)' : '1px solid var(--border)'}`,
+        isKey ? `background:rgba(255,255,255,.025)` : '',
+      ].filter(Boolean).join(';');
       for(let m=0; m<60; m+=SLOT_MIN){
         const cell = document.createElement('div');
         const is15 = m % 15 === 0 && m > 0;
@@ -9678,13 +9705,9 @@ function renderTimeBlock(dateStr){
     }
   }
 
-  // 最初の記録時刻の1時間前にスクロール（夜の頑張りも見逃さない）
+  // 動的範囲なので先頭がそのまま「最初の記録の1時間前」→ スクロールをリセット
   const scrollWrap = document.getElementById('tbScrollWrap');
-  if(scrollWrap && usedMins.length > 0){
-    const firstMin = Math.min(...usedMins);
-    const scrollToH = Math.max(0, Math.floor(firstMin / 60) - 1);
-    scrollWrap.scrollTop = scrollToH * ROW_H;
-  }
+  if(scrollWrap) scrollWrap.scrollTop = 0;
 }
 
 /* ════════════════════════════════════════
