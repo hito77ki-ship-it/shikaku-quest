@@ -7746,7 +7746,8 @@ async function finishTimer(){
   char.totalEXP+=exp;
   const endedAt=new Date().toISOString();
   const startedAt=timerStartedAt||new Date(Date.now()-minutes*60000).toISOString();
-  sessions.push({date,subject,type:'study',amount:minutes,exp,note,startedAt,endedAt});
+  const condition=getTodayCondition();
+  sessions.push({date,subject,type:'study',amount:minutes,exp,note,startedAt,endedAt,condition});
   const smins1=studyMins(sessions),lv1=computeLevel(smins1);
   char.level=lv1;
   await saveAll();
@@ -12710,7 +12711,8 @@ function generateRpgLog(name, subjectName, minutes){
    コンディション選択
 ──────────────────────────────────────── */
 function selectCondition(val){
-  document.getElementById('mrecCondition').value = val;
+  const condEl=document.getElementById('mrecCondition');
+  if(condEl) condEl.value = val;
   [0,1,2].forEach(i => document.getElementById('cond-'+i)?.classList.toggle('active', i===val));
 }
 
