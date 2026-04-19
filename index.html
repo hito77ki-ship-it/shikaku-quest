@@ -340,6 +340,19 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .plan-del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 4px;}
 .plan-del-btn:hover{color:#EF4444;}
 /* Today plan on status */
+.tqb{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;}
+.tqb-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.tqb-streak{font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;color:#F59E0B;}
+.tqb-streak.warn{color:#ef4444;animation:tqb-pulse 1.5s ease-in-out infinite;}
+@keyframes tqb-pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.tqb-mission{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);}
+.tqb-mission span{color:var(--text);}
+.tqb-bar-wrap{display:flex;flex-direction:column;gap:4px;}
+.tqb-bar-label{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);}
+.tqb-bar-track{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;}
+.tqb-bar-fill{height:100%;border-radius:4px;background:linear-gradient(to right,#7c3aed,#a855f7);transition:width .6s;}
+.tqb-bar-fill.warn{background:linear-gradient(to right,#dc2626,#ef4444);}
+.tqb-bar-fill.done{background:linear-gradient(to right,#15803d,#22c55e);}
 .today-plan-card{background:var(--panel);border:1px solid var(--border);border-left:4px solid #3B82F6;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow);}
 .today-plan-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:#3B82F6;margin-bottom:10px;}
 .today-plan-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
@@ -3866,6 +3879,8 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
 
   <!-- STATUS -->
   <div id="panel-status">
+    <!-- 今日のクエストバナー（全幅） -->
+    <div id="todayQuestBanner" style="grid-column:1/-1;"></div>
     <!-- 試験カウントダウン（全幅） -->
     <div id="examBannerWrap" style="grid-column:1/-1;"></div>
     <!-- 左カラム：今日のスケジュール -->
@@ -7003,6 +7018,7 @@ function renderAll(){
   renderRaidBoss();
   renderPaceDiag();
   renderDailyMissions();
+  renderTodayQuestBanner();
   // レポート/プロフィールタブが開いていれば即更新
   const rptPanel=document.getElementById('panel-report');
   const profPanel=document.getElementById('panel-profile');
@@ -7233,7 +7249,7 @@ function switchTab(tab){
   else unsubscribeTlRealtime();
   if(tab==='report')  requestAnimationFrame(()=>renderReportTab());
   if(tab==='profile') requestAnimationFrame(()=>{ renderProfileTab(); renderWeekPlan(); initProfileQR(); });
-  if(tab==='status')  requestAnimationFrame(()=>{ renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); });
+  if(tab==='status')  requestAnimationFrame(()=>{ renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); renderTodayQuestBanner(); });
   // モバイルタブバーも同期
   document.querySelectorAll('.m-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   const activeBtn=document.getElementById('tab-'+tab);
@@ -10333,6 +10349,55 @@ function checkMissionDone(mission, todaySess){
 const DM_AWARDED_KEY = 'sq2_dm_awarded_';
 function getDmAwarded(dateStr){ try{ return JSON.parse(localStorage.getItem(DM_AWARDED_KEY+dateStr)||'[]'); }catch(e){ return []; } }
 function setDmAwarded(dateStr, ids){ try{ localStorage.setItem(DM_AWARDED_KEY+dateStr, JSON.stringify(ids)); }catch(e){} }
+
+function renderTodayQuestBanner(){
+  const el = document.getElementById('todayQuestBanner');
+  if(!el) return;
+
+  const dateStr = getTodayStr();
+  const todaySess = sessions.filter(s => s.date === dateStr && isStudyType(s));
+  const todayMins = todaySess.reduce((a,s) => a+s.amount, 0);
+  const missions = generateDailyMissions(dateStr);
+  const awarded = getDmAwarded(dateStr);
+  const doneCount = missions.filter(m => checkMissionDone(m, sessions.filter(s=>s.date===dateStr))).length;
+
+  // 今日の目標（デイリーミッションのtotal_timeから取得）
+  const totalMission = missions.find(m => m.type === 'total_time');
+  const goalMins = totalMission ? totalMission.target : 120;
+  const pct = Math.min(1, todayMins / goalMins);
+
+  // ストリーク状態
+  const streak = (typeof char !== 'undefined') ? (char.streak || 0) : 0;
+  const hour = new Date().getHours();
+  const isWarn = todayMins === 0 && hour >= 18 && streak >= 1;
+
+  const todayH = Math.floor(todayMins/60);
+  const todayM = todayMins % 60;
+  const goalH = Math.floor(goalMins/60);
+  const goalM = goalMins % 60;
+  const todayStr = todayH > 0 ? `${todayH}h${todayM > 0 ? todayM+'m' : ''}` : `${todayM}m`;
+  const goalStr = goalH > 0 ? `${goalH}h${goalM > 0 ? goalM+'m' : ''}` : `${goalM}m`;
+
+  const barClass = pct >= 1 ? 'done' : isWarn ? 'warn' : '';
+  const streakClass = isWarn ? 'warn' : '';
+  const streakText = isWarn
+    ? `⚠ ${streak}日連続が途切れる！`
+    : streak >= 1 ? `🔥 ${streak}日連続` : '🔥 記録しよう';
+
+  el.innerHTML = `<div class="tqb">
+    <div class="tqb-top">
+      <div class="tqb-streak ${streakClass}">${streakText}</div>
+      <div class="tqb-mission">クエスト <span>${doneCount}/${missions.length}</span> 達成</div>
+    </div>
+    <div class="tqb-bar-wrap">
+      <div class="tqb-bar-label">
+        <span>今日の学習</span>
+        <span>${todayStr} / ${goalStr}</span>
+      </div>
+      <div class="tqb-bar-track"><div class="tqb-bar-fill ${barClass}" style="width:${Math.round(pct*100)}%"></div></div>
+    </div>
+  </div>`;
+}
 
 function renderDailyMissions(){
   const el = document.getElementById('dailyMissionCard');
