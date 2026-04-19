@@ -6326,8 +6326,23 @@ function allSelectedSubjects(){
   });
   return out;
 }
-function studyMins(sess){return sess.filter(s=>s.type==='study'||s.type==='exam').reduce((a,s)=>a+s.amount,0);}
-function subjStudyMins(sess,key){return sess.filter(s=>s.subject===key&&(s.type==='study'||s.type==='exam')).reduce((a,s)=>a+s.amount,0);}
+/* 秒精度ヘルパー: amountSecs があればそれを/60、なければ amount（旧データ互換） */
+function sAmount(s){ return s.amountSecs !== undefined ? s.amountSecs / 60 : (s.amount || 0); }
+/* 合計秒数を返す */
+function sAmountSecs(s){ return s.amountSecs !== undefined ? s.amountSecs : (s.amount || 0) * 60; }
+/* 秒数 → "1h 23m 45s" 形式 */
+function fmtSecs(totalSecs){
+  totalSecs = Math.round(totalSecs);
+  const h = Math.floor(totalSecs / 3600);
+  const m = Math.floor((totalSecs % 3600) / 60);
+  const s = totalSecs % 60;
+  if(h > 0) return `${h}時間${m > 0 ? m+'分' : ''}${s > 0 ? s+'秒' : ''}`;
+  if(m > 0) return `${m}分${s > 0 ? s+'秒' : ''}`;
+  return `${s}秒`;
+}
+/* 分数（小数可）→ "Xh Ym" 表示（従来互換） */
+function studyMins(sess){return sess.filter(s=>s.type==='study'||s.type==='exam').reduce((a,s)=>a+sAmount(s),0);}
+function subjStudyMins(sess,key){return sess.filter(s=>s.subject===key&&(s.type==='study'||s.type==='exam')).reduce((a,s)=>a+sAmount(s),0);}
 function formatHM(mins){return `${Math.floor(mins/60)}h ${Math.round(mins%60)}m`;}
 function computeAttrs(){
   const vals={atk:0,int:0,dex:0,mag:0,spi:0};
@@ -7979,11 +7994,12 @@ function spawnBossKill(){
 async function finishTimer(){
   if(timerSeconds<10){alert('10秒以上計測してから記録してください');return;}
   clearInterval(timerInterval);timerRunning=false;
-  const minutes=Math.ceil(timerSeconds/60);
+  const totalSecs=timerSeconds;
+  const minutes=Math.floor(totalSecs/60);
   const subject=document.getElementById('timerSubject')?.value;
   const note=document.getElementById('timerNote')?.value.trim()||'';
   const date=getTodayStr();
-  const exp=minutes;
+  const exp=Math.ceil(totalSecs/60); // EXPは切り上げのまま
 
   const smins0=studyMins(sessions),lv0=computeLevel(smins0);
   const today=date;
@@ -7994,11 +8010,11 @@ async function finishTimer(){
   }
   char.totalEXP+=exp;
   const endedAt=new Date().toISOString();
-  const startedAt=timerStartedAt||new Date(Date.now()-minutes*60000).toISOString();
+  const startedAt=timerStartedAt||new Date(Date.now()-totalSecs*1000).toISOString();
   const condition=getTodayCondition();
   const isFirstSession = sessions.length === 0;
   gtag('event','session_record',{subject, minutes, is_first: isFirstSession});
-  sessions.push({date,subject,type:'study',amount:minutes,exp,note,startedAt,endedAt,condition});
+  sessions.push({date,subject,type:'study',amount:minutes,amountSecs:totalSecs,exp,note,startedAt,endedAt,condition});
   const smins1=studyMins(sessions),lv1=computeLevel(smins1);
   char.level=lv1;
   await saveAll();
@@ -8823,14 +8839,14 @@ function getMonthStr(){ return new Date().toISOString().slice(0,7); }
 function isStudyType(s){ return s.type==='study'||s.type==='exam'; }
 function getTodayMins(){
   const t=getTodayStr();
-  return sessions.filter(s=>isStudyType(s)&&s.date===t).reduce((a,s)=>a+s.amount,0);
+  return sessions.filter(s=>isStudyType(s)&&s.date===t).reduce((a,s)=>a+sAmount(s),0);
 }
 function getThisMonthMins(){
   const m=getMonthStr();
-  return sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(m)).reduce((a,s)=>a+s.amount,0);
+  return sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(m)).reduce((a,s)=>a+sAmount(s),0);
 }
 function getWeekMinsForDate(dateStr){
-  return sessions.filter(s=>isStudyType(s)&&s.date===dateStr).reduce((a,s)=>a+s.amount,0);
+  return sessions.filter(s=>isStudyType(s)&&s.date===dateStr).reduce((a,s)=>a+sAmount(s),0);
 }
 function getLast7DaysData(){
   const days=[];
@@ -8849,7 +8865,7 @@ function getLast6MonthsData(){
     const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
     const ms=d.toISOString().slice(0,7);
     const label=(d.getMonth()+1)+'月';
-    const mins=sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(ms)).reduce((a,s)=>a+s.amount,0);
+    const mins=sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(ms)).reduce((a,s)=>a+sAmount(s),0);
     months.push({label,mins});
   }
   return months;
@@ -8884,10 +8900,11 @@ function renderReportStats(){
   const todayM=getTodayMins();
   const monthM=getThisMonthMins();
   const totalM=studyMins(sessions);
-  document.getElementById('rpt-today').textContent =
-    todayM<60 ? todayM+'分' : Math.floor(todayM/60)+'時間'+(todayM%60?todayM%60+'分':'');
+  // 秒精度で今日の合計を取得して表示
+  const todaySecs = sessions.filter(s=>isStudyType(s)&&s.date===getTodayStr()).reduce((a,s)=>a+sAmountSecs(s),0);
+  document.getElementById('rpt-today').textContent = fmtSecs(todaySecs);
   document.getElementById('rpt-month').textContent =
-    monthM<60 ? monthM+'分' : Math.floor(monthM/60)+'時間';
+    monthM<60 ? Math.round(monthM)+'分' : Math.floor(monthM/60)+'時間'+(Math.round(monthM%60)?Math.round(monthM%60)+'分':'');
   document.getElementById('rpt-total').textContent = Math.floor(totalM/60)+'時間';
 }
 
@@ -8896,7 +8913,7 @@ let rptPeriod = 'week'; // 現在の期間
 
 function getThisYearMins(){
   const y = new Date().getFullYear().toString();
-  return sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(y)).reduce((a,s)=>a+s.amount,0);
+  return sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(y)).reduce((a,s)=>a+sAmount(s),0);
 }
 function fmtMins(m){
   const h=Math.floor(m/60), mn=m%60;
@@ -9036,7 +9053,7 @@ function renderWeekBar(){
         const chartColor = getSubjectChartColor(s.key, s.color);
         return {
           label: s.name,
-          data: days.map(d=>+(sessions.filter(x=>isStudyType(x)&&x.subject===s.key&&(d.isMonth?x.date&&x.date.startsWith(d.date):x.date===d.date)).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)),
+          data: days.map(d=>+(sessions.filter(x=>isStudyType(x)&&x.subject===s.key&&(d.isMonth?x.date&&x.date.startsWith(d.date):x.date===d.date)).reduce((a,x)=>a+sAmount(x),0)/60).toFixed(2)),
           backgroundColor: chartColor,
           borderWidth:0, borderRadius:2, borderSkipped:false,
           chartColor, // 凡例用に保持
@@ -9058,8 +9075,8 @@ function renderWeekBar(){
     (period==='day'||d.date===null||d.hourBlock)
       ? +(d.mins/60).toFixed(2)
       : d.isMonth
-        ? +(sessions.filter(x=>isStudyType(x)&&x.date&&x.date.startsWith(d.date)).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)
-        : +(sessions.filter(x=>isStudyType(x)&&x.date===d.date).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)
+        ? +(sessions.filter(x=>isStudyType(x)&&x.date&&x.date.startsWith(d.date)).reduce((a,x)=>a+sAmount(x),0)/60).toFixed(2)
+        : +(sessions.filter(x=>isStudyType(x)&&x.date===d.date).reduce((a,x)=>a+sAmount(x),0)/60).toFixed(2)
   );
   const maxTotal=Math.max(...dayTotals,0);
 
@@ -11886,7 +11903,10 @@ function renderSessions(subjs){
   [...sessions].reverse().slice(0,60).forEach((s,revIdx)=>{
     const realIdx = sessions.length - 1 - revIdx; // 実際のindexに変換
     const sub=smap[s.subject]||{name:s.subject||'—',color:'#606080'};
-    const tl=s.type==='study'?s.amount+'分':s.type==='calc'?s.amount+'問':s.type==='exam'?'答練 '+s.amount+'分':'答練';
+    const _dispTime = s.type==='study'||s.type==='exam'
+      ? fmtSecs(sAmountSecs(s))
+      : s.type==='calc' ? s.amount+'問' : '答練';
+    const tl = s.type==='study' ? _dispTime : s.type==='calc' ? s.amount+'問' : s.type==='exam' ? '答練 '+_dispTime : '答練';
     // 開始〜終了時刻（startedAt/endedAt がある場合のみ表示）
     const t0 = fmtHHmm(s.startedAt);
     const t1 = fmtHHmm(s.endedAt);
@@ -11919,10 +11939,10 @@ function renderMobileQuestLog(){
   const weekStart = (()=>{ const d=new Date(); d.setHours(0,0,0,0); const day=d.getDay(); d.setDate(d.getDate()-(day===0?6:day-1)); return toLocalDateStr(d); })();
   const month = today.slice(0,7);
   const isStudy = s => s.type==='study'||s.type==='exam';
-  const fmt = m => m<60?m+'分':Math.floor(m/60)+'h'+(m%60?m%60+'m':'');
-  const todayM = sessions.filter(s=>isStudy(s)&&s.date===today).reduce((a,s)=>a+s.amount,0);
-  const weekM  = sessions.filter(s=>isStudy(s)&&s.date>=weekStart).reduce((a,s)=>a+s.amount,0);
-  const monthM = sessions.filter(s=>isStudy(s)&&s.date&&s.date.startsWith(month)).reduce((a,s)=>a+s.amount,0);
+  const fmt = m => m<60?Math.round(m)+'分':Math.floor(m/60)+'h'+(Math.round(m%60)?Math.round(m%60)+'m':'');
+  const todayM = sessions.filter(s=>isStudy(s)&&s.date===today).reduce((a,s)=>a+sAmount(s),0);
+  const weekM  = sessions.filter(s=>isStudy(s)&&s.date>=weekStart).reduce((a,s)=>a+sAmount(s),0);
+  const monthM = sessions.filter(s=>isStudy(s)&&s.date&&s.date.startsWith(month)).reduce((a,s)=>a+sAmount(s),0);
   const totalM = studyMins(sessions);
   const statsEl = document.getElementById('mql-stats');
   if(statsEl) statsEl.innerHTML = `<div class="ql-stat">本日<span>${fmt(todayM)}</span></div><div class="ql-stat">今週<span>${fmt(weekM)}</span></div><div class="ql-stat">今月<span>${fmt(monthM)}</span></div><div class="ql-stat">総計<span>${Math.floor(totalM/60)}h</span></div>`;
@@ -11935,7 +11955,7 @@ function renderMobileQuestLog(){
   [...sessions].reverse().slice(0,60).forEach((s,revIdx)=>{
     const realIdx = sessions.length - 1 - revIdx;
     const sub = smap[s.subject]||{name:s.subject||'—',color:'#606080'};
-    const tl = s.type==='study'?s.amount+'分':s.type==='exam'?'答練 '+s.amount+'分':s.amount+'分';
+    const tl = (s.type==='study'||s.type==='exam') ? fmtSecs(sAmountSecs(s)) : s.amount+'分';
     const t0 = fmtHHmm(s.startedAt), t1 = fmtHHmm(s.endedAt);
     const timeHtml = (t0&&t1)?`<span class="session-time">${t0}〜${t1}</span>`:'';
     const item = document.createElement('div');
