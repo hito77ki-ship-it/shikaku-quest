@@ -6405,12 +6405,8 @@ function continueAsGuest(){
       if(syncBtn) syncBtn.style.display='none';
     }
     localStorage.setItem('sq2_guest','1');
-    console.log('[continueAsGuest] jobIds:', selectedJobIds, 'subjKeys:', selectedSubjectKeys, 'name:', char.name);
-    if(selectedJobIds.length>0 && selectedSubjectKeys.length>0 && char.name){
-      initDashboard(); showScreen('screen-dash');
-    } else {
-      buildJobGrid(); showScreen('screen-job');
-    }
+    if(!char.name){ char.name='冒険者'; saveAll(); }
+    initDashboard(); showScreen('screen-dash');
   } catch(e) {
     console.error('continueAsGuest error:', e);
     alert('エラーが発生しました。ページを再読み込みしてください。\n'+e.message);
@@ -6889,6 +6885,9 @@ function buildJobGrid(){
   });
 }
 function goStep2(){
+  // 名前を自動プリフィル
+  const nameInput = document.getElementById('nameInput');
+  if(nameInput && !nameInput.value && char.name) nameInput.value = char.name;
   if(!selectedJobIds.length){
     // ジョブ選択画面のエラー
     const existing = document.getElementById('jobErrMsg');
@@ -7038,13 +7037,8 @@ async function startAdventure(){
   const showErr = (msg) => {
     if(errEl){ errEl.textContent = '⚠ ' + msg; errEl.style.display = ''; errEl.scrollIntoView({behavior:'smooth',block:'center'}); }
   };
-  const name = document.getElementById('nameInput').value.trim();
+  const name = document.getElementById('nameInput').value.trim() || char.name || '冒険者';
   console.log('[startAdventure] name:', name, 'subjKeys:', selectedSubjectKeys);
-  if(!name){
-    showErr('冒険者の名前を入力してください（画面上部の入力欄）');
-    document.getElementById('nameInput').focus();
-    return;
-  }
   if(!selectedSubjectKeys.length){
     showErr('科目を1つ以上選択してください（チェックボックスをタップ）');
     return;
@@ -8623,14 +8617,9 @@ async function init(){
         // クラウドからデータ復元を試みてからルーティング
         restoreFromCloud().then(restored=>{
           if(restored) console.log('[auth] data restored from cloud');
-          // ログイン後にローカルデータを即座にクラウドへ同期
-          // （PCでゲスト利用後にログインした場合もデータが引き継がれる）
           syncToCloud().catch(()=>{});
-          if(selectedJobIds.length>0 && selectedSubjectKeys.length>0 && char.name){
-            initDashboard(); showScreen('screen-dash');
-          } else {
-            buildJobGrid(); showScreen('screen-job');
-          }
+          if(!char.name){ char.name = currentUser?.user_metadata?.full_name?.split(' ')[0] || '冒険者'; saveAll(); }
+          initDashboard(); showScreen('screen-dash');
         });
       }
     }
@@ -8648,11 +8637,8 @@ async function init(){
     restoreFromCloud().then(restored => {
       if(restored) console.log('[init] data restored from cloud');
       syncToCloud().catch(()=>{});
-      if(selectedJobIds.length>0 && selectedSubjectKeys.length>0 && char.name){
-        initDashboard(); showScreen('screen-dash');
-      } else {
-        buildJobGrid(); showScreen('screen-job');
-      }
+      if(!char.name){ char.name = currentUser?.user_metadata?.full_name?.split(' ')[0] || '冒険者'; saveAll(); }
+      initDashboard(); showScreen('screen-dash');
     });
   } else {
     console.log('[init] no session, showing auth screen');
@@ -10725,9 +10711,9 @@ function renderOnboardingBanner(){
   if(dayNum === 0){
     titleText = '⚔ 冒険を始めよう！最初の3ステップ';
     steps = [
-      {icon:'🎯', text:'ジョブ（資格）を選ぶ',       done: hasJob},
-      {icon:'⏱', text:'タイマーで初回勉強を記録する', done: hasSession},
-      {icon:'💀', text:'ボス（模試・試験日）を設定する',done: hasBoss},
+      {icon:'🎯', text:'ジョブ（資格）を選ぶ', done: hasJob, action: hasJob?null:'buildJobGrid();showScreen(\'screen-job\')'},
+      {icon:'⏱', text:'タイマーで初回勉強を記録する', done: hasSession, action: hasSession?null:'switchTab(\'quest\')'},
+      {icon:'💀', text:'ボス（模試・試験日）を設定する', done: hasBoss, action: hasBoss?null:'switchTab(\'boss\')'},
     ];
   } else if(dayNum === 1){
     titleText = '🔥 2日目！連続ログイン達成！';
@@ -10754,10 +10740,10 @@ function renderOnboardingBanner(){
     </div>
     <div class="ob-steps">
       ${steps.map(s=>`
-      <div class="ob-step">
+      <div class="ob-step" ${s.action?`onclick="${s.action}" style="cursor:pointer;"`:''}>
         <span class="ob-step-icon">${s.icon}</span>
         <span class="${s.done?'ob-step-done':''}">${s.text}</span>
-        <span class="ob-check">${s.done?'✅':'○'}</span>
+        <span class="ob-check">${s.done?'✅':s.action?'▶':'○'}</span>
       </div>`).join('')}
     </div>
     <div class="ob-prog">
