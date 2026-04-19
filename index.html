@@ -10845,7 +10845,7 @@ function renderOnboardingBanner(){
 
   const hasJob = selectedJobIds.length > 0;
   const hasSession = sessions.length > 0;
-  const hasBoss = bosses.length > 0;
+  const hasWeeklyGoal = getThisWeekGoalHours() > 0;
 
   const dayLabel = ['DAY 1','DAY 2','DAY 3'][dayNum];
 
@@ -10855,7 +10855,7 @@ function renderOnboardingBanner(){
     steps = [
       {icon:'🎯', text:'ジョブ（資格）を選ぶ', done: hasJob, action: hasJob?null:'buildJobGrid();showScreen(\'screen-job\')'},
       {icon:'⏱', text:'タイマーで初回勉強を記録する', done: hasSession, action: hasSession?null:'switchTab(\'quest\')'},
-      {icon:'💀', text:'ボス（模試・試験日）を設定する', done: hasBoss, action: hasBoss?null:'switchTab(\'boss\')'},
+      {icon:'🎯', text:'今週の目標を設定する（レポートタブ）', done: hasWeeklyGoal, action: hasWeeklyGoal?null:'switchTab(\'report\')'},
     ];
   } else if(dayNum === 1){
     titleText = '🔥 2日目！連続ログイン達成！';
@@ -12461,14 +12461,14 @@ const HELP_CONTENT = {
           tip:'受験する試験が複数あっても全部登録OK'
         },
         {
-          n:'④', title:'模試・答練を「ボス」として登録する',
-          desc:'「BOSS」タブで模試の名前・日付・目標勉強時間を設定します。HPバーが勉強するたびに減っていき、「ボス討伐」感覚で勉強できます。',
-          tip:'複数の模試をまとめて管理できます'
+          n:'④', title:'週間目標でリズムをつくる',
+          desc:'「レポート」タブ → 画面中ほどの入力欄から今週の目標時間を設定。日曜が終わるまで変更できない仕様で、甘えを防止します。',
+          tip:'棒グラフで日別達成状況が一目でわかります'
         },
         {
-          n:'⑤', title:'週間目標でリズムをつくる',
-          desc:'「レポート」タブで今週の目標時間を設定。日曜が終わるまで変更できない仕様で、甘えを防止します。',
-          tip:'棒グラフで日別達成状況が一目でわかります'
+          n:'⑤', title:'模試・答練は「BOSS」で管理する',
+          desc:'模試や答練が近づいたら「BOSS」タブで登録。目標勉強時間をHPで可視化し、終わったらそのまま点数も記録できます。',
+          tip:'模試がない時期はスキップしてOK'
         },
       ];
       const tutBtn = `<div style="margin-top:20px;text-align:center;">
