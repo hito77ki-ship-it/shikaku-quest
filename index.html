@@ -4013,7 +4013,9 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         <div class="decl-share-row">
           <button class="decl-share-btn" onclick="postDeclToTimeline(null, true)">📣 TLに投稿</button>
           <button class="decl-share-btn" onclick="shareDeclToX()">𝕏 宣言をXに投稿</button>
+          <button class="decl-share-btn" onclick="shareDeclToThreads()">🧵 Threadsに投稿</button>
           <button class="decl-result-btn" onclick="shareDeclResultToX()" id="declResultBtn" style="display:none;">🏆 結果をXに投稿</button>
+          <button class="decl-result-btn" onclick="shareDeclResultToThreads()" id="declResultThreadsBtn" style="display:none;">🧵 結果をThreadsに投稿</button>
         </div>
       </div>
       <!-- 未設定 or フォーム表示 -->
@@ -10141,9 +10143,11 @@ function updateDeclDisplay(decl){
     }).join('');
   } else { subjList.innerHTML=''; }
 
-  // 100%達成したら「結果をXに投稿」ボタン表示
+  // 100%達成したら「結果を投稿」ボタン表示
   const resultBtn = document.getElementById('declResultBtn');
   if(resultBtn) resultBtn.style.display = pct>=100 ? '' : 'none';
+  const resultThreadsBtn = document.getElementById('declResultThreadsBtn');
+  if(resultThreadsBtn) resultThreadsBtn.style.display = pct>=100 ? '' : 'none';
 }
 
 /* タイムラインへの宣言投稿 */
@@ -10227,6 +10231,27 @@ function shareDeclToX(){
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text),'_blank');
 }
 
+function shareDeclToThreads(){
+  const decl = loadDecl();
+  if(!decl) return;
+  const goalH = Math.floor(decl.totalMins/60), goalM = decl.totalMins%60;
+  const goalStr = goalH ? `${goalH}時間${goalM?goalM+'分':''}` : `${goalM}分`;
+  const subjs = allSelectedSubjects().filter(s=>decl.subjects[s.key]);
+  const subjLines = subjs.map(s=>{
+    const m = decl.subjects[s.key];
+    const str = m>=60?Math.floor(m/60)+'時間'+(m%60?m%60+'分':''):m+'分';
+    return `📖 ${s.name} ${str}`;
+  }).join('\n');
+  const jobName = JOBS.find(j=>selectedJobIds.includes(j.id))?.name||'資格';
+  const text = `【今日の宣言📣】\n\n` +
+    (subjLines ? subjLines+'\n\n' : '') +
+    `合計目標：${goalStr}\n\n` +
+    `達成したら報告します💪\n\n` +
+    `#${jobName.replace(/[（）()]/g,'')} #勉強垢 #スタディクエスト\n` +
+    `https://hito77ki-ship-it.github.io/study-quest/`;
+  window.open('https://www.threads.net/intent/post?text='+encodeURIComponent(text),'_blank');
+}
+
 /* Xへの結果投稿 */
 function shareDeclResultToX(){
   const decl = loadDecl();
@@ -10252,6 +10277,29 @@ function shareDeclResultToX(){
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text),'_blank');
 }
 
+function shareDeclResultToThreads(){
+  const decl = loadDecl();
+  if(!decl) return;
+  const today = getTodayStr();
+  const doneMins = sessions.filter(s=>(s.type==='study'||s.type==='exam')&&s.date===today).reduce((a,s)=>a+s.amount,0);
+  const doneH = Math.floor(doneMins/60), doneM = doneMins%60;
+  const doneStr = doneH ? `${doneH}時間${doneM?doneM+'分':''}` : `${doneM}分`;
+  const pct = Math.min(100, Math.round(doneMins/decl.totalMins*100));
+  const subjs = allSelectedSubjects().filter(s=>decl.subjects[s.key]);
+  const subjLines = subjs.map(s=>{
+    const dm = sessions.filter(x=>isStudyType(x)&&x.date===today&&x.subject===s.key).reduce((a,x)=>a+x.amount,0);
+    const str = dm>=60?Math.floor(dm/60)+'時間'+(dm%60?dm%60+'分':''):dm+'分';
+    return `✅ ${s.name} ${str}`;
+  }).join('\n');
+  const jobName = JOBS.find(j=>selectedJobIds.includes(j.id))?.name||'資格';
+  const emoji = pct>=100?'🏆':pct>=80?'💪':'📊';
+  const text = `${emoji} 今日の勉強記録\n\n` +
+    (subjLines ? subjLines+'\n\n' : '') +
+    `合計：${doneStr}（目標達成率 ${pct}%）\n\n` +
+    `#${jobName.replace(/[（）()]/g,'')} #勉強垢 #スタディクエスト\n` +
+    `https://hito77ki-ship-it.github.io/study-quest/`;
+  window.open('https://www.threads.net/intent/post?text='+encodeURIComponent(text),'_blank');
+}
 
 /* ════════════════════════════════════════
    過去の記録引き継ぎ（スタディプラス等）
