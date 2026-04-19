@@ -8908,6 +8908,7 @@ function renderReportStats(){
 
 /* ── 期間データ取得 ── */
 let rptPeriod = 'week'; // 現在の期間
+let rptSelectedDay = getTodayStr(); // Day モードで表示する日付
 
 function getThisYearMins(){
   const y = new Date().getFullYear().toString();
@@ -8917,28 +8918,50 @@ function fmtMins(m){
   const h=Math.floor(m/60), mn=m%60;
   return h>0 ? (mn>0?`${h}h ${mn}m`:`${h}h`) : `${mn}m`;
 }
+function getDayMins(dateStr){
+  return sessions.filter(s=>isStudyType(s)&&s.date===dateStr).reduce((a,s)=>a+sAmount(s),0);
+}
 function getPeriodMins(period){
-  if(period==='day')   return getTodayMins();
+  if(period==='day')   return getDayMins(rptSelectedDay);
   if(period==='week')  return getThisWeekTotalMins();
   if(period==='month') return getThisMonthMins();
   if(period==='year')  return getThisYearMins();
   return 0;
 }
 function getPeriodLabel(period){
-  if(period==='day')   return '今日';
+  if(period==='day'){
+    const d = new Date(rptSelectedDay+'T00:00:00');
+    const today = getTodayStr();
+    if(rptSelectedDay===today) return '今日';
+    return `${d.getMonth()+1}/${d.getDate()}`;
+  }
   if(period==='week')  return '今週';
   if(period==='month') return '今月';
   if(period==='year')  return '今年';
 }
 function getPeriodChartTitle(period){
-  if(period==='day')   return '時間帯別（今日）';
+  if(period==='day'){
+    const d = new Date(rptSelectedDay+'T00:00:00');
+    return `科目別（${d.getMonth()+1}/${d.getDate()}）`;
+  }
   if(period==='week')  return '学習推移（直近7日）';
   if(period==='month') return '学習推移（今月）';
   if(period==='year')  return '学習推移（今年）';
 }
+function rptDayNav(delta){
+  const d = new Date(rptSelectedDay+'T00:00:00');
+  d.setDate(d.getDate()+delta);
+  const newDay = toLocalDateStr(d);
+  const today = getTodayStr();
+  if(newDay > today) return; // 未来は不可
+  rptSelectedDay = newDay;
+  updateRptPeriodSummary();
+  renderWeekBar();
+}
 
 function switchRptPeriod(period){
   rptPeriod = period;
+  if(period==='day') rptSelectedDay = getTodayStr();
   ['day','week','month','year'].forEach(p=>{
     document.getElementById('rpb-'+p)?.classList.toggle('active', p===period);
   });
@@ -8951,6 +8974,28 @@ function updateRptPeriodSummary(){
   document.getElementById('rptPeriodTotal').textContent = fmtMins(mins);
   document.getElementById('rptPeriodLabel').textContent = getPeriodLabel(rptPeriod);
   document.getElementById('rptChartTitle').textContent  = getPeriodChartTitle(rptPeriod);
+
+  // Day モード: 日付ナビゲーションを表示
+  let dayNav = document.getElementById('rptDayNav');
+  if(rptPeriod === 'day'){
+    if(!dayNav){
+      dayNav = document.createElement('div');
+      dayNav.id = 'rptDayNav';
+      dayNav.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0 0;';
+      document.getElementById('rptPeriodSummary').insertAdjacentElement('afterend', dayNav);
+    }
+    const d = new Date(rptSelectedDay+'T00:00:00');
+    const today = getTodayStr();
+    const isToday = rptSelectedDay === today;
+    dayNav.innerHTML = `
+      <button onclick="rptDayNav(-1)" style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:4px 12px;font-size:16px;cursor:pointer;color:var(--fg);">‹</button>
+      <span style="font-size:15px;font-weight:600;min-width:80px;text-align:center;">${d.getMonth()+1}/${d.getDate()}（${['日','月','火','水','木','金','土'][d.getDay()]}）</span>
+      <button onclick="rptDayNav(1)" style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:4px 12px;font-size:16px;cursor:pointer;color:var(--fg);opacity:${isToday?'0.3':'1'};pointer-events:${isToday?'none':'auto'};">›</button>
+    `;
+    dayNav.style.display = 'flex';
+  } else {
+    if(dayNav) dayNav.style.display = 'none';
+  }
 
   // Week のみ目標進捗を表示
   const wrap = document.getElementById('rptPeriodProgressWrap');
@@ -8966,7 +9011,6 @@ function updateRptPeriodSummary(){
       wrap.style.display = 'none';
     }
   } else if(rptPeriod === 'day'){
-    // 1日目標 = 週間目標 / 7（参考値）
     const goalH = getThisWeekGoalHours();
     if(goalH > 0){
       const dailyGoalMins = Math.round(goalH * 60 / 7);
@@ -8986,25 +9030,20 @@ function getPeriodChartDays(){
   const period = rptPeriod || 'week';
 
   if(period === 'day'){
-    // 今日の時間帯別（3時間ブロック × 8）
-    // startedAt（ISO文字列）からローカル時間の時を取得して振り分け
-    const t = getTodayStr();
-    return Array.from({length:8},(_,i)=>{
-      const hFrom = i*3, hTo = hFrom+3;
-      const label = `${hFrom}〜${hTo}時`;
-      const mins = sessions.filter(s=>{
-        if(!isStudyType(s)||s.date!==t) return false;
-        // startedAt から時間帯を判定（ローカル時間）
-        if(s.startedAt){
-          const h = new Date(s.startedAt).getHours();
-          return h >= hFrom && h < hTo;
-        }
-        // startedAt がない手動記録は現在時刻の時間帯に入れる
-        const nowH = new Date().getHours();
-        return nowH >= hFrom && nowH < hTo;
-      }).reduce((a,s)=>a+s.amount,0);
-      return {date:null,label,mins,hourBlock:true};
-    });
+    // 選択日の科目別集計（1本/科目）
+    const t = rptSelectedDay;
+    const subjs = allSelectedSubjects();
+    const daySessions = sessions.filter(s=>isStudyType(s)&&s.date===t);
+    if(subjs.length === 0){
+      const mins = daySessions.reduce((a,s)=>a+sAmount(s),0);
+      return [{date:t, label:'学習', mins}];
+    }
+    const rows = subjs.map(sj=>{
+      const mins = daySessions.filter(s=>s.subject===sj.key).reduce((a,s)=>a+sAmount(s),0);
+      return {date:t, label:sj.name, mins, subjKey:sj.key, subjColor:sj.color};
+    }).filter(r=>r.mins>0);
+    if(rows.length===0) return [{date:t,label:'',mins:0}];
+    return rows;
   }
 
   if(period === 'week'){
@@ -9045,37 +9084,44 @@ function renderWeekBar(){
   const subjs=allSelectedSubjects();
 
   // 科目ごとのデータ
-  const useSessions = period !== 'day';
-  let datasets = useSessions
-    ? subjs.map(s=>{
+  let datasets;
+  if(period === 'day'){
+    // Day モード: 各科目が1本の棒（days が科目行の配列）
+    datasets = days.map(d=>{
+      const chartColor = d.subjKey ? getSubjectChartColor(d.subjKey, d.subjColor) : 'rgba(140,198,63,.7)';
+      return {
+        label: d.label,
+        data: [+(d.mins/60).toFixed(2)],
+        backgroundColor: chartColor,
+        borderWidth:0, borderRadius:4, borderSkipped:false,
+        chartColor,
+      };
+    }).filter(ds=>ds.data.some(v=>v>0));
+  } else {
+    datasets = subjs.map(s=>{
         const chartColor = getSubjectChartColor(s.key, s.color);
         return {
           label: s.name,
           data: days.map(d=>+(sessions.filter(x=>isStudyType(x)&&x.subject===s.key&&(d.isMonth?x.date&&x.date.startsWith(d.date):x.date===d.date)).reduce((a,x)=>a+sAmount(x),0)/60).toFixed(2)),
           backgroundColor: chartColor,
           borderWidth:0, borderRadius:2, borderSkipped:false,
-          chartColor, // 凡例用に保持
+          chartColor,
         };
-      }).filter(ds=>ds.data.some(v=>v>0))
-    : [{
-        label:'学習時間',
-        data: days.map(d=>+(d.mins/60).toFixed(2)),
-        backgroundColor:'rgba(140,198,63,.7)',
-        borderWidth:0, borderRadius:2, borderSkipped:false,
-      }];
-  // データが全0でもグラフ軸は維持（空datasetsだとChart.jsが何も描画しないため最低1つ保持）
+      }).filter(ds=>ds.data.some(v=>v>0));
+  }
+  // データが全0でもグラフ軸は維持
   if(datasets.length === 0){
-    datasets = [{label:'',data:days.map(()=>0),backgroundColor:'transparent',borderWidth:0}];
+    datasets = [{label:'',data: period==='day'?[0]:days.map(()=>0),backgroundColor:'transparent',borderWidth:0}];
   }
 
   // 各日の合計（時間単位）— day/period共通
-  const dayTotals=days.map(d=>
-    (period==='day'||d.date===null||d.hourBlock)
-      ? +(d.mins/60).toFixed(2)
-      : d.isMonth
-        ? +(sessions.filter(x=>isStudyType(x)&&x.date&&x.date.startsWith(d.date)).reduce((a,x)=>a+sAmount(x),0)/60).toFixed(2)
-        : +(sessions.filter(x=>isStudyType(x)&&x.date===d.date).reduce((a,x)=>a+sAmount(x),0)/60).toFixed(2)
-  );
+  const dayTotals = period==='day'
+    ? [days.reduce((a,d)=>a+d.mins,0)/60].map(v=>+v.toFixed(2))
+    : days.map(d=>
+        d.isMonth
+          ? +(sessions.filter(x=>isStudyType(x)&&x.date&&x.date.startsWith(d.date)).reduce((a,x)=>a+sAmount(x),0)/60).toFixed(2)
+          : +(sessions.filter(x=>isStudyType(x)&&x.date===d.date).reduce((a,x)=>a+sAmount(x),0)/60).toFixed(2)
+      );
   const maxTotal=Math.max(...dayTotals,0);
 
   // 空データ時のメッセージ表示制御
@@ -9097,37 +9143,51 @@ function renderWeekBar(){
   const stackTopLabelPlugin={
     id:'stackTopLabel',
     afterDraw(chart){
-      const{ctx,scales:{x,y}}=chart;
-      ctx.save();
-      ctx.restore();
+      const{ctx,scales:{x,y},data}=chart;
       ctx.save();
       ctx.font=`600 ${labelFontSize}px "Hiragino Maru Gothic ProN","Hiragino Rounded Gothic Pro","Rounded Mplus 1c",sans-serif`;
       ctx.fillStyle='rgba(255,255,255,0.92)';
       ctx.textAlign='center';
       ctx.textBaseline='bottom';
-      let lastXPos = -999;
-      const minGap = labelFontSize * 5; // 文字間の最小距離（重なり防止）
-      dayTotals.forEach((total,i)=>{
-        if(total<=0) return;
-        const h=Math.floor(total);
-        const m=Math.round((total-h)*60);
-        const label=h>0?(m>0?`${h}h ${m}m`:`${h}h`):(m+'m');
-        const xPos=x.getPixelForValue(i);
-        const yPos=y.getPixelForValue(total)-5;
-        // 直前のラベルと近すぎる場合はスキップ
-        if(Math.abs(xPos - lastXPos) < minGap) return;
-        ctx.fillText(label,xPos,yPos);
-        lastXPos = xPos;
-      });
+      if(period==='day'){
+        // Day: ラベルは各データセット（科目）の棒の上
+        chart.data.datasets.forEach((ds,di)=>{
+          const val=ds.data[0]||0;
+          if(val<=0) return;
+          const meta=chart.getDatasetMeta(di);
+          if(!meta.data[0]) return;
+          const bar=meta.data[0];
+          const h=Math.floor(val), m=Math.round((val-h)*60);
+          const label=h>0?(m>0?`${h}h ${m}m`:`${h}h`):(m+'m');
+          ctx.fillText(label, bar.x, bar.y-4);
+        });
+      } else {
+        let lastXPos = -999;
+        const minGap = labelFontSize * 5;
+        dayTotals.forEach((total,i)=>{
+          if(total<=0) return;
+          const h=Math.floor(total);
+          const m=Math.round((total-h)*60);
+          const label=h>0?(m>0?`${h}h ${m}m`:`${h}h`):(m+'m');
+          const xPos=x.getPixelForValue(i);
+          const yPos=y.getPixelForValue(total)-5;
+          if(Math.abs(xPos - lastXPos) < minGap) return;
+          ctx.fillText(label,xPos,yPos);
+          lastXPos = xPos;
+        });
+      }
       ctx.restore();
     }
   };
+
+  // Day モード: データセット毎に1つのラベル（科目名）と1データ点
+  const chartLabels = period==='day' ? [''] : days.map(d=>d.label);
 
   if(rptChartInstances.week){rptChartInstances.week.destroy();}
   rptChartInstances.week=new Chart(canvas,{
     type:'bar',
     data:{
-      labels:days.map(d=>d.label),
+      labels: chartLabels,
       datasets
     },
     plugins:[stackTopLabelPlugin],
@@ -9137,22 +9197,25 @@ function renderWeekBar(){
       plugins:{
         legend:{display:false},
         tooltip:{
-          mode:'index', intersect:false,
+          mode: period==='day'?'dataset':'index', intersect: period==='day',
           backgroundColor:'rgba(15,8,32,.97)',
           titleColor:'#c9a84c',bodyColor:'#ddd',
           borderColor:'rgba(201,168,76,.35)',borderWidth:1,
           padding:10,
           callbacks:{
+            title: items => period==='day' ? items[0].dataset.label : items[0].label,
             label:ctx=>{
-              if(ctx.raw<=0) return null; // 0の科目は非表示
+              if(ctx.raw<=0) return null;
               const h=Math.floor(ctx.raw);
               const m=Math.round((ctx.raw-h)*60);
               const timeStr=(h?h+'h':'')+(m?m+'m':'0m');
+              if(period==='day') return ` ${timeStr}`;
               const total=dayTotals[ctx.dataIndex];
               const pct=total>0?Math.round(ctx.raw/total*100):0;
               return ` ${ctx.dataset.label}：${timeStr}（${pct}%）`;
             },
             footer:items=>{
+              if(period==='day') return '';
               const total=dayTotals[items[0].dataIndex];
               if(total<=0) return '';
               const h=Math.floor(total);
@@ -9163,8 +9226,8 @@ function renderWeekBar(){
         }
       },
       scales:{
-        x:{stacked:true,grid:{display:false},ticks:{font:{size:isMobile?8:9},color:'#999',maxRotation:0}},
-        y:{stacked:true,grid:{color:'rgba(255,255,255,.05)'},
+        x:{stacked: period!=='day', grid:{display:false}, ticks:{font:{size:isMobile?8:9},color:'#999',maxRotation:0}},
+        y:{stacked: period!=='day', grid:{color:'rgba(255,255,255,.05)'},
           ticks:{font:{size:9},color:'#bbb',callback:v=>v===0?'0':v+'h'},
           beginAtZero:true,
           max:yMax
