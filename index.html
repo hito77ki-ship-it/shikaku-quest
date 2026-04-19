@@ -8909,6 +8909,7 @@ function renderReportStats(){
 /* ── 期間データ取得 ── */
 let rptPeriod = 'week'; // 現在の期間
 let rptSelectedDay = getTodayStr(); // Day モードで表示する日付
+let rptDayBySubject = true; // Day モード: 科目別表示 or まとめ表示
 
 function getThisYearMins(){
   const y = new Date().getFullYear().toString();
@@ -8991,6 +8992,9 @@ function updateRptPeriodSummary(){
       <button onclick="rptDayNav(-1)" style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:4px 12px;font-size:16px;cursor:pointer;color:var(--fg);">‹</button>
       <span style="font-size:15px;font-weight:600;min-width:80px;text-align:center;">${d.getMonth()+1}/${d.getDate()}（${['日','月','火','水','木','金','土'][d.getDay()]}）</span>
       <button onclick="rptDayNav(1)" style="background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:4px 12px;font-size:16px;cursor:pointer;color:var(--fg);opacity:${isToday?'0.3':'1'};pointer-events:${isToday?'none':'auto'};">›</button>
+      <div onclick="rptDayBySubject=!rptDayBySubject;updateRptPeriodSummary();renderWeekBar();" style="margin-left:4px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:10px;cursor:pointer;color:${rptDayBySubject?'var(--exp2)':'var(--muted)'};white-space:nowrap;user-select:none;">
+        ${rptDayBySubject?'科目別':'まとめ'}
+      </div>
     `;
     dayNav.style.display = 'flex';
   } else {
@@ -9030,10 +9034,15 @@ function getPeriodChartDays(){
   const period = rptPeriod || 'week';
 
   if(period === 'day'){
-    // 選択日の科目別集計（1本/科目）
     const t = rptSelectedDay;
-    const subjs = allSelectedSubjects();
     const daySessions = sessions.filter(s=>isStudyType(s)&&s.date===t);
+    if(!rptDayBySubject){
+      // まとめ表示: 1本の棒
+      const mins = daySessions.reduce((a,s)=>a+sAmount(s),0);
+      return [{date:t, label:'合計', mins}];
+    }
+    // 科目別表示
+    const subjs = allSelectedSubjects();
     if(subjs.length === 0){
       const mins = daySessions.reduce((a,s)=>a+sAmount(s),0);
       return [{date:t, label:'学習', mins}];
