@@ -662,6 +662,13 @@ body[data-theme="dark"] .eb-prog-labels{color:#9ae6b4;}
 .lu-close:hover{background:rgba(201,168,76,.1);}
 .lu-share-btn{background:none;border:1.5px solid #1d9bf0;color:#1d9bf0;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;padding:9px 22px;cursor:pointer;transition:all .2s;border-radius:20px;}
 .lu-share-btn:hover{background:rgba(29,155,240,.12);}
+.lu-threads-btn{background:none;border:1.5px solid #aaa;color:#ccc;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;padding:9px 22px;cursor:pointer;transition:all .2s;border-radius:20px;}
+.lu-threads-btn:hover{background:rgba(255,255,255,.08);}
+/* コンフェッティ */
+.confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:9998;}
+/* ストリークマイルストーン */
+.streak-milestone{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,#78350f,#b45309);border:2px solid #F59E0B;border-radius:16px;padding:28px 32px;text-align:center;z-index:10000;animation:smPop .5s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes smPop{to{transform:translate(-50%,-50%) scale(1);}}
 
 .data-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--border);}
@@ -5235,10 +5242,11 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     <div class="lu-title" id="luTitle">短答式受験生</div>
     <div class="lu-log" id="luLog">全科目の魔力が微増した！</div>
     <div class="lu-study-hours" id="luStudyHours"></div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <button class="lu-share-btn" onclick="shareLevelUpToX()" id="luShareBtn">𝕏 シェアする</button>
-      <button class="lu-close" onclick="closeLevelUp()">CONTINUE →</button>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
+      <button class="lu-share-btn" onclick="shareLevelUpToX()" id="luShareBtn">𝕏 シェア</button>
+      <button class="lu-threads-btn" onclick="shareLevelUpToThreads()">🧵 Threads</button>
     </div>
+    <button class="lu-close" onclick="closeLevelUp()">CONTINUE →</button>
   </div>
 </div>
 
@@ -7315,6 +7323,51 @@ function switchTab(tab){
   const activeBtn=document.getElementById('tab-'+tab);
   if(activeBtn) activeBtn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
 }
+function launchConfetti(){
+  const canvas = document.createElement('canvas');
+  canvas.className = 'confetti-canvas';
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const colors = ['#8CC63F','#F59E0B','#a855f7','#38bdf8','#f43f5e','#fff'];
+  const particles = Array.from({length:90}, ()=>({
+    x: Math.random()*canvas.width, y: -10,
+    vx: (Math.random()-0.5)*4, vy: Math.random()*4+2,
+    r: Math.random()*5+3, color: colors[Math.floor(Math.random()*colors.length)],
+    rot: Math.random()*360, rotV: (Math.random()-0.5)*8, life:1
+  }));
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rotV; p.vy+=0.08;
+      p.life = Math.max(0, 1-(frame/120));
+      ctx.save(); ctx.globalAlpha=p.life;
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6);
+      ctx.restore();
+    });
+    frame++;
+    if(frame<140) requestAnimationFrame(draw); else canvas.remove();
+  }
+  draw();
+}
+
+const STREAK_MILESTONES = [3,7,14,30,60,100];
+function checkStreakMilestone(streak){
+  if(!STREAK_MILESTONES.includes(streak)) return;
+  const msgs = {3:'3日連続！習慣化のスタートライン',7:'1週間連続！本物の習慣になってきた',14:'2週間連続！意志力じゃなく仕組みで勝ってる',30:'1ヶ月連続！もう止まれない冒険者',60:'2ヶ月連続！圧倒的継続力',100:'100日連続！レジェンド冒険者'};
+  const m = document.createElement('div');
+  m.className = 'streak-milestone';
+  m.innerHTML = `<div style="font-size:36px;margin-bottom:8px;">🔥</div>
+    <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em;color:#F59E0B;margin-bottom:6px;">STREAK ${streak} DAYS</div>
+    <div style="font-size:14px;color:#fff;margin-bottom:18px;">${msgs[streak]}</div>
+    <button onclick="this.closest('.streak-milestone').remove()" style="background:#F59E0B;border:none;color:#000;font-weight:700;padding:8px 24px;border-radius:20px;cursor:pointer;font-size:13px;">最高だ！</button>`;
+  document.body.appendChild(m);
+  launchConfetti();
+  setTimeout(()=>m.remove(), 8000);
+}
+
 function showLevelUp(lv,smins){
   const ti=getTitleInfo(lv);const log=LEVEL_LOGS[Math.floor(Math.random()*LEVEL_LOGS.length)];
   document.getElementById('luLevel').textContent=lv;
@@ -7322,8 +7375,9 @@ function showLevelUp(lv,smins){
   document.getElementById('luLog').textContent=log;
   document.getElementById('luStudyHours').textContent=`累計 ${Math.floor(smins/60)}h / 平均 ${Math.floor(getAvgMins()/60)}h / MAX ${Math.floor(getMaxMins()/60)}h`;
   const btn=document.getElementById('luShareBtn');
-  if(btn){btn.textContent='𝕏 シェアする';btn.style.borderColor='#1d9bf0';btn.style.color='#1d9bf0';btn.disabled=false;}
+  if(btn){btn.textContent='𝕏 シェア';btn.style.borderColor='#1d9bf0';btn.style.color='#1d9bf0';btn.disabled=false;}
   document.getElementById('luOverlay').classList.add('show');
+  launchConfetti();
 }
 function closeLevelUp(){
   document.getElementById('luOverlay').classList.remove('show');
@@ -7348,6 +7402,14 @@ async function shareLevelUpToX(){
     try{ await navigator.share({text}); return; }catch(e){ if(e.name==='AbortError') return; }
   }
   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+}
+async function shareLevelUpToThreads(){
+  const smins = studyMins(sessions);
+  const lv = getLevelProgress(smins).level;
+  const ti = getTitleInfo(lv);
+  const totalH = Math.floor(smins/60);
+  const text = `${ti.emoji} レベルアップ！ Lv.${lv}「${ti.title}」に到達した。\n累計${totalH}時間の積み重ねが、今ここで報われた。\nまだ終わらない。次のレベルへ。\n\n#スタディクエスト\nhttps://hito77ki-ship-it.github.io/study-quest/`;
+  window.open('https://www.threads.net/intent/post?text='+encodeURIComponent(text),'_blank');
 }
 // closeLevelUp defined above with DQ alloc trigger
 function resetConfirm(){
@@ -7836,6 +7898,7 @@ async function finishTimer(){
   spawnDmgNumber(`+${exp} EXP`, '#e040fb', true);
   spawnDmgNumber(`📖 ${minutes}分 記録完了！`, '#7cff6e', true);
   if(lv1>lv0){setTimeout(()=>showLevelUp(lv1,smins1),800); checkClassChange(lv0,lv1,smins1);}
+  else { checkStreakMilestone(char.streak); }
   if(currentUser) syncToCloud().catch(()=>{});
 
   // タイムラインに自動投稿
