@@ -340,6 +340,18 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .plan-del-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 4px;}
 .plan-del-btn:hover{color:#EF4444;}
 /* Today plan on status */
+.aff-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+.aff-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.aff-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;color:var(--muted);}
+.aff-job{font-size:12px;font-weight:700;color:var(--text);}
+.aff-items{display:flex;flex-direction:column;gap:8px;}
+.aff-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;text-decoration:none;transition:border-color .15s;}
+.aff-item:hover{border-color:var(--accent);}
+.aff-item-left{display:flex;flex-direction:column;gap:2px;}
+.aff-item-name{font-size:13px;font-weight:700;color:var(--text);}
+.aff-item-desc{font-size:10px;color:var(--muted);}
+.aff-item-btn{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);border:1px solid rgba(140,198,63,.4);padding:4px 10px;border-radius:12px;white-space:nowrap;flex-shrink:0;}
+.aff-note{font-size:9px;color:var(--muted);margin-top:8px;text-align:right;}
 .tqb{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;}
 .tqb-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .tqb-streak{font-family:'Share Tech Mono',monospace;font-size:13px;font-weight:700;color:#F59E0B;}
@@ -3901,6 +3913,8 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     <div style="display:none;" id="attrSection">
       <div id="attrRows"></div>
     </div>
+    <!-- アフィリエイト：おすすめスクール -->
+    <div id="affiliateCard" style="grid-column:1/-1;display:none;"></div>
     <!-- クイック記録 -->
     <div class="section" style="grid-column:1/-1;">
       <div class="quick-rec-label">⚡ QUICK RECORD</div>
@@ -7019,6 +7033,7 @@ function renderAll(){
   renderPaceDiag();
   renderDailyMissions();
   renderTodayQuestBanner();
+  renderAffiliateCard();
   // レポート/プロフィールタブが開いていれば即更新
   const rptPanel=document.getElementById('panel-report');
   const profPanel=document.getElementById('panel-profile');
@@ -7249,7 +7264,7 @@ function switchTab(tab){
   else unsubscribeTlRealtime();
   if(tab==='report')  requestAnimationFrame(()=>renderReportTab());
   if(tab==='profile') requestAnimationFrame(()=>{ renderProfileTab(); renderWeekPlan(); initProfileQR(); });
-  if(tab==='status')  requestAnimationFrame(()=>{ renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); renderTodayQuestBanner(); });
+  if(tab==='status')  requestAnimationFrame(()=>{ renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); renderTodayQuestBanner(); renderAffiliateCard(); });
   // モバイルタブバーも同期
   document.querySelectorAll('.m-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   const activeBtn=document.getElementById('tab-'+tab);
@@ -10349,6 +10364,124 @@ function checkMissionDone(mission, todaySess){
 const DM_AWARDED_KEY = 'sq2_dm_awarded_';
 function getDmAwarded(dateStr){ try{ return JSON.parse(localStorage.getItem(DM_AWARDED_KEY+dateStr)||'[]'); }catch(e){ return []; } }
 function setDmAwarded(dateStr, ids){ try{ localStorage.setItem(DM_AWARDED_KEY+dateStr, JSON.stringify(ids)); }catch(e){} }
+
+/* ────────────────────────────────────────
+   アフィリエイト：おすすめスクール
+──────────────────────────────────────── */
+const AFFILIATE_DATA = {
+  cpa: {
+    label: '公認会計士',
+    items: [
+      { name:'CPA会計学院', desc:'合格者数No.1。短答・論文を徹底サポート。', url:'https://cpa-net.jp/', badge:'合格実績No.1' },
+      { name:'TAC', desc:'老舗の大手予備校。全国校舎・Web講義あり。', url:'https://www.tac-school.co.jp/kouza_kaikei.html', badge:'大手安心' },
+      { name:'大原簿記学校', desc:'実績豊富。通学・通信どちらも充実。', url:'https://www.o-hara.ac.jp/best/kaikei/', badge:'実績豊富' },
+    ]
+  },
+  zeirishi: {
+    label: '税理士',
+    items: [
+      { name:'TAC', desc:'税理士講座の定番。科目別受講が可能。', url:'https://www.tac-school.co.jp/kouza_zeiri.html', badge:'定番' },
+      { name:'大原簿記学校', desc:'合格者多数。通学・通信・Web対応。', url:'https://www.o-hara.ac.jp/best/zeirishi/', badge:'合格多数' },
+      { name:'スタディング', desc:'スマホで学べるコスパ最強の通信講座。', url:'https://studying.jp/zeirishi/', badge:'スマホ学習' },
+    ]
+  },
+  boki1: {
+    label: '日商簿記1級',
+    items: [
+      { name:'TAC', desc:'簿記1級の王道。合格率トップクラス。', url:'https://www.tac-school.co.jp/kouza_boki.html', badge:'王道' },
+      { name:'大原簿記学校', desc:'学校法人ならではの本格的な簿記教育。', url:'https://www.o-hara.ac.jp/best/boki/', badge:'本格派' },
+      { name:'ネットスクール', desc:'Web特化の通信講座。コスパ良好。', url:'https://www.net-school.co.jp/boki/', badge:'コスパ◎' },
+    ]
+  },
+  boki2: {
+    label: '日商簿記2級',
+    items: [
+      { name:'クレアール', desc:'ビデオ講座が充実。2級に特化したカリキュラム。', url:'https://www.crear-ac.co.jp/boki/', badge:'2級特化' },
+      { name:'スタディング', desc:'スマホで完結。月額制でコスパ最強。', url:'https://studying.jp/boki/', badge:'スマホOK' },
+      { name:'TAC', desc:'合格実績豊富な大手予備校。', url:'https://www.tac-school.co.jp/kouza_boki.html', badge:'安心の大手' },
+    ]
+  },
+  boki3: {
+    label: '日商簿記3級',
+    items: [
+      { name:'スタディング', desc:'3級はスマホ学習で十分。最安クラス。', url:'https://studying.jp/boki/', badge:'コスパ最高' },
+      { name:'ネットスクール', desc:'3級向け教材が豊富で丁寧な解説。', url:'https://www.net-school.co.jp/boki/', badge:'丁寧な解説' },
+    ]
+  },
+  fp2: {
+    label: 'FP2級',
+    items: [
+      { name:'スタディング', desc:'FP講座はスタディングが最安水準。', url:'https://studying.jp/fp/', badge:'最安水準' },
+      { name:'TAC', desc:'FP・AFP認定研修も対応の大手。', url:'https://www.tac-school.co.jp/kouza_fp.html', badge:'AFP対応' },
+    ]
+  },
+  fp3: {
+    label: 'FP3級',
+    items: [
+      { name:'スタディング', desc:'3級ならスマホ学習で十分合格可能。', url:'https://studying.jp/fp/', badge:'スマホOK' },
+    ]
+  },
+  toeic: {
+    label: 'TOEIC',
+    items: [
+      { name:'スタディサプリ ENGLISH', desc:'TOEIC特化。AIが弱点を分析。', url:'https://eigosapuri.jp/toeic/', badge:'AI分析' },
+      { name:'abceed', desc:'公式問題集含む豊富な教材をアプリで。', url:'https://www.abceed.com/', badge:'公式問題集収録' },
+    ]
+  },
+  eiken2: {
+    label: '英検2級',
+    items: [
+      { name:'スタディサプリ ENGLISH', desc:'英検対策コースあり。動画でわかりやすく。', url:'https://eigosapuri.jp/eiken/', badge:'動画解説' },
+    ]
+  },
+  takken: {
+    label: '宅建',
+    items: [
+      { name:'スタディング', desc:'宅建はスタディングが業界最安クラス。', url:'https://studying.jp/takken/', badge:'最安クラス' },
+      { name:'TAC', desc:'宅建合格者多数の老舗予備校。', url:'https://www.tac-school.co.jp/kouza_takken.html', badge:'合格多数' },
+      { name:'フォーサイト', desc:'フルカラーテキストで合格率高め。', url:'https://www.foresight.jp/takken/', badge:'高合格率' },
+    ]
+  },
+  roushi: {
+    label: '社会保険労務士',
+    items: [
+      { name:'フォーサイト', desc:'社労士の高合格率が評判の通信講座。', url:'https://www.foresight.jp/syaroushi/', badge:'高合格率' },
+      { name:'TAC', desc:'通学・通信ともに実績豊富。', url:'https://www.tac-school.co.jp/kouza_roumu.html', badge:'実績豊富' },
+    ]
+  },
+};
+
+function renderAffiliateCard(){
+  const el = document.getElementById('affiliateCard');
+  if(!el) return;
+  if(!selectedJobIds || selectedJobIds.length === 0){ el.style.display='none'; return; }
+
+  const job = JOBS.find(j => selectedJobIds.includes(j.id));
+  const data = job ? AFFILIATE_DATA[job.id] : null;
+  if(!data){ el.style.display='none'; return; }
+
+  el.style.display = 'block';
+  el.innerHTML = `<div class="aff-card">
+    <div class="aff-header">
+      <div style="flex:1;">
+        <div class="aff-label">RECOMMENDED SCHOOLS</div>
+        <div class="aff-job">${job.icon} ${data.label} のおすすめ講座</div>
+      </div>
+    </div>
+    <div class="aff-items">
+      ${data.items.map(item => `
+        <a class="aff-item" href="${item.url}" target="_blank" rel="noopener">
+          <div class="aff-item-left">
+            <div class="aff-item-name">${item.name}</div>
+            <div class="aff-item-desc">${item.desc}</div>
+          </div>
+          <div class="aff-item-btn">${item.badge} →</div>
+        </a>
+      `).join('')}
+    </div>
+    <div class="aff-note">※ 広告・PR</div>
+  </div>`;
+}
 
 function renderTodayQuestBanner(){
   const el = document.getElementById('todayQuestBanner');
