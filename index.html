@@ -12411,7 +12411,7 @@ const HELP_CONTENT = {
       const intro = `<div style="background:linear-gradient(135deg,rgba(124,77,255,.1),rgba(224,64,251,.06));border:1px solid rgba(124,77,255,.25);border-radius:8px;padding:16px;margin-bottom:18px;">
         <div style="font-size:14px;font-weight:700;color:var(--exp2);margin-bottom:8px;">🎮 勉強、RPGにしてみました。</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.8;">
-          スタディクエストは、資格勉強を<strong style="color:var(--text)">ドラクエ風RPG</strong>に変換するアプリです。<br>
+          スタディクエストは、資格勉強を<strong style="color:var(--text)">RPG風のゲーム体験</strong>に変換するアプリです。<br>
           1分勉強すると1EXP、レベルが上がり、称号が解放されます。<br>
           「なんか知らんけどモチベ出る」が設計思想です。<br><br>
           <strong style="color:var(--gold)">模試や答練のカウントダウン</strong>は「ボス戦」として設定でき、<br>
@@ -12505,7 +12505,7 @@ const HELP_CONTENT = {
         },
         {
           q: 'ゲーム（RPG）とどう連携していますか？',
-          a: '「⚔ ゲームを始める」ボタンからドラクエ風RPGを遊べます。\n\n学習記録のEXPと独立したゲームですが、学習の息抜きやモチベーション維持に活用できます。'
+          a: '「⚔ ゲームを始める」ボタンからRPG風のミニゲームを遊べます。\n\n学習記録のEXPと独立したゲームですが、学習の息抜きやモチベーション維持に活用できます。'
         },
         {
           q: 'プロフィールアイコンはどこで変えられますか？',
@@ -12529,18 +12529,19 @@ const HELP_CONTENT = {
     title: '✨ 機能一覧',
     render(){
       const features = [
-        { icon:'⚔', name:'STATUS',     desc:'キャラクターレベル・EXPバー・科目別レーダーチャート・DQステータス（ATK/DEF/INT…）' },
-        { icon:'📋', name:'QUEST',      desc:'学習タイマー（ポモドーロ対応）・勉強記録の追加・クエストログの表示・削除' },
-        { icon:'💀', name:'BOSS',       desc:'模試・答練のカウントダウン設定・HPバーで残り時間を可視化' },
+        { icon:'⚔', name:'STATUS',     desc:'キャラクターレベル・EXPバー・科目別レーダーチャート・RPGステータス（ATK/DEF/INT…）' },
+        { icon:'📋', name:'QUEST',      desc:'学習タイマー（ポモドーロ対応）・秒単位で正確に記録・クエストログの表示・削除' },
+        { icon:'💀', name:'BOSS',       desc:'模試・答練のカウントダウン設定・HPバーで残り勉強時間を可視化' },
         { icon:'🏅', name:'TITLES',     desc:'累計時間・連続日数・得点などで解放される称号バッジ' },
-        { icon:'🏆', name:'RANKING',    desc:'Supabase同期ユーザーとのレベル・学習時間ランキング' },
+        { icon:'🏆', name:'RANKING',    desc:'フォロー中ユーザーとのレベル・学習時間ランキング（累計・週間）' },
         { icon:'📊', name:'SCORE',      desc:'模試得点の入力・合計点推移グラフ・科目別正答率・レーダーチャート' },
-        { icon:'📈', name:'レポート',   desc:'日次/週次/月次の学習時間・棒グラフ・円グラフ・カウントダウンカード・週間目標リング' },
-        { icon:'👤', name:'自分',       desc:'プロフィールアイコン（画像アップロード）・表示名・データ管理' },
-        { icon:'⏱', name:'バックグラウンドタイマー', desc:'タブ非表示でも計測継続・1分ごと自動保存・クラッシュ復元・Web通知' },
-        { icon:'🗑', name:'記録の削除', desc:'クエストログから記録を削除・5秒間のアンドゥ機能・EXP自動再計算' },
-        { icon:'🔒', name:'週間目標',   desc:'月〜日の学習目標を設定・週終了まで変更不可のロック機能・日別バー' },
-        { icon:'⚔', name:'RPGゲーム',  desc:'ドラクエ風マップ探索・バトル・呪文システム・セーブ/ロード（準備中）' },
+        { icon:'📈', name:'レポート',   desc:'Day/Week/Month/Year の学習時間グラフ・科目別円グラフ・週間目標・日付ナビゲーション' },
+        { icon:'🌐', name:'タイムライン', desc:'学習宣言・目標投稿・フォロー中ユーザーの投稿を閲覧・いいね' },
+        { icon:'💬', name:'DM',         desc:'相互フォロー中のユーザーとダイレクトメッセージ' },
+        { icon:'👤', name:'自分',       desc:'プロフィールアイコン（画像アップロード）・表示名・公開/非公開設定・データ管理' },
+        { icon:'⏱', name:'バックグラウンドタイマー', desc:'タブ非表示でも計測継続・自動保存・クラッシュ復元・Web通知' },
+        { icon:'🔒', name:'週間目標',   desc:'月〜日の学習目標を設定・週終了まで変更不可のロック機能' },
+        { icon:'🎮', name:'RPGミニゲーム', desc:'RPG風のマップ探索・バトル・呪文システム（β版）' },
       ];
       return `<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
         スタディクエストで使える全機能の一覧です。タブ名と機能が一致するようになっています。
