@@ -9036,12 +9036,7 @@ function getPeriodChartDays(){
   if(period === 'day'){
     const t = rptSelectedDay;
     const daySessions = sessions.filter(s=>isStudyType(s)&&s.date===t);
-    if(!rptDayBySubject){
-      // まとめ表示: 1本の棒
-      const mins = daySessions.reduce((a,s)=>a+sAmount(s),0);
-      return [{date:t, label:'合計', mins}];
-    }
-    // 科目別表示
+    // 科目別・まとめ共通: 科目別データを返す（表示方法で積み上げ/並列を切り替え）
     const subjs = allSelectedSubjects();
     if(subjs.length === 0){
       const mins = daySessions.reduce((a,s)=>a+sAmount(s),0);
@@ -9235,8 +9230,8 @@ function renderWeekBar(){
         }
       },
       scales:{
-        x:{stacked: period!=='day', grid:{display:false}, ticks:{font:{size:isMobile?8:9},color:'#999',maxRotation:0}},
-        y:{stacked: period!=='day', grid:{color:'rgba(255,255,255,.05)'},
+        x:{stacked: period!=='day'||!rptDayBySubject, grid:{display:false}, ticks:{font:{size:isMobile?8:9},color:'#999',maxRotation:0}},
+        y:{stacked: period!=='day'||!rptDayBySubject, grid:{color:'rgba(255,255,255,.05)'},
           ticks:{font:{size:9},color:'#bbb',callback:v=>v===0?'0':v+'h'},
           beginAtZero:true,
           max:yMax
