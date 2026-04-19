@@ -9000,7 +9000,7 @@ function getPeriodChartDays(){
     return Array.from({length:12},(_,i)=>{
       const ms = `${year}-${String(i+1).padStart(2,'0')}`;
       const mins = sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(ms)).reduce((a,s)=>a+s.amount,0);
-      return {date:null, label:`${i+1}月`, mins};
+      return {date:ms, label:`${i+1}月`, mins, isMonth:true};
     });
   }
   return getLast7DaysData();
@@ -9021,7 +9021,7 @@ function renderWeekBar(){
         const chartColor = getSubjectChartColor(s.key, s.color);
         return {
           label: s.name,
-          data: days.map(d=>+(sessions.filter(x=>isStudyType(x)&&x.date===d.date&&x.subject===s.key).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)),
+          data: days.map(d=>+(sessions.filter(x=>isStudyType(x)&&x.subject===s.key&&(d.isMonth?x.date&&x.date.startsWith(d.date):x.date===d.date)).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)),
           backgroundColor: chartColor,
           borderWidth:0, borderRadius:2, borderSkipped:false,
           chartColor, // 凡例用に保持
@@ -9040,9 +9040,11 @@ function renderWeekBar(){
 
   // 各日の合計（時間単位）— day/period共通
   const dayTotals=days.map(d=>
-    period==='day'
+    (period==='day'||d.date===null||d.hourBlock)
       ? +(d.mins/60).toFixed(2)
-      : +(sessions.filter(x=>isStudyType(x)&&x.date===d.date).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)
+      : d.isMonth
+        ? +(sessions.filter(x=>isStudyType(x)&&x.date&&x.date.startsWith(d.date)).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)
+        : +(sessions.filter(x=>isStudyType(x)&&x.date===d.date).reduce((a,x)=>a+x.amount,0)/60).toFixed(2)
   );
   const maxTotal=Math.max(...dayTotals,0);
 
