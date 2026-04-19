@@ -6394,6 +6394,7 @@ function updateProviderBadge(user){
 
 function continueAsGuest(){
   try {
+    gtag('event','login',{method:'guest'});
     isGuest = true;
     const bar = document.getElementById('userBar');
     if(bar){
@@ -7063,7 +7064,11 @@ async function startAdventure(){
 
 /* ═══════════════ DASHBOARD ═══════════════ */
 function initDashboard(){
-  if(!char.installDate){ char.installDate=getTodayStr(); saveAll(); }
+  if(!char.installDate){
+    char.installDate=getTodayStr(); saveAll();
+    gtag('event','sign_up',{method: isGuest?'guest':'google'});
+  }
+  gtag('event','login',{method: isGuest?'guest':'google'});
   updateGnavVisibility();
   applyChartDarkDefaults();
   const pw=document.getElementById('jobPills');pw.innerHTML='';
@@ -7647,7 +7652,11 @@ function toggleTimer(){
 
 function startTimer(){
   timerRunning=true;
-  if(!timerStartedAt) timerStartedAt = new Date().toISOString();
+  if(!timerStartedAt){
+    timerStartedAt = new Date().toISOString();
+    const subj = document.getElementById('timerSubject')?.value||'unknown';
+    gtag('event','timer_start',{subject: subj});
+  }
   const btn=document.getElementById('timerStartBtn');
   const stopBtn=document.getElementById('timerStopBtn');
   const breakBtn=document.getElementById('manualBreakBtn');
@@ -7938,6 +7947,7 @@ async function finishTimer(){
   const startedAt=timerStartedAt||new Date(Date.now()-minutes*60000).toISOString();
   const condition=getTodayCondition();
   const isFirstSession = sessions.length === 0;
+  gtag('event','session_record',{subject, minutes, is_first: isFirstSession});
   sessions.push({date,subject,type:'study',amount:minutes,exp,note,startedAt,endedAt,condition});
   const smins1=studyMins(sessions),lv1=computeLevel(smins1);
   char.level=lv1;
@@ -12521,8 +12531,10 @@ async function setBoss(){
   if(editId){
     const idx = bosses.findIndex(b=>b.id===editId);
     if(idx>=0) bosses[idx]={...bosses[idx],name,date,targetHours};
+    gtag('event','exam_update',{exam_name:name, target_hours:targetHours});
   } else {
     bosses.push({id:genId(),name,date,targetHours});
+    gtag('event','exam_set',{exam_name:name, target_hours:targetHours});
   }
   closeBossForm();
   await saveAll();
