@@ -9152,7 +9152,8 @@ function renderWeekBar(){
       const{ctx,scales:{x,y},data}=chart;
       ctx.save();
       ctx.font=`600 ${labelFontSize}px "Hiragino Maru Gothic ProN","Hiragino Rounded Gothic Pro","Rounded Mplus 1c",sans-serif`;
-      ctx.fillStyle='rgba(255,255,255,0.92)';
+      const isDark = document.body.dataset.theme === 'dark';
+      ctx.fillStyle = isDark ? 'rgba(255,255,255,0.92)' : 'rgba(30,30,30,0.85)';
       ctx.textAlign='center';
       ctx.textBaseline='bottom';
       if(period==='day'){
