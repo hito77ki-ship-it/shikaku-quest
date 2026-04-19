@@ -2922,10 +2922,10 @@ body[data-theme="dark"] #mobileTabBar {
   /* iOSセーフエリア対応 + 底部タブバー分の余白 */
   .wrap { padding: 12px 12px calc(80px + env(safe-area-inset-bottom, 0px)) !important; }
 
-  /* gnav: モバイル固定ヘッダー */
-  .gnav { height: 52px; padding: 0 12px; position: fixed; top: 0; left: 0; right: 0; z-index: 600; }
-  /* gnav固定分のコンテンツ上余白 */
-  .wrap { padding-top: calc(52px + 8px) !important; }
+  /* gnav: モバイル固定ヘッダー（ステータスバーの下に配置） */
+  .gnav { height: 52px; padding: 0 12px; position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 600; }
+  /* gnav固定分 + セーフエリア分のコンテンツ上余白 */
+  .wrap { padding-top: calc(52px + env(safe-area-inset-top, 0px) + 8px) !important; }
   .gnav-pc-only { display: none !important; }
   .gnav-logo { font-size: 12px; letter-spacing: .12em; }
 
