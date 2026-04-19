@@ -1305,7 +1305,7 @@ body[data-theme="dark"] .wg-lock-note{color:var(--muted);}
    グローバルナビゲーションバー
 ════════════════════════════════════════ */
 .gnav{
-  position:sticky;top:0;z-index:600;
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:600;
   display:flex;align-items:center;justify-content:space-between;
   background:rgba(255,255,255,.95);
   backdrop-filter:blur(12px);
