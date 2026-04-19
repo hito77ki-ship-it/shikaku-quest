@@ -4491,7 +4491,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     </div>
 
     <!-- 入力フォーム -->
-    <div class="section">
+    <div class="section" id="scoreFormSection">
       <div class="sec-title">ADD EXAM RECORD</div>
       <div class="score-form-grid">
         <div class="form-row-2">
@@ -12686,11 +12686,29 @@ function renderBoss(){
           残り: <span style="color:#ff9e4d">${Math.max(0,(tgtH-doneH).toFixed(1))}h</span>
           ／ 目標: ${tgtH}h
         </div>
+        ${passed ? `<button onclick="recordBossResult('${b.id}')" style="margin-top:12px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(140,198,63,.15),rgba(140,198,63,.05));border:1px solid rgba(140,198,63,.4);border-radius:6px;color:#8cc63f;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">✏ 結果を記録する → SCORE</button>` : ''}
       </div>
       <button class="boss-card-del" onclick="editBoss('${b.id}')">✎</button>
       <button class="boss-card-del" style="top:36px;" onclick="deleteBoss('${b.id}')">🗑</button>
     </div>`;
   }).join('');
+}
+
+function recordBossResult(bossId){
+  const b = bosses.find(x=>x.id===bossId);
+  if(!b) return;
+  switchTab('score');
+  requestAnimationFrame(()=>{
+    const nameEl = document.getElementById('scoreExamName');
+    const dateEl = document.getElementById('scoreExamDate');
+    if(nameEl && !nameEl.value) nameEl.value = b.name;
+    if(dateEl && !dateEl.value) dateEl.value = b.date;
+    const sec = document.getElementById('scoreFormSection');
+    if(sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
+    // テンプレート自動選択をトリガー
+    renderScoreTab();
+    if(nameEl) nameEl.focus();
+  });
 }
 
 function openBossForm(id){
