@@ -9098,6 +9098,7 @@ function renderWeekBar(){
         data: [+(d.mins/60).toFixed(2)],
         backgroundColor: chartColor,
         borderWidth:0, borderRadius:4, borderSkipped:false,
+        maxBarThickness: rptDayBySubject ? 56 : 80,
         chartColor,
       };
     }).filter(ds=>ds.data.some(v=>v>0));
