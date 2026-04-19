@@ -14627,7 +14627,7 @@ async function loadDmPartners(){
         ? `<span class="dm-tab-unread">${dmUnreadCount[p.id]}</span>`
         : ''}
       ${p.demo ? '<span style="font-size:8px;color:var(--muted);margin-left:2px;">デモ</span>' : ''}
-    </div>`).join('');
+    </div>`}).join('');
 
   // 最初の相手を選択
   if(dmPartners.length > 0 && !dmCurrentPartner){
