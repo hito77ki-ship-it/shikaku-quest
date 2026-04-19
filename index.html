@@ -7435,7 +7435,7 @@ function switchTab(tab){
   }
   if(tab==='timeline') requestAnimationFrame(()=>{ loadTimeline(); subscribeTlRealtime(); });
   else unsubscribeTlRealtime();
-  if(tab==='report')  requestAnimationFrame(()=>renderReportTab());
+  if(tab==='report')  requestAnimationFrame(()=>{ const ml=document.getElementById('mql-list'); if(ml) ml._mqlShowing=5; renderReportTab(); });
   if(tab==='profile') requestAnimationFrame(()=>{ renderProfileTab(); renderWeekPlan(); initProfileQR(); updateReminderUI(); });
   if(tab==='status')  requestAnimationFrame(()=>{ renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); renderOnboardingBanner(); renderTodayQuestBanner(); renderAffiliateCard(); });
   // モバイルタブバーも同期
@@ -12021,18 +12021,36 @@ function renderMobileQuestLog(){
   const listEl = document.getElementById('mql-list');
   if(!listEl) return;
   if(!sessions.length){ listEl.innerHTML='<div class="no-data">クエスト記録なし</div>'; return; }
-  listEl.innerHTML = '';
-  [...sessions].reverse().slice(0,60).forEach((s,revIdx)=>{
-    const realIdx = sessions.length - 1 - revIdx;
-    const sub = smap[s.subject]||{name:s.subject||'—',color:'#606080'};
-    const tl = (s.type==='study'||s.type==='exam') ? fmtSecs(sAmountSecs(s)) : s.amount+'分';
-    const t0 = fmtHHmm(s.startedAt), t1 = fmtHHmm(s.endedAt);
-    const timeHtml = (t0&&t1)?`<span class="session-time">${t0}〜${t1}</span>`:'';
-    const item = document.createElement('div');
-    item.className = 'session-item';
-    item.innerHTML = `<span class="session-date">${s.date||'—'}</span>${timeHtml}<span class="session-subj" style="color:${sub.color}">${sub.name}</span><span class="session-desc">${tl}${s.note?' · '+escHtml(s.note):''}</span><span class="session-exp">+${s.exp} EXP</span>`;
-    listEl.appendChild(item);
-  });
+
+  const reversed = [...sessions].reverse();
+  const INITIAL = 5;
+  let showing = listEl._mqlShowing || INITIAL;
+  listEl._mqlShowing = showing;
+
+  const renderItems = (count) => {
+    listEl.innerHTML = '';
+    reversed.slice(0, count).forEach((s, revIdx)=>{
+      const sub = smap[s.subject]||{name:s.subject||'—',color:'#606080'};
+      const tl = (s.type==='study'||s.type==='exam') ? fmtSecs(sAmountSecs(s)) : s.amount+'分';
+      const t0 = fmtHHmm(s.startedAt), t1 = fmtHHmm(s.endedAt);
+      const timeHtml = (t0&&t1)?`<span class="session-time">${t0}〜${t1}</span>`:'';
+      const item = document.createElement('div');
+      item.className = 'session-item';
+      item.innerHTML = `<span class="session-date">${s.date||'—'}</span>${timeHtml}<span class="session-subj" style="color:${sub.color}">${sub.name}</span><span class="session-desc">${tl}${s.note?' · '+escHtml(s.note):''}</span><span class="session-exp">+${s.exp} EXP</span>`;
+      listEl.appendChild(item);
+    });
+    if(count < reversed.length){
+      const btn = document.createElement('button');
+      btn.textContent = `もっとみる（残り ${reversed.length - count} 件）`;
+      btn.style.cssText = 'width:100%;margin-top:10px;padding:10px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;';
+      btn.onclick = () => {
+        listEl._mqlShowing = Math.min(count + 20, reversed.length);
+        renderItems(listEl._mqlShowing);
+      };
+      listEl.appendChild(btn);
+    }
+  };
+  renderItems(showing);
 }
 
 /* ── 統計ミニバー ── */
