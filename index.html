@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <title>スタディクエスト｜RPG風 勉強管理アプリ【無料】</title>
 <!-- PWA -->
@@ -165,10 +165,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .section{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);}
 .sec-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;color:var(--accent2);margin-bottom:18px;display:flex;align-items:center;gap:10px;font-weight:700;}
 .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;}
-.screen{display:none;}.screen.active{display:block;}
+.screen{display:none;}.screen.active{display:block;min-height:100dvh;overflow-y:auto;}
 
 /* AUTH */
-.auth-inner{max-width:400px;margin:0 auto;padding:32px 20px;}
+.auth-inner{max-width:400px;margin:0 auto;padding:32px 20px;overflow-y:auto;}
 .lp-hero{text-align:center;margin-bottom:24px;}
 .lp-tagline{font-family:'Cinzel',serif;font-size:22px;line-height:1.55;color:var(--text);margin-bottom:6px;letter-spacing:.03em;}
 .lp-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.7;}
@@ -2996,6 +2996,32 @@ body[data-theme="dark"] #mobileTabBar {
 
   /* タブレット・モバイル共通: inputズーム防止 */
   .timer-goal-input { font-size: 16px !important; }
+
+  /* LP hero: 3列 → 縦並びまたは小さく */
+  .lp-tagline { font-size: 18px; }
+  .lp-features { gap: 6px; }
+  .lp-feat { padding: 10px 4px; }
+  .lp-feat-icon { font-size: 20px; }
+  .lp-feat-text { font-size: 9px; }
+  .lp-feat-text b { font-size: 10px; }
+
+  /* オンボーディングバナー */
+  .ob-step { font-size: 12px; min-height: 36px; }
+  .ob-title { font-size: 13px; }
+
+  /* リマインダー設定 */
+  #reminderTimeRow { flex-wrap: wrap; gap: 8px; }
+  #reminderTimeInput { font-size: 16px !important; }
+
+  /* レベルアップモーダル */
+  .lu-box { padding: 28px 20px; }
+  .lu-level { font-size: 44px; }
+
+  /* ストリークマイルストーン */
+  .streak-milestone { width: 88%; padding: 22px 20px; }
+
+  /* 初討伐モーダル内ボタン */
+  .lu-threads-btn, .lu-share-btn { padding: 9px 14px; font-size: 10px; }
 
   /* ── モバイル記録タブ：デフォルト（教材グリッド表示）──  */
   /* timer-panel と余計な要素を隠す */
