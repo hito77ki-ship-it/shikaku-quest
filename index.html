@@ -3352,6 +3352,26 @@ body[data-theme="dark"] #mobileTabBar {
 }
 .news-item-desc{font-size:11px;color:var(--muted);line-height:1.65;}
 
+/* グループヘッダー */
+.news-group{ margin-bottom:10px; }
+.news-group-header{
+  display:flex;align-items:center;gap:6px;
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;font-weight:700;
+  padding:6px 4px;margin-bottom:5px;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+}
+.news-group-header.type-feature{ color:#8CC63F; border-bottom-color:rgba(140,198,63,.3); }
+.news-group-header.type-fix{     color:#60a5fa; border-bottom-color:rgba(96,165,250,.3); }
+.news-group-header.type-improve{ color:#f59e0b; border-bottom-color:rgba(245,158,11,.3); }
+.news-group-icon{ font-size:13px; }
+.news-group-count{
+  margin-left:auto;
+  font-size:8px;background:var(--panel2);
+  padding:1px 6px;border-radius:10px;color:var(--muted);
+  font-family:'Share Tech Mono',monospace;letter-spacing:.04em;
+}
+
 .news-modal-footer{
   padding:10px 14px;border-top:1px solid var(--border);
   text-align:center;flex-shrink:0;background:var(--panel);
@@ -17276,17 +17296,39 @@ function renderNewsFeed(){
   const newReadIds = [...read, ...NEWS_ITEMS.map(n => n.id)];
   saveReadNews([...new Set(newReadIds)]);
 
-  feed.innerHTML = NEWS_ITEMS.map(item => {
-    const isUnread = !read.includes(item.id);
+  // タイプ順・グループ表示
+  const typeOrder = ['feature', 'improve', 'fix'];
+  const typeIcons = { feature:'⚔', improve:'✨', fix:'🔧' };
+  const grouped = {};
+  typeOrder.forEach(t => { grouped[t] = []; });
+  NEWS_ITEMS.forEach(item => {
+    const t = typeOrder.includes(item.type) ? item.type : 'feature';
+    grouped[t].push(item);
+  });
+
+  feed.innerHTML = typeOrder.map(type => {
+    const items = grouped[type];
+    if(!items.length) return '';
+    const itemsHtml = items.map(item => {
+      const isUnread = !read.includes(item.id);
+      return `
+      <div class="news-item type-${item.type}${isUnread?' unread':''}">
+        <div class="news-item-header">
+          <span class="news-item-date">${item.date}</span>
+          ${isUnread ? '<span class="news-unread-dot" title="未読"></span>' : ''}
+        </div>
+        <div class="news-item-title">${item.title}</div>
+        <div class="news-item-desc">${item.desc}</div>
+      </div>`;
+    }).join('');
     return `
-    <div class="news-item type-${item.type}${isUnread?' unread':''}">
-      <div class="news-item-header">
-        <span class="news-item-badge ${item.type}">${typeLabels[item.type]||item.type}</span>
-        <span class="news-item-date">${item.date}</span>
-        ${isUnread ? '<span class="news-unread-dot" title="未読"></span>' : ''}
+    <div class="news-group">
+      <div class="news-group-header type-${type}">
+        <span class="news-group-icon">${typeIcons[type]}</span>
+        <span>${typeLabels[type]}</span>
+        <span class="news-group-count">${items.length}</span>
       </div>
-      <div class="news-item-title">${item.title}</div>
-      <div class="news-item-desc">${item.desc}</div>
+      ${itemsHtml}
     </div>`;
   }).join('');
 
