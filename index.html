@@ -12580,26 +12580,28 @@ const HELP_CONTENT = {
     title: '✨ 機能一覧',
     render(){
       const features = [
-        { icon:'⚔', name:'STATUS',     desc:'キャラクターレベル・EXPバー・科目別レーダーチャート・RPGステータス（ATK/DEF/INT…）' },
-        { icon:'📋', name:'QUEST',      desc:'学習タイマー（ポモドーロ対応）・秒単位で正確に記録・クエストログの表示・削除' },
-        { icon:'💀', name:'BOSS',       desc:'模試・答練のカウントダウン設定・HPバーで残り勉強時間を可視化' },
-        { icon:'🏅', name:'TITLES',     desc:'累計時間・連続日数・得点などで解放される称号バッジ' },
-        { icon:'🏆', name:'RANKING',    desc:'フォロー中ユーザーとのレベル・学習時間ランキング（累計・週間）' },
-        { icon:'📊', name:'SCORE',      desc:'模試得点の入力・合計点推移グラフ・科目別正答率・レーダーチャート' },
-        { icon:'📈', name:'レポート',   desc:'Day/Week/Month/Year の学習時間グラフ・科目別円グラフ・週間目標・日付ナビゲーション' },
-        { icon:'🌐', name:'タイムライン', desc:'学習宣言・目標投稿・フォロー中ユーザーの投稿を閲覧・いいね' },
-        { icon:'💬', name:'DM',         desc:'相互フォロー中のユーザーとダイレクトメッセージ' },
-        { icon:'👤', name:'自分',       desc:'プロフィールアイコン（画像アップロード）・表示名・公開/非公開設定・データ管理' },
-        { icon:'⏱', name:'バックグラウンドタイマー', desc:'タブ非表示でも計測継続・自動保存・クラッシュ復元・Web通知' },
-        { icon:'🔒', name:'週間目標',   desc:'月〜日の学習目標を設定・週終了まで変更不可のロック機能' },
-        { icon:'🎮', name:'RPGミニゲーム', desc:'RPG風のマップ探索・バトル・呪文システム（β版）' },
+        { icon:'fa-solid fa-shield-halved', name:'STATUS',     desc:'キャラクターレベル・EXPバー・科目別レーダーチャート・RPGステータス（ATK/DEF/INT…）' },
+        { icon:'fa-solid fa-stopwatch',     name:'QUEST',      desc:'学習タイマー（ポモドーロ対応）・秒単位で正確に記録・クエストログの表示・削除' },
+        { icon:'fa-solid fa-skull',         name:'BOSS',       desc:'模試・答練のカウントダウン設定・HPバーで残り勉強時間を可視化' },
+        { icon:'fa-solid fa-medal',         name:'TITLES',     desc:'累計時間・連続日数・得点などで解放される称号バッジ' },
+        { icon:'fa-solid fa-ranking-star',  name:'RANKING',    desc:'フォロー中ユーザーとのレベル・学習時間ランキング（累計・週間）' },
+        { icon:'fa-solid fa-chart-bar',     name:'SCORE',      desc:'模試得点の入力・合計点推移グラフ・科目別正答率・レーダーチャート' },
+        { icon:'fa-solid fa-chart-line',    name:'レポート',   desc:'Day/Week/Month/Year の学習時間グラフ・科目別円グラフ・週間目標・日付ナビゲーション' },
+        { icon:'fa-solid fa-users',         name:'タイムライン', desc:'学習宣言・目標投稿・フォロー中ユーザーの投稿を閲覧・いいね' },
+        { icon:'fa-solid fa-envelope',      name:'DM',         desc:'相互フォロー中のユーザーとダイレクトメッセージ' },
+        { icon:'fa-solid fa-circle-user',   name:'自分',       desc:'プロフィールアイコン（画像アップロード）・表示名・公開/非公開設定・データ管理' },
+        { icon:'fa-solid fa-clock',         name:'バックグラウンドタイマー', desc:'タブ非表示でも計測継続・自動保存・クラッシュ復元・Web通知' },
+        { icon:'fa-solid fa-lock',          name:'週間目標',   desc:'月〜日の学習目標を設定・週終了まで変更不可のロック機能' },
+        { icon:'fa-solid fa-gamepad',       name:'RPGミニゲーム', desc:'RPG風のマップ探索・バトル・呪文システム（β版）' },
       ];
       return `<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
         スタディクエストで使える全機能の一覧です。タブ名と機能が一致するようになっています。
       </div>`
       + features.map(f=>`
         <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);">
-          <span style="font-size:20px;flex-shrink:0;width:28px;text-align:center">${f.icon}</span>
+          <span style="flex-shrink:0;width:28px;text-align:center;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--accent2);">
+            <i class="${f.icon}"></i>
+          </span>
           <div>
             <div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:3px;">${f.name}</div>
             <div style="font-size:11px;color:var(--muted);line-height:1.6">${f.desc}</div>
