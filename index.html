@@ -5082,10 +5082,13 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
             <span id="reminderToggleThumb" style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;"></span>
           </label>
         </div>
-        <div id="reminderTimeRow" style="display:none;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:12px;color:var(--muted);">通知時刻</span>
-          <input type="time" id="reminderTimeInput" value="21:00" onchange="saveReminderSettings()" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 10px;font-size:13px;outline:none;">
-          <span style="font-size:11px;color:var(--muted);" id="reminderStatus"></span>
+        <div id="reminderTimeRow" style="display:none;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:12px;color:var(--muted);">通知時刻</span>
+            <input type="time" id="reminderTimeInput" value="21:00" onchange="saveReminderSettings()" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 10px;font-size:13px;outline:none;">
+            <span style="font-size:11px;color:var(--muted);" id="reminderStatus"></span>
+          </div>
+          <button onclick="testStudyReminder()" style="align-self:flex-start;padding:5px 12px;background:rgba(140,198,63,.12);border:1px solid rgba(140,198,63,.4);border-radius:8px;color:var(--accent2);font-size:11px;cursor:pointer;">テスト通知を送る</button>
         </div>
       </div>
     </div>
@@ -7190,11 +7193,21 @@ function buildSubjSelect(){
     const renderSubjBlocks = () => {
       while(list.children.length > 1) list.removeChild(list.lastChild);
       const customSubjs = j.customizable ? loadCustomSubjects(j.id) : [];
-      [...j.subjects, ...customSubjs].forEach(s=>renderSubjRow(s, list));
+      j.subjects.forEach(s=>renderSubjRow(s, list));
+      customSubjs.forEach(s=>{
+        renderSubjRow(s, list);
+        // カスタム科目には削除ボタンを追加
+        const row = list.lastElementChild;
+        row.style.position = 'relative';
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '×';
+        delBtn.style.cssText = 'margin-left:6px;padding:3px 8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:6px;color:#EF4444;font-size:13px;cursor:pointer;flex-shrink:0;line-height:1;';
+        delBtn.onclick = (e) => { e.stopPropagation(); deleteCustomSubj(j.id, s.key); };
+        row.appendChild(delBtn);
+      });
 
       // カスタマイザブルな場合：科目追加UI
       if(j.customizable){
-        const COLORS = ['#EF4444','#3B82F6','#10B981','#F59E0B','#A855F7','#EC4899','#14B8A6','#F97316','#6366F1','#84CC16'];
         const addWrap = document.createElement('div');
         addWrap.style.cssText = 'margin-top:8px;display:flex;gap:8px;align-items:center;';
         addWrap.innerHTML = `
@@ -7208,13 +7221,6 @@ function buildSubjSelect(){
             追加
           </button>`;
         list.appendChild(addWrap);
-
-        if(customSubjs.length){
-          const delNote = document.createElement('div');
-          delNote.style.cssText = 'font-size:10px;color:var(--muted);margin-top:4px;';
-          delNote.textContent = '追加した科目を削除するにはジョブ変更設定から行えます';
-          list.appendChild(delNote);
-        }
       }
       updateAllBtn();
     };
@@ -7237,7 +7243,12 @@ function addCustomSubj(jobId){
   // 自動選択
   if(!selectedSubjectKeys.includes(key)) selectedSubjectKeys.push(key);
   input.value = '';
-  // 再描画
+  buildSubjSelect();
+}
+function deleteCustomSubj(jobId, key){
+  const updated = loadCustomSubjects(jobId).filter(s => s.key !== key);
+  saveCustomSubjects(jobId, updated);
+  selectedSubjectKeys = selectedSubjectKeys.filter(k => k !== key);
   buildSubjSelect();
 }
 
@@ -12657,6 +12668,23 @@ function updateReminderUI(){
     statusEl.textContent = todayStudied ? '✅ 今日は達成済み' : `⏰ ${cfg.time} に通知予定`;
   }
 }
+async function _showReminderNotif(){
+  const streak = char.streak||0;
+  const body = streak>0
+    ? `🔥 ${streak}日連続継続中！今日の勉強を記録してストリークを守ろう。`
+    : '今日の勉強をまだ記録していません。冒険を続けよう！';
+  try{
+    if('serviceWorker' in navigator){
+      const reg = await navigator.serviceWorker.ready;
+      await reg.showNotification('⚔ スタディクエスト', {
+        body, icon:'/study-quest/icons/app-icon.png',
+        tag:'sq-daily-reminder', badge:'/study-quest/icons/icon.svg'
+      });
+    } else {
+      new Notification('⚔ スタディクエスト', {body, icon:'/study-quest/icons/app-icon.png', tag:'sq-daily-reminder'});
+    }
+  }catch(e){}
+}
 function scheduleStudyReminder(){
   if(reminderTimeout){ clearTimeout(reminderTimeout); reminderTimeout=null; }
   const cfg = loadReminderSettings();
@@ -12668,19 +12696,28 @@ function scheduleStudyReminder(){
   const now = new Date();
   const target = new Date(); target.setHours(h,m,0,0);
   const ms = target - now;
-  if(ms <= 0) return; // 既に過ぎた
+  const shownKey = 'sq_remshown_' + getTodayStr();
+  // 遡及チェック：アプリが閉じていた間にリマインダー時刻を過ぎていた場合、起動時に通知
+  if(ms <= 0){
+    if(!localStorage.getItem(shownKey)){
+      localStorage.setItem(shownKey, '1');
+      _showReminderNotif();
+    }
+    return;
+  }
   reminderTimeout = setTimeout(()=>{
     const studiedNow = sessions.some(s=>s.date===getTodayStr()&&(s.type==='study'||s.type==='exam'));
     if(studiedNow) return;
-    const streak = char.streak||0;
-    try{
-      new Notification('⚔ スタディクエスト', {
-        body: streak>0 ? `🔥 ${streak}日連続継続中！今日の勉強を記録してストリークを守ろう。` : '今日の勉強をまだ記録していません。冒険を続けよう！',
-        icon: '/study-quest/icons/app-icon.png',
-        tag: 'sq-daily-reminder'
-      });
-    }catch(e){}
+    localStorage.setItem(shownKey, '1');
+    _showReminderNotif();
   }, ms);
+}
+function testStudyReminder(){
+  if(Notification.permission !== 'granted'){
+    alert('通知が許可されていません。設定から許可してください。');
+    return;
+  }
+  _showReminderNotif();
 }
 function cancelStudyReminder(){
   if(reminderTimeout){ clearTimeout(reminderTimeout); reminderTimeout=null; }

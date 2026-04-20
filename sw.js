@@ -5,7 +5,7 @@
    - 外部API(Supabase/Google等): キャッシュしない
    ================================================ */
 
-const VERSION = 'sq-v7';
+const VERSION = 'sq-v8';
 const STATIC_CACHE = VERSION + '-static';
 const RUNTIME_CACHE = VERSION + '-runtime';
 
@@ -102,6 +102,18 @@ async function cacheFirst(request) {
     return offlineFallback();
   }
 }
+
+// 通知タップ → アプリを開く
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      const existing = list.find(c => c.url.includes('/study-quest/'));
+      if (existing) return existing.focus();
+      return clients.openWindow('/study-quest/');
+    })
+  );
+});
 
 // オフライン時フォールバック
 function offlineFallback() {
