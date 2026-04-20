@@ -7684,6 +7684,7 @@ function switchTab(tab){
     // モバイル：タイマー未実行なら教材グリッド表示
     if(window.innerWidth <= 600 && !timerRunning){
       document.getElementById('panel-quest')?.classList.remove('show-timer');
+      _unlockScreenScroll();
       renderMobileQuestMaterials();
     } else if(window.innerWidth <= 600 && timerRunning){
       document.getElementById('panel-quest')?.classList.add('show-timer');
@@ -8354,6 +8355,7 @@ async function finishTimer(){
   // 記録完了後：全デバイスで元の画面に戻る
   setTimeout(()=>{
     document.getElementById('panel-quest')?.classList.remove('show-timer');
+    _unlockScreenScroll();
     if(window.innerWidth <= 600){
       renderMobileQuestMaterials && renderMobileQuestMaterials();
     } else {
@@ -16208,6 +16210,14 @@ function renderQuickMaterialSelect(){
   }).join('');
 }
 
+function _lockScreenScroll(){
+  const s = document.getElementById('screen-dash');
+  if(s) s.style.overflow = 'hidden';
+}
+function _unlockScreenScroll(){
+  const s = document.getElementById('screen-dash');
+  if(s) s.style.overflow = '';
+}
 function quickSelectMaterial(materialId){
   // 新しい2タブ記録UIを起動（全デバイス共通）
   const sel = document.getElementById('timerMaterial');
@@ -16215,6 +16225,7 @@ function quickSelectMaterial(materialId){
   document.getElementById('panel-quest')?.classList.add('show-timer');
   initMrecUI(materialId);
   window.scrollTo(0, 0);
+  if(window.innerWidth <= 600) _lockScreenScroll();
 }
 
 /* ─────────────────────────────────────────────
@@ -16404,6 +16415,7 @@ async function mrecSubmitManual(){
   if(document.getElementById('mrecStartTime')) document.getElementById('mrecStartTime').value = '';
   // 記録後：全デバイスで元の画面へ戻る
   document.getElementById('panel-quest')?.classList.remove('show-timer');
+  _unlockScreenScroll();
   if(window.innerWidth <= 600){
     renderMobileQuestMaterials && renderMobileQuestMaterials();
   } else {
@@ -16453,6 +16465,7 @@ function exitMobileTimerMode(){
     pauseTimer();
   }
   document.getElementById('panel-quest')?.classList.remove('show-timer');
+  _unlockScreenScroll();
   if(window.innerWidth <= 600){
     renderMobileQuestMaterials();
   } else {
