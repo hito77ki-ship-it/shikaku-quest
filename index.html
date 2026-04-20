@@ -4219,6 +4219,14 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
             </div>
           </div>
           <div class="mrec-row">
+            <span class="mrec-row-icon"><i class="fa-solid fa-play nav-icon"></i></span>
+            <span class="mrec-row-label">開始時刻</span>
+            <div class="mrec-row-value">
+              <input type="time" id="mrecStartTime" class="mrec-select" style="font-size:15px;width:auto;color:var(--text);">
+              <span style="font-size:10px;color:var(--muted);white-space:nowrap;">任意</span>
+            </div>
+          </div>
+          <div class="mrec-row">
             <span class="mrec-row-icon"><i class="fa-solid fa-clock nav-icon"></i></span>
             <span class="mrec-row-label">時間</span>
             <div class="mrec-row-value">
@@ -16338,18 +16346,21 @@ async function mrecSubmitManual(){
   const note    = document.getElementById('mrecNote')?.value.trim() || '';
   // 既存フォームに値をセット → addQuest() を呼ぶ
   const setVal = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+  const startTime = document.getElementById('mrecStartTime')?.value || '';
   setVal('questAmountHour', h);
   setVal('questAmountMin',  m);
   setVal('questDate',       date);
   setVal('questSubject',    subject);
   setVal('questNote',       note);
+  setVal('questStartTime',  startTime);
   // 教材IDも記録に含める
   const matSel = document.getElementById('timerMaterial');
   await addQuest();
   // フォームをリセット
-  if(document.getElementById('mrecHour')) document.getElementById('mrecHour').value = '';
-  if(document.getElementById('mrecMin'))  document.getElementById('mrecMin').value  = '';
-  if(document.getElementById('mrecNote')) document.getElementById('mrecNote').value = '';
+  if(document.getElementById('mrecHour'))      document.getElementById('mrecHour').value      = '';
+  if(document.getElementById('mrecMin'))       document.getElementById('mrecMin').value       = '';
+  if(document.getElementById('mrecNote'))      document.getElementById('mrecNote').value      = '';
+  if(document.getElementById('mrecStartTime')) document.getElementById('mrecStartTime').value = '';
   // 記録後：全デバイスで元の画面へ戻る
   document.getElementById('panel-quest')?.classList.remove('show-timer');
   if(window.innerWidth <= 600){
