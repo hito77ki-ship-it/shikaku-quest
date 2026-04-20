@@ -2920,8 +2920,9 @@ body[data-theme="dark"] #mobileTabBar {
   .user-bar { display: none !important; }
   .mobile-nav-section { display: block !important; }
 
-  /* iOSセーフエリア対応 + 底部タブバー分の余白 */
-  .wrap { padding: 12px 12px calc(80px + env(safe-area-inset-bottom, 0px)) !important; }
+  /* ━━ レイアウト骨格 ━━
+     gnav(top固定) ─ screen.active(スクロールBox) ─ mobileTabBar(bottom固定)
+     の3層に分離。screen.active はふたつに挟まれた独立スクロール容器。 */
 
   /* gnav: ステータスバー裏まで覆い、内側でコンテンツを押し下げ（+12px 余裕） */
   .gnav {
@@ -2929,8 +2930,21 @@ body[data-theme="dark"] #mobileTabBar {
     padding: calc(env(safe-area-inset-top, 0px) + 12px) 18px 0;
     position: fixed; top: 0; left: 0; right: 0; z-index: 600;
   }
-  /* gnav高さ分のコンテンツ上余白 */
-  .wrap { padding-top: calc(56px + env(safe-area-inset-top, 0px) + 12px + 8px) !important; }
+
+  /* メインコンテンツ領域：gnav〜tabbar間の固定スクロールBox */
+  .screen.active {
+    position: fixed !important;
+    top: calc(56px + env(safe-area-inset-top, 0px) + 12px) !important;
+    bottom: calc(59px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 0 !important; right: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    min-height: 0 !important;
+  }
+
+  /* wrap: gnav補正・tabbar補正ともに不要（screen.activeが境界を担う） */
+  .wrap { padding: 12px 12px 24px !important; }
   .gnav-pc-only { display: none !important; }
   .gnav-logo { font-size: 12px; letter-spacing: .12em; }
 
@@ -3102,8 +3116,10 @@ body[data-theme="dark"] #mobileTabBar {
 @media (max-width: 600px) {
   #panel-quest.show-timer #mobileRecordUI {
     position: fixed;
-    top: 48px; left: 0; right: 0; bottom: 0;
-    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    top: calc(56px + env(safe-area-inset-top, 0px) + 12px);
+    bottom: calc(59px + env(safe-area-inset-bottom, 0px));
+    left: 0; right: 0;
+    padding-bottom: 0;
     z-index: 200; background: var(--bg);
     overflow: hidden;
   }
