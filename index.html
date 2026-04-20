@@ -3153,10 +3153,10 @@ body[data-theme="dark"] #mobileTabBar {
   box-shadow: 0 2px 8px rgba(0,0,0,.12);
 }
 /* ── ペイン共通 ── */
-.mrec-pane { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.mrec-pane { display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
 .mrec-form-scroll {
   flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 14px;
-  overscroll-behavior: contain;
+  overscroll-behavior: contain; min-height: 0;
 }
 .mrec-btn-area { flex-shrink: 0; padding: 10px 14px 12px; background: var(--bg); }
 /* ── 手動入力 フォーム行 ── */
