@@ -3745,6 +3745,9 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         👤 ゲストとして続ける（ランキング非参加）
       </button>
     </div>
+
+    <!-- 最新アップデート -->
+    <div id="lpNewsSection" style="margin-top:20px;width:100%;max-width:360px;"></div>
   </div>
 </div>
 
@@ -11937,6 +11940,28 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   })();
 
+  // LP 最新アップデートを描画
+  (function renderLpNews(){
+    const el = document.getElementById('lpNewsSection');
+    if(!el) return;
+    const typeLabels = { feature:'新機能', fix:'バグ修正', improve:'改善', new:'NEW' };
+    const typeColors = { feature:'#8CC63F', fix:'#f6875f', improve:'#68d391', new:'#f6875f' };
+    const items = NEWS_ITEMS.slice(0, 4);
+    el.innerHTML = `
+      <div style="font-size:9px;letter-spacing:.18em;color:rgba(255,255,255,.45);font-family:'Cinzel',serif;text-align:center;margin-bottom:10px;">LATEST UPDATES</div>
+      ${items.map(n=>`
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);">
+          <span style="font-size:8px;padding:2px 7px;border-radius:10px;background:${typeColors[n.type]||'#8CC63F'};color:#fff;white-space:nowrap;margin-top:2px;flex-shrink:0;">${typeLabels[n.type]||n.type}</span>
+          <div>
+            <div style="font-size:11px;color:rgba(255,255,255,.85);line-height:1.5;">${n.title.replace(/^[\p{Emoji}\s]+/u,'')}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:1px;">${n.date}</div>
+          </div>
+        </div>`).join('')}
+      <div style="text-align:center;margin-top:10px;">
+        <span style="font-size:9px;color:rgba(255,255,255,.3);">ログイン後に全履歴を確認できます 🔔</span>
+      </div>`;
+  })();
+
   loadReportState();
   // userAvatarにアバター復元
   if(profileAvatarData){
@@ -16632,6 +16657,48 @@ const NEWS_READ_KEY = 'sq2_news_read';
 
 // ── アップデートログ（新しい順） ──
 const NEWS_ITEMS = [
+  {
+    id: 'v20260420_mobile_header',
+    date: '2026-04-20',
+    type: 'fix',
+    title: '📱 iOSでヘッダーがステータスバーに被る問題を修正',
+    desc: 'iPhoneでアプリを開いたとき、「STUDY QUEST」ロゴが時計・電池残量と重なって表示される問題を修正しました。ステータスバーから適切な余白を確保し、どの機種でもロゴとアイコンが正しく表示されます。'
+  },
+  {
+    id: 'v20260420_help_icons',
+    date: '2026-04-20',
+    type: 'improve',
+    title: '✨ ヘルプ「機能一覧」のアイコンをデザイン統一',
+    desc: 'ヘルプモーダルの「機能一覧」に表示されるアイコンを、アプリ全体のナビゲーションと同じFont Awesomeの塗りつぶしアイコンに統一しました。'
+  },
+  {
+    id: 'v20260419_boss_score_link',
+    date: '2026-04-19',
+    type: 'feature',
+    title: '⚔ BOSSカードから直接スコアを記録できるように',
+    desc: '試験日を過ぎたBOSSカードに「📊 結果を記録」ボタンが表示されるようになりました。ボタンをタップするとSCOREタブにそのまま移動し、BOSSの情報が自動入力された状態でスコア記録を開始できます。二度入力の手間がなくなります。'
+  },
+  {
+    id: 'v20260419_day_graph_redesign',
+    date: '2026-04-19',
+    type: 'feature',
+    title: '📊 Dayレポートをスタプラ風の日付ナビ＋科目別グラフに刷新',
+    desc: 'レポートのDayタブに日付ナビゲーション（◀ ▶）を追加し、任意の日の記録を確認できるようになりました。グラフは「科目別」と「まとめ」をトグルで切替可能。科目別では各科目に色が付き、まとめでは全科目を積み上げ棒グラフで表示します。'
+  },
+  {
+    id: 'v20260419_quest_log_more',
+    date: '2026-04-19',
+    type: 'improve',
+    title: '📋 QUEST LOG に「もっとみる」ボタンを追加',
+    desc: 'レポート画面のQUEST LOG（記録ログ）は最初の5件のみ表示され、「もっとみる」ボタンで追加表示できるようになりました。記録が多くても画面がスッキリ保たれます。'
+  },
+  {
+    id: 'v20260419_onboarding_weekly_goal',
+    date: '2026-04-19',
+    type: 'improve',
+    title: '🎯 はじめての3ステップをより分かりやすく改善',
+    desc: '初日に表示される「最初の3ステップ」のステップ3を「週間目標を設定する」に変更しました。設定場所（レポートタブ）へのナビゲーションも明示され、初期設定がスムーズになりました。'
+  },
   {
     id: 'v20260416_period_selector',
     date: '2026-04-16',
