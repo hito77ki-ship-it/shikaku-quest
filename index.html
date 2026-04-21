@@ -14263,9 +14263,38 @@ function switchTlFilter(filter, btn){
   tlPage = 0;
   document.querySelectorAll('.tl-filter-btn').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
+  else {
+    const btns = document.querySelectorAll('.tl-filter-btn');
+    const filters = ['all','me','goal','top'];
+    const idx = filters.indexOf(filter);
+    if(btns[idx]) btns[idx].classList.add('active');
+  }
   hideTlNewBanner();
   loadTimeline();
 }
+
+// TLスワイプ切り替え
+(function(){
+  const FILTERS = ['all','me','goal','top'];
+  let tx = 0, ty = 0, swiping = false;
+  function getPanel(){ return document.getElementById('panel-timeline'); }
+  document.addEventListener('touchstart', e => {
+    const p = getPanel();
+    if(!p || !p.contains(e.target)) return;
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY; swiping = true;
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if(!swiping) return; swiping = false;
+    const p = getPanel();
+    if(!p || !p.contains(e.changedTouches[0].target)) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    if(Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+    const cur = FILTERS.indexOf(tlCurrentFilter);
+    const next = dx < 0 ? Math.min(cur+1, FILTERS.length-1) : Math.max(cur-1, 0);
+    if(next !== cur) switchTlFilter(FILTERS[next], null);
+  }, { passive: true });
+})();
 
 async function loadTimeline(){
   const feed = document.getElementById('tlFeed');
