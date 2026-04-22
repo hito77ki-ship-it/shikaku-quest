@@ -9273,7 +9273,7 @@ function getThisYearMins(){
   return sessions.filter(s=>isStudyType(s)&&s.date&&s.date.startsWith(y)).reduce((a,s)=>a+sAmount(s),0);
 }
 function fmtMins(m){
-  const h=Math.floor(m/60), mn=m%60;
+  const h=Math.floor(m/60), mn=+(m%60).toFixed(1);
   return h>0 ? (mn>0?`${h}h ${mn}m`:`${h}h`) : `${mn}m`;
 }
 function getDayMins(dateStr){
