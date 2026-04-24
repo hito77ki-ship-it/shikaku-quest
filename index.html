@@ -15635,8 +15635,11 @@ function renderReplyThreadDOM(postId){
     html += replies.map(r => {
       const ac = (r.user_name || '？')[0];
       const col = typeof avatarColor === 'function' ? avatarColor(r.user_name) : '#8CC63F';
+      const avatarHtml = r.avatar_url
+        ? `<div class="tl-reply-avatar" style="background:none;padding:0;"><img src="${r.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`
+        : `<div class="tl-reply-avatar" style="background:${col}">${ac}</div>`;
       return `<div class="tl-reply-item">
-        <div class="tl-reply-avatar" style="background:${col}">${ac}</div>
+        ${avatarHtml}
         <div style="flex:1;">
           <div class="tl-reply-name">${escHtml(r.user_name||'名無し')} <span style="font-size:9px;font-weight:400;color:var(--muted);">Lv.${r.user_level||1}</span></div>
           <div class="tl-reply-text">${escHtml(r.note)}</div>
