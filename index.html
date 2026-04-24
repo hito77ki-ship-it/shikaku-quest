@@ -1742,6 +1742,21 @@ body[data-theme="dark"] .tl-badge-icon { color:#68d391; }
   background: rgba(239,68,68,.06);
 }
 .tl-like-btn.liked { color: #EF4444; }
+/* ── リアクションピッカー ── */
+.tl-reaction-picker{position:absolute;bottom:calc(100% + 6px);left:0;background:var(--panel);border:1px solid var(--border);border-radius:24px;padding:5px 8px;display:flex;gap:2px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.25);animation:reactionPickerIn .15s ease;}
+@keyframes reactionPickerIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.tl-reaction-option{font-size:20px;cursor:pointer;padding:5px 6px;border-radius:50%;transition:transform .1s;border:none;background:none;line-height:1;}
+.tl-reaction-option:hover{transform:scale(1.3);}
+.tl-reaction-option.selected{background:rgba(140,198,63,.2);}
+.tl-reaction-chip{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);cursor:pointer;background:none;transition:all .15s;color:var(--muted);}
+.tl-reaction-chip.mine{border-color:var(--accent);background:rgba(140,198,63,.1);color:var(--accent2);}
+.tl-reaction-add{display:inline-flex;align-items:center;gap:3px;font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);cursor:pointer;background:none;color:var(--muted);transition:border-color .15s;position:relative;}
+.tl-reaction-add:hover{border-color:var(--accent);}
+/* ── 投稿プライバシー設定 ── */
+.tl-privacy-row{display:flex;gap:5px;margin-top:8px;}
+.tl-privacy-opt{flex:1;font-size:11px;padding:5px 3px;border:1px solid var(--border);border-radius:16px;background:none;color:var(--muted);cursor:pointer;transition:all .15s;text-align:center;font-family:inherit;}
+.tl-privacy-opt.active{border-color:var(--accent);color:var(--accent2);background:rgba(140,198,63,.08);}
+.tl-vis-badge{font-size:9px;padding:1px 6px;border-radius:8px;border:1px solid rgba(140,198,63,.3);color:var(--muted);}
 .tl-subject-tag {
   font-size: 10px; color: var(--accent2);
   background: rgba(140,198,63,.1);
@@ -5257,6 +5272,12 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
           <button onclick="clearTlImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:1;">✕</button>
         </div>
         <input type="file" id="tlImageFile" accept="image/*" style="display:none;" onchange="handleTlImageSelect(event)">
+        <!-- プライバシー設定 -->
+        <div class="tl-privacy-row">
+          <button class="tl-privacy-opt active" data-vis="public" onclick="setPostVisibility('public')">🌐 全員</button>
+          <button class="tl-privacy-opt" data-vis="followers" onclick="setPostVisibility('followers')">👥 フォロワー</button>
+          <button class="tl-privacy-opt" data-vis="private" onclick="setPostVisibility('private')">🔒 自分のみ</button>
+        </div>
         <div class="tl-compose-footer">
           <button onclick="document.getElementById('tlImageFile').click()" style="background:none;border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--muted);cursor:pointer;">📷 写真</button>
           <button class="tl-post-btn" onclick="manualPost()">投稿</button>
@@ -14305,6 +14326,7 @@ async function manualPost(){
     is_free_post: true,
     post_image:   tlPostImage || null,
     avatar_url:   profileAvatarData || null,
+    visibility:   tlCurrentVisibility || 'public',
     created_at:   new Date().toISOString(),
   };
 
@@ -14328,6 +14350,7 @@ async function manualPost(){
         is_free_post: true,
         post_image:   post.post_image,
         avatar_url:   post.avatar_url,
+        visibility:   post.visibility,
         created_at:   post.created_at,
       });
     } catch(e){ console.warn('Free post cloud failed:', e); }
@@ -14345,6 +14368,13 @@ async function manualPost(){
 function openTlCompose(){
   const el = document.getElementById('tlComposeToggle');
   if(el) el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
+/* ── 投稿プライバシー設定 ── */
+let tlCurrentVisibility = 'public';
+function setPostVisibility(vis){
+  tlCurrentVisibility = vis;
+  document.querySelectorAll('.tl-privacy-opt').forEach(b => b.classList.toggle('active', b.dataset.vis === vis));
 }
 
 /* ── タイムライン読み込み ── */
@@ -14530,6 +14560,17 @@ async function loadTlFilter(filter){
     merged = merged.filter(p => (p.job_ids||[]).some(j => selectedJobIds.includes(j)));
   }
 
+  // プライバシーフィルタリング
+  const myId = currentUser ? currentUser.id : null;
+  const myName = char.name;
+  merged = merged.filter(p => {
+    const vis = p.visibility || 'public';
+    const isOwn = (myId && p.user_id === myId) || p.user_name === myName;
+    if(vis === 'private') return isOwn;
+    if(vis === 'followers') return isOwn || !!currentUser; // ログイン済みなら表示
+    return true; // public
+  });
+
   tlPostsByFilter[filter] = merged;
   renderTlPage(filter, 0);
 }
@@ -14602,6 +14643,8 @@ async function deleteTlPost(postId, btn){
 
 /* ── 投稿カードHTML生成 ── */
 function renderPostHTML(post, likes){
+  const myReactions = loadLocalReactions();
+  const myReaction = myReactions[post.id] || null;
   const liked = likes[post.id] || (post.from_cloud && tlLikedSet && tlLikedSet.has(post.id));
   const timeStr = formatRelativeTime(post.created_at);
   const avatarChar = (post.user_name || '？')[0];
@@ -14736,74 +14779,212 @@ function renderPostHTML(post, likes){
     `}
 
     <!-- フッター -->
-    <div class="tl-post-footer">
-      <button class="tl-like-btn ${liked?'liked':''}" id="tllike-${post.id}"
-        onclick="toggleLocalLike('${post.id}', this)">
-        ${liked ? '❤️' : '🤍'}
-        <span id="tllike-count-${post.id}">${post.likes || post.likes_count || 0}</span>
-      </button>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">${jobLabel}</div>
-      <button onclick="sharePostToX('${post.id}')"
-        style="background:none;border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:10px;color:var(--muted);cursor:pointer;margin-left:auto;">
-        𝕏 シェア
-      </button>
-      ${isOwn ? `<button onclick="deleteTlPost('${post.id}', this)"
-        style="background:none;border:1px solid rgba(239,68,68,.4);border-radius:20px;padding:4px 10px;font-size:10px;color:#EF4444;cursor:pointer;">
-        🗑
-      </button>` : ''}
+    <div class="tl-post-footer" style="flex-direction:column;gap:8px;align-items:stretch;">
+      <!-- リアクション行 -->
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <div style="position:relative;display:inline-flex;" id="tl-react-wrap-${post.id}">
+          <button class="tl-reaction-add" id="tl-react-btn-${post.id}"
+            onclick="showReactionPicker('${post.id}', this)">
+            ${myReaction ? REACTIONS.find(r=>r.key===myReaction)?.emoji || '😊' : '＋'}
+            <span style="font-size:11px;">${myReaction ? REACTIONS.find(r=>r.key===myReaction)?.label || '' : 'リアクション'}</span>
+          </button>
+        </div>
+        <div id="tl-react-chips-${post.id}" style="display:flex;gap:4px;flex-wrap:wrap;">
+          ${buildReactionChips(post, myReaction)}
+        </div>
+        <div style="margin-left:auto;display:flex;gap:4px;align-items:center;">
+          ${isOwn && post.visibility && post.visibility !== 'public' ? `<span class="tl-vis-badge">${post.visibility==='followers'?'👥 フォロワー':'🔒 自分のみ'}</span>` : ''}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">${jobLabel}</div>
+        </div>
+      </div>
+      <!-- シェア・削除行 -->
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button onclick="sharePostToX('${post.id}')"
+          style="background:none;border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:10px;color:var(--muted);cursor:pointer;">
+          𝕏 シェア
+        </button>
+        ${isOwn ? `<button onclick="deleteTlPost('${post.id}', this)"
+          style="background:none;border:1px solid rgba(239,68,68,.4);border-radius:20px;padding:4px 10px;font-size:10px;color:#EF4444;cursor:pointer;">
+          🗑
+        </button>` : ''}
+      </div>
     </div>
   </div>`;
 }
 
-/* ── いいね（ローカル + クラウド） ── */
-async function toggleLocalLike(postId, btn){
-  const likes = loadLocalLikes();
-  const liked = !!likes[postId];
-  const countEl = document.getElementById(`tllike-count-${postId}`);
-  const current = parseInt(countEl?.textContent || '0');
+/* ════════════════════════════════════════
+   リアクションシステム
+════════════════════════════════════════ */
+const REACTIONS = [
+  { key: 'heart',  emoji: '❤️', label: 'エール' },
+  { key: 'fire',   emoji: '🔥', label: 'すごい！' },
+  { key: 'coffee', emoji: '☕', label: '一緒にがんばろう' },
+  { key: 'muscle', emoji: '💪', label: 'ファイト！' },
+  { key: 'clap',   emoji: '👏', label: 'お疲れさま！' },
+];
+const TL_REACTIONS_KEY = 'sq2_tl_reactions'; // { [postId]: reactionKey }
+const TL_RCOUNTS_KEY   = 'sq2_tl_rcounts';  // { [postId]: { heart:3, fire:2 } }
 
-  if(liked){
-    delete likes[postId];
-    countEl.textContent = Math.max(0, current - 1);
-    btn.classList.remove('liked');
-    btn.innerHTML = `🤍 <span id="tllike-count-${postId}">${Math.max(0,current-1)}</span>`;
-  } else {
-    likes[postId] = true;
-    countEl.textContent = current + 1;
-    btn.classList.add('liked');
-    btn.innerHTML = `❤️ <span id="tllike-count-${postId}">${current+1}</span>`;
+function loadLocalReactions(){
+  try { const v = localStorage.getItem(TL_REACTIONS_KEY); return v ? JSON.parse(v) : {}; } catch { return {}; }
+}
+function saveLocalReactions(r){
+  try { localStorage.setItem(TL_REACTIONS_KEY, JSON.stringify(r)); } catch {}
+}
+function loadLocalRCounts(){
+  try { const v = localStorage.getItem(TL_RCOUNTS_KEY); return v ? JSON.parse(v) : {}; } catch { return {}; }
+}
+function saveLocalRCounts(c){
+  try { localStorage.setItem(TL_RCOUNTS_KEY, JSON.stringify(c)); } catch {}
+}
+
+/* リアクション数のオブジェクトを投稿から構築 */
+function getPostReactionCounts(post){
+  const local = loadLocalRCounts()[post.id] || {};
+  const cloud = (typeof post.reactions === 'object' && post.reactions) ? post.reactions : {};
+  const merged = Object.assign({}, cloud, local);
+  // 旧いいねの後方互換: post.likes / likes_count → heart に加算
+  if(!merged.heart){
+    const old = post.likes || post.likes_count || 0;
+    if(old > 0) merged.heart = old;
   }
-  saveLocalLikes(likes);
+  return merged;
+}
 
-  // ローカル投稿のlikeカウントも更新
-  const posts = loadLocalPosts();
-  const idx = posts.findIndex(p => p.id === postId);
-  if(idx >= 0){ posts[idx].likes = parseInt(document.getElementById(`tllike-count-${postId}`)?.textContent || '0'); saveLocalPosts(posts); }
+/* リアクションチップのHTML生成 */
+function buildReactionChips(post, myReaction){
+  const counts = getPostReactionCounts(post);
+  return REACTIONS
+    .filter(r => (counts[r.key] || 0) > 0)
+    .map(r => {
+      const isMine = myReaction === r.key;
+      return `<button class="tl-reaction-chip${isMine?' mine':''}"
+        onclick="toggleReaction('${post.id}','${r.key}',this)">
+        ${r.emoji} <span>${counts[r.key]}</span>
+      </button>`;
+    }).join('');
+}
 
-  // Supabase にも反映（ログイン中のみ）
+/* リアクションピッカーの表示/非表示 */
+let _pickerOpenId = null;
+function showReactionPicker(postId, triggerBtn){
+  // 既に開いているピッカーを閉じる
+  document.querySelectorAll('.tl-reaction-picker').forEach(el => el.remove());
+  if(_pickerOpenId === postId){ _pickerOpenId = null; return; }
+  _pickerOpenId = postId;
+
+  const myReactions = loadLocalReactions();
+  const myReaction = myReactions[postId] || null;
+
+  const picker = document.createElement('div');
+  picker.className = 'tl-reaction-picker';
+  picker.id = 'tl-picker-' + postId;
+  picker.innerHTML = REACTIONS.map(r =>
+    `<button class="tl-reaction-option${myReaction===r.key?' selected':''}"
+      title="${r.label}"
+      onclick="toggleReaction('${postId}','${r.key}',null);document.getElementById('tl-picker-${postId}')?.remove();_pickerOpenId=null;">
+      ${r.emoji}
+    </button>`
+  ).join('');
+
+  const wrap = document.getElementById('tl-react-wrap-' + postId);
+  if(wrap) wrap.appendChild(picker);
+
+  // 外側クリックで閉じる
+  setTimeout(() => {
+    const close = (e) => {
+      if(!picker.contains(e.target) && e.target !== triggerBtn){
+        picker.remove(); _pickerOpenId = null;
+        document.removeEventListener('click', close, true);
+      }
+    };
+    document.addEventListener('click', close, true);
+  }, 10);
+}
+
+/* リアクション切り替え（ローカル + Supabase） */
+async function toggleReaction(postId, reactionKey, chipBtn){
+  const myReactions = loadLocalReactions();
+  const prevKey = myReactions[postId] || null;
+  const rcounts = loadLocalRCounts();
+  if(!rcounts[postId]) rcounts[postId] = {};
+
+  // 旧カウント補正（Supabaseから取れた値をローカルに反映）
+  const post = tlAllPostsFlat().find(p => p.id === postId);
+  if(post && (post.likes || post.likes_count) && !rcounts[postId].heart){
+    rcounts[postId].heart = post.likes || post.likes_count || 0;
+  }
+
+  if(prevKey === reactionKey){
+    // 同じリアクション → キャンセル
+    delete myReactions[postId];
+    rcounts[postId][reactionKey] = Math.max(0, (rcounts[postId][reactionKey] || 0) - 1);
+  } else {
+    // 前のリアクションを取り消し
+    if(prevKey){
+      rcounts[postId][prevKey] = Math.max(0, (rcounts[postId][prevKey] || 0) - 1);
+    }
+    myReactions[postId] = reactionKey;
+    rcounts[postId][reactionKey] = (rcounts[postId][reactionKey] || 0) + 1;
+  }
+  saveLocalReactions(myReactions);
+  saveLocalRCounts(rcounts);
+
+  // DOM更新
+  const newMyReaction = myReactions[postId] || null;
+  const reactBtn = document.getElementById('tl-react-btn-' + postId);
+  if(reactBtn){
+    const r = REACTIONS.find(x => x.key === newMyReaction);
+    reactBtn.innerHTML = r
+      ? `${r.emoji} <span style="font-size:11px;">${r.label}</span>`
+      : `＋ <span style="font-size:11px;">リアクション</span>`;
+  }
+  const chipsEl = document.getElementById('tl-react-chips-' + postId);
+  if(chipsEl && post) chipsEl.innerHTML = buildReactionChips(post, newMyReaction);
+
+  // ローカル投稿のlikeカウントを後方互換維持
+  const localPosts = loadLocalPosts();
+  const idx = localPosts.findIndex(p => p.id === postId);
+  if(idx >= 0){
+    localPosts[idx].likes = rcounts[postId].heart || 0;
+    localPosts[idx].reactions = rcounts[postId];
+    saveLocalPosts(localPosts);
+  }
+
+  // 通知（リアクションを付けた時）
+  if(post && post.user_name !== char.name && !prevKey){
+    const r = REACTIONS.find(x => x.key === reactionKey);
+    showNotifToast(r?.emoji||'❤️', 'エールを送りました', `「${post.subject_name||'学習'}」の投稿に${r?.label||'リアクション'}！`);
+  }
+
+  // Supabase同期（ログイン中のみ）
   if(currentUser){
     try {
-      if(!liked){
-        await sb.from('post_likes').insert({ post_id: postId, user_id: currentUser.id });
-        await sb.from('timeline_posts').update({ likes_count: current+1 }).eq('id', postId);
-
-        // いいねされた相手に通知を送る
-        const post = tlAllPostsFlat().find(p => p.id === postId);
-        if(post && post.user_id && post.user_id !== currentUser.id){
+      const newCount = rcounts[postId].heart || 0;
+      if(reactionKey === 'heart' || prevKey === 'heart'){
+        await sb.from('timeline_posts').update({ likes_count: newCount }).eq('id', postId);
+      }
+      if(myReactions[postId]){
+        await sb.from('post_likes').upsert({ post_id: postId, user_id: currentUser.id, reaction: reactionKey }, { onConflict: 'post_id,user_id' }).catch(()=>{});
+        if(post && post.user_id && post.user_id !== currentUser.id && !prevKey){
           await sb.from('notifications').insert({
-            to_user_id:   post.user_id,
+            to_user_id:     post.user_id,
             from_user_name: char.name || 'だれか',
-            type:         'like',
-            post_id:      postId,
-            subject_name: post.subject_name || '学習',
+            type:           'like',
+            post_id:        postId,
+            subject_name:   post.subject_name || '学習',
           }).catch(()=>{});
         }
       } else {
-        await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
-        await sb.from('timeline_posts').update({ likes_count: Math.max(0,current-1) }).eq('id', postId);
+        await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id).catch(()=>{});
       }
-    } catch(e){ console.warn('Like sync:', e); }
+    } catch(e){ console.warn('Reaction sync:', e); }
   }
+}
+
+/* 後方互換：旧コードから呼ばれる可能性のある toggleLocalLike を新関数に委譲 */
+async function toggleLocalLike(postId, btn){
+  return toggleReaction(postId, 'heart', btn);
 }
 
 /* ════ 通知ポーリング（30秒ごとに未読チェック） ════ */
@@ -15175,48 +15356,7 @@ function showNotifToast(icon, title, msg){
   setTimeout(()=>toast.classList.remove('show'), 3500);
 }
 
-/* ── いいね時に通知 ── */
-const _origToggleLocalLike = typeof toggleLocalLike === 'function' ? toggleLocalLike : null;
-async function toggleLocalLike(postId, btn){
-  const likes = loadLocalLikes();
-  const liked = !!likes[postId];
-
-  if(!liked){
-    // いいねした相手の投稿を探す
-    const post = tlAllPostsFlat().find(p => p.id === postId);
-    if(post && post.user_name !== char.name){
-      showNotifToast('❤️', 'エールを送りました', `「${(post.subject_name||'学習')}」の投稿にエール！`);
-    }
-  }
-
-  // 元のいいね処理（元の関数をインライン）
-  const countEl = document.getElementById(`tllike-count-${postId}`);
-  const current = parseInt(countEl?.textContent || '0');
-  if(liked){
-    delete likes[postId];
-    btn.classList.remove('liked');
-    btn.innerHTML = `🤍 <span id="tllike-count-${postId}">${Math.max(0,current-1)}</span>`;
-  } else {
-    likes[postId] = true;
-    btn.classList.add('liked');
-    btn.innerHTML = `❤️ <span id="tllike-count-${postId}">${current+1}</span>`;
-  }
-  saveLocalLikes(likes);
-  const posts = loadLocalPosts();
-  const idx = posts.findIndex(p=>p.id===postId);
-  if(idx>=0){posts[idx].likes=parseInt(document.getElementById(`tllike-count-${postId}`)?.textContent||'0');saveLocalPosts(posts);}
-  if(currentUser){
-    try{
-      if(!liked){
-        await sb.from('post_likes').insert({post_id:postId,user_id:currentUser.id});
-        await sb.from('timeline_posts').update({likes_count:current+1}).eq('id',postId);
-      }else{
-        await sb.from('post_likes').delete().eq('post_id',postId).eq('user_id',currentUser.id);
-        await sb.from('timeline_posts').update({likes_count:Math.max(0,current-1)}).eq('id',postId);
-      }
-    }catch(e){console.warn('Like sync:',e);}
-  }
-}
+/* ── リアクション通知はtoggleReaction内で処理済み ── */
 
 /* ════════════════════════════════════════
    クラスチェンジ演出
