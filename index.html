@@ -15163,7 +15163,7 @@ async function toggleReaction(postId, reactionKey, chipBtn){
         await sb.from('timeline_posts').update({ likes_count: newCount }).eq('id', postId);
       }
       if(myReactions[postId]){
-        await sb.from('post_likes').upsert({ post_id: postId, user_id: currentUser.id, reaction: reactionKey }, { onConflict: 'post_id,user_id' }).catch(()=>{});
+        await sb.from('post_likes').upsert({ post_id: postId, user_id: currentUser.id, reaction: reactionKey }, { onConflict: 'post_id,user_id' });
         if(post && post.user_id && post.user_id !== currentUser.id && !prevKey){
           await sb.from('notifications').insert({
             to_user_id:     post.user_id,
@@ -15171,10 +15171,10 @@ async function toggleReaction(postId, reactionKey, chipBtn){
             type:           'like',
             post_id:        postId,
             subject_name:   post.subject_name || '学習',
-          }).catch(()=>{});
+          });
         }
       } else {
-        await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id).catch(()=>{});
+        await sb.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
       }
     } catch(e){ console.warn('Reaction sync:', e); }
   }
@@ -15676,7 +15676,7 @@ function deleteReply(postId, replyId){
   renderReplyThreadDOM(postId);
   // Supabase
   if(currentUser){
-    sb.from('timeline_replies').delete().eq('id', replyId).eq('user_id', currentUser.id).catch(()=>{});
+    try { await sb.from('timeline_replies').delete().eq('id', replyId).eq('user_id', currentUser.id); } catch(e){}
   }
 }
 
@@ -15723,7 +15723,7 @@ async function submitReply(postId){
         avatar_url: reply.avatar_url,
         note:       reply.note,
         created_at: reply.created_at,
-      }).catch(()=>{});
+      });
       const post = tlAllPostsFlat().find(p => p.id === postId);
       if(post && post.user_id && post.user_id !== currentUser.id){
         await sb.from('notifications').insert({
@@ -15732,7 +15732,7 @@ async function submitReply(postId){
           type:           'reply',
           post_id:        postId,
           subject_name:   text.slice(0,30),
-        }).catch(()=>{});
+        });
       }
     } catch(e){ console.warn('Reply sync:', e); }
   }
