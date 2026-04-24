@@ -1818,6 +1818,16 @@ body[data-theme="dark"] .tl-badge-icon { color:#68d391; }
 .tl-quick-reply:hover{border-color:var(--accent);color:var(--accent2);}
 .tl-reply-submit{background:var(--accent);color:#fff;border:none;border-radius:20px;padding:6px 18px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;float:right;margin-top:6px;transition:background .2s;}
 .tl-reply-submit:hover{background:var(--accent2);}
+.tl-reply-thread{border-left:2px solid var(--border);padding-left:12px;}
+.tl-reply-action-bar{display:flex;align-items:center;gap:8px;margin-top:5px;}
+.tl-reply-like-btn{display:inline-flex;align-items:center;gap:3px;background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:6px;transition:color .15s;font-family:inherit;}
+.tl-reply-like-btn:hover{color:var(--accent2);}
+.tl-reply-like-btn.liked{color:var(--accent2);}
+.tl-reply-to-btn{background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:6px;transition:color .15s;font-family:inherit;letter-spacing:.03em;}
+.tl-reply-to-btn:hover{color:var(--accent2);}
+.tl-mention{color:var(--accent2);font-weight:600;}
+.tl-reply-collapse{display:flex;align-items:center;gap:6px;background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;margin-top:10px;padding:0;font-family:inherit;transition:color .15s;}
+.tl-reply-collapse:hover{color:var(--accent2);}
 /* ── 投稿プライバシー設定 ── */
 .tl-privacy-row{display:flex;gap:5px;margin-top:8px;}
 .tl-privacy-opt{flex:1;font-size:11px;padding:5px 3px;border:1px solid var(--border);border-radius:16px;background:none;color:var(--muted);cursor:pointer;transition:all .15s;text-align:center;font-family:inherit;}
@@ -15626,42 +15636,108 @@ function toggleReplyThread(postId){
   if(opening) renderReplyThreadDOM(postId);
 }
 
+const TL_REPLY_LIKES_KEY = 'sq2_tl_reply_likes'; // { [replyId]: true }
+function loadReplyLikes(){ try{ return JSON.parse(localStorage.getItem(TL_REPLY_LIKES_KEY)||'{}'); }catch{ return {}; } }
+function saveReplyLikes(l){ try{ localStorage.setItem(TL_REPLY_LIKES_KEY, JSON.stringify(l)); }catch{} }
+
 function renderReplyThreadDOM(postId){
   const thread = document.getElementById('tl-thread-' + postId);
   if(!thread) return;
-  const replies = loadLocalReplies()[postId] || [];
+  const allReplies = loadLocalReplies();
+  const replies = allReplies[postId] || [];
+  const replyLikes = loadReplyLikes();
   let html = '';
+
   if(replies.length){
     html += replies.map(r => {
       const ac = (r.user_name || '？')[0];
       const col = typeof avatarColor === 'function' ? avatarColor(r.user_name) : '#8CC63F';
       const avatarHtml = r.avatar_url
-        ? `<div class="tl-reply-avatar" style="background:none;padding:0;"><img src="${r.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`
+        ? `<div class="tl-reply-avatar" style="background:none;padding:0;overflow:hidden;"><img src="${r.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`
         : `<div class="tl-reply-avatar" style="background:${col}">${ac}</div>`;
       const isOwnReply = (currentUser && r.user_id === currentUser.id) || r.user_name === char.name;
+      const likedReply = !!replyLikes[r.id];
+      const likeCount = r.likes || 0;
+
+      // @メンション付きテキスト描画
+      let noteHtml = escHtml(r.note);
+      if(r.reply_to_name){
+        const mention = '@' + r.reply_to_name;
+        noteHtml = `<span class="tl-mention">${escHtml(mention)}</span> ` + escHtml(r.note.replace(new RegExp('^' + mention.replace('@','\\@') + '\\s*'), ''));
+      }
+
       return `<div class="tl-reply-item" id="tl-reply-${r.id}">
         ${avatarHtml}
-        <div style="flex:1;">
+        <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
-            <div class="tl-reply-name">${escHtml(r.user_name||'名無し')} <span style="font-size:9px;font-weight:400;color:var(--muted);">Lv.${r.user_level||1}</span></div>
-            ${isOwnReply ? `<button onclick="deleteReply('${postId}','${r.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 4px;opacity:.6;" title="削除">🗑</button>` : ''}
+            <span class="tl-reply-name">${escHtml(r.user_name||'名無し')}</span>
+            <span style="font-size:9px;color:var(--muted);">${formatRelativeTime(r.created_at)}</span>
           </div>
-          <div class="tl-reply-text">${escHtml(r.note)}</div>
-          <div class="tl-reply-time">${formatRelativeTime(r.created_at)}</div>
+          <div class="tl-reply-text" style="margin:3px 0 4px;">${noteHtml}</div>
+          <div class="tl-reply-action-bar">
+            <button class="tl-reply-like-btn${likedReply?' liked':''}" id="rl-${r.id}" onclick="toggleReplyLike('${postId}','${r.id}')">
+              👍 <span id="rl-count-${r.id}">${likeCount}</span>
+            </button>
+            <button class="tl-reply-to-btn" onclick="startReplyTo('${postId}','${r.id}','${(r.user_name||'').replace(/'/g,'\\\'')}')" >返信</button>
+            ${isOwnReply ? `<button onclick="deleteReply('${postId}','${r.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;margin-left:auto;opacity:.5;font-family:inherit;">🗑</button>` : ''}
+          </div>
         </div>
       </div>`;
     }).join('');
+    html += `<button class="tl-reply-collapse" onclick="toggleReplyThread('${postId}')">▲ 返信を非表示</button>`;
   } else {
-    html += `<div style="font-size:12px;color:var(--muted);text-align:center;padding:6px 0 10px;">まだ返信がありません</div>`;
+    html += `<div style="font-size:12px;color:var(--muted);padding:4px 0 8px;">まだ返信がありません</div>`;
   }
-  html += `<div class="tl-reply-input-wrap">
+
+  html += `<div class="tl-reply-input-wrap" style="margin-top:10px;">
+    <div id="tl-reply-target-${postId}" style="font-size:11px;color:var(--accent2);margin-bottom:4px;display:none;"></div>
     <div class="tl-quick-replies">
       ${QUICK_REPLIES.map(q=>`<button class="tl-quick-reply" onclick="setQuickReply('${postId}','${q}')">${q}</button>`).join('')}
     </div>
     <textarea class="tl-reply-input" id="tl-reply-input-${postId}" rows="2" placeholder="返信を入力…" maxlength="200"></textarea>
     <div style="overflow:hidden;"><button class="tl-reply-submit" onclick="submitReply('${postId}')">返信する</button></div>
   </div>`;
+
   thread.innerHTML = html;
+}
+
+/* 返信に対する返信のセットアップ */
+function startReplyTo(postId, replyId, userName){
+  const input = document.getElementById('tl-reply-input-' + postId);
+  const targetEl = document.getElementById('tl-reply-target-' + postId);
+  if(!input) return;
+  input.dataset.replyToId   = replyId;
+  input.dataset.replyToName = userName;
+  input.value = '';
+  input.placeholder = `@${userName} への返信…`;
+  input.focus();
+  if(targetEl){ targetEl.textContent = `↩ @${userName} に返信中`; targetEl.style.display = ''; }
+}
+
+/* 返信のいいね */
+function toggleReplyLike(postId, replyId){
+  const likes = loadReplyLikes();
+  const liked = !!likes[replyId];
+  const allReplies = loadLocalReplies();
+  const replies = allReplies[postId] || [];
+  const idx = replies.findIndex(r => r.id === replyId);
+  if(idx < 0) return;
+
+  if(liked){
+    delete likes[replyId];
+    replies[idx].likes = Math.max(0, (replies[idx].likes||0) - 1);
+  } else {
+    likes[replyId] = true;
+    replies[idx].likes = (replies[idx].likes||0) + 1;
+  }
+  saveReplyLikes(likes);
+  allReplies[postId] = replies;
+  saveLocalReplies(allReplies);
+
+  const btn = document.getElementById('rl-' + replyId);
+  const cnt = document.getElementById('rl-count-' + replyId);
+  if(btn) btn.classList.toggle('liked', !liked);
+  if(cnt) cnt.textContent = replies[idx].likes;
 }
 
 function deleteReply(postId, replyId){
@@ -15689,17 +15765,26 @@ async function submitReply(postId){
   const input = document.getElementById('tl-reply-input-' + postId);
   const text = input?.value.trim();
   if(!text){ input?.focus(); return; }
+  const replyToName = input.dataset.replyToName || null;
 
   const reply = {
-    id:         Date.now().toString(36) + Math.random().toString(36).slice(2,5),
-    post_id:    postId,
-    user_id:    currentUser ? currentUser.id : 'guest_' + char.name,
-    user_name:  char.name || '冒険者',
-    user_level: char.level || 1,
-    avatar_url: profileAvatarData || null,
-    note:       text,
-    created_at: new Date().toISOString(),
+    id:            Date.now().toString(36) + Math.random().toString(36).slice(2,5),
+    post_id:       postId,
+    user_id:       currentUser ? currentUser.id : 'guest_' + char.name,
+    user_name:     char.name || '冒険者',
+    user_level:    char.level || 1,
+    avatar_url:    profileAvatarData || null,
+    note:          text,
+    reply_to_name: replyToName,
+    likes:         0,
+    created_at:    new Date().toISOString(),
   };
+  // 入力欄リセット
+  input.dataset.replyToId   = '';
+  input.dataset.replyToName = '';
+  input.placeholder = '返信を入力…';
+  const targetEl = document.getElementById('tl-reply-target-' + postId);
+  if(targetEl) targetEl.style.display = 'none';
 
   const allReplies = loadLocalReplies();
   if(!allReplies[postId]) allReplies[postId] = [];
