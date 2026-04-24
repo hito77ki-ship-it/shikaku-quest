@@ -545,21 +545,11 @@ footer{
 <section style="padding:0 24px 60px;">
   <div style="max-width:480px;margin:0 auto;">
     <div style="font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.25);text-align:center;margin-bottom:12px;text-transform:uppercase;">Sponsored</div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
-      <!-- 資格スクエア 300x250 -->
-      <a href="https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+6CHB5" rel="nofollow" target="_blank" style="display:block;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3);">
-        <img border="0" width="300" height="250" alt="資格スクエア" src="https://www28.a8.net/svt/bgt?aid=260424355639&wid=001&eno=01&mid=s00000014916001066000&mc=1" style="display:block;max-width:100%;height:auto;">
-      </a>
-      <!-- スタディサプリENGLISH 320x50 -->
-      <a href="https://px.a8.net/svt/ejp?a8mat=4B1OTO+E6TXTE+3AQG+BZ0Z5" rel="nofollow" target="_blank" style="display:block;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.3);">
-        <img border="0" width="320" height="50" alt="スタディサプリENGLISH" src="https://www29.a8.net/svt/bgt?aid=260419308858&wid=001&eno=01&mid=s00000015388002011000&mc=1" style="display:block;max-width:100%;height:auto;">
-      </a>
-    </div>
+    <div id="lpBannerSlot" style="display:flex;flex-direction:column;align-items:center;gap:16px;"></div>
   </div>
 </section>
-<!-- トラッキングピクセル -->
-<img border="0" width="1" height="1" src="https://www15.a8.net/0.gif?a8mat=4B1OTO+E6TXTE+3AQG+BZ0Z5" alt="">
-<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4B1SPV+AKG0C2+373C+6CHB5" alt="">
+<!-- トラッキングピクセル（全素材分・常時設置） -->
+<div id="lpTrackingPixels"></div>
 
 <!-- FINAL CTA -->
 <section class="final-cta">
@@ -589,6 +579,44 @@ footer{
 </footer>
 
 <script>
+/* ─── バナー広告ローテーション ─── */
+(function(){
+  // 全バナー素材（728x90はPC向きのため除外）
+  const BANNERS_SHIKAKU = [
+    { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+6CHB5', img:'https://www28.a8.net/svt/bgt?aid=260424355639&wid=001&eno=01&mid=s00000014916001066000&mc=1', w:300, h:250, px:'https://www16.a8.net/0.gif?a8mat=4B1SPV+AKG0C2+373C+6CHB5' },
+    { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+639IP', img:'https://www26.a8.net/svt/bgt?aid=260424355639&wid=001&eno=01&mid=s00000014916001023000&mc=1', w:300, h:250, px:'https://www16.a8.net/0.gif?a8mat=4B1SPV+AKG0C2+373C+639IP' },
+    { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+6CP0X', img:'https://www27.a8.net/svt/bgt?aid=260424355639&wid=001&eno=01&mid=s00000014916001067000&mc=1', w:300, h:250, px:'https://www11.a8.net/0.gif?a8mat=4B1SPV+AKG0C2+373C+6CP0X' },
+    { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+631SX', img:'https://www27.a8.net/svt/bgt?aid=260424355639&wid=001&eno=01&mid=s00000014916001022000&mc=1', w:300, h:250, px:'https://www15.a8.net/0.gif?a8mat=4B1SPV+AKG0C2+373C+631SX' },
+    { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+77ZKH', img:'https://www20.a8.net/svt/bgt?aid=260424355639&wid=001&eno=01&mid=s00000014916001213000&mc=1', w:300, h:250, px:'https://www15.a8.net/0.gif?a8mat=4B1SPV+AKG0C2+373C+77ZKH' },
+    { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+7F9WX', img:'https://www28.a8.net/svt/bgt?aid=260424355639&wid=001&eno=01&mid=s00000014916001247000&mc=1', w:300, h:300, px:'https://www15.a8.net/0.gif?a8mat=4B1SPV+AKG0C2+373C+7F9WX' },
+    { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+614CX', img:'https://www22.a8.net/svt/bgt?aid=260424355639&wid=001&eno=01&mid=s00000014916001013000&mc=1', w:468, h:60,  px:'https://www16.a8.net/0.gif?a8mat=4B1SPV+AKG0C2+373C+614CX' },
+  ];
+  const BANNER_ENGLISH = { href:'https://px.a8.net/svt/ejp?a8mat=4B1OTO+E6TXTE+3AQG+BZ0Z5', img:'https://www29.a8.net/svt/bgt?aid=260419308858&wid=001&eno=01&mid=s00000015388002011000&mc=1', w:320, h:50, px:'https://www15.a8.net/0.gif?a8mat=4B1OTO+E6TXTE+3AQG+BZ0Z5' };
+
+  function pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function bannerHTML(b){
+    return `<a href="${b.href}" rel="nofollow" target="_blank" style="display:block;border-radius:${b.h>=100?'12':'8'}px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3);">
+      <img border="0" width="${b.w}" height="${b.h}" alt="" src="${b.img}" style="display:block;max-width:100%;height:auto;">
+    </a>`;
+  }
+
+  function pixelHTML(b){
+    return `<img border="0" width="1" height="1" src="${b.px}" alt="">`;
+  }
+
+  const slot = document.getElementById('lpBannerSlot');
+  const pxSlot = document.getElementById('lpTrackingPixels');
+  if(!slot) return;
+
+  // メインバナー：資格スクエアからランダム1本
+  const main = pickRandom(BANNERS_SHIKAKU);
+  // サブバナー：スタディサプリENGLISH（常時）
+  slot.innerHTML = bannerHTML(main) + bannerHTML(BANNER_ENGLISH);
+  // 表示したバナーのピクセルのみ発火
+  if(pxSlot) pxSlot.innerHTML = pixelHTML(main) + pixelHTML(BANNER_ENGLISH);
+})();
+
 /* ─── Nav scroll ─── */
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {

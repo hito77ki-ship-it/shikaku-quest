@@ -9337,27 +9337,31 @@ function renderReportTab(){
   try{ renderAffiliateCards(); }catch(e){ console.warn('renderAffiliateCards',e); }
 }
 
-/* ── アフィリエイトカード（ジョブ連動） ── */
-const AFFILIATE_ADS = {
-  english: {
-    href:  'https://px.a8.net/svt/ejp?a8mat=4B1OTO+E97O8I+3AQG+ZS5GI',
-    icon:  '🌐',
-    label: 'PR · スタディサプリENGLISH',
-    title: '英語学習を、動画で加速しよう',
-    desc:  '日常英会話コース・TOEIC対策など・聞き流しでもOK',
-  },
-  default: {
-    href:  'https://px.a8.net/svt/ejp?a8mat=4B1OTO+ECS9V6+408S+60OXE',
-    icon:  '📱',
-    label: 'PR · オンスク.JP',
-    title: 'スマホで資格学習、はじめよう',
-    desc:  '月額1,628円〜・50資格以上が学び放題の動画講義',
-  },
-};
+/* ── アフィリエイトカード（ジョブ連動 + ランダムローテーション） ── */
+const _AFF_ENGLISH = [
+  { href:'https://px.a8.net/svt/ejp?a8mat=4B1OTO+E97O8I+3AQG+ZS5GI', icon:'🌐', label:'PR · スタディサプリENGLISH', title:'英語学習を、動画で加速しよう', desc:'日常英会話コース・TOEIC対策など・聞き流しでもOK' },
+];
+const _AFF_LEGAL = [
+  { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+6CHB5', icon:'📝', label:'PR · 資格スクエア', title:'資格試験をオンラインで攻略しよう', desc:'行政書士・宅建・司法書士など動画講義が充実' },
+  { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+639IP', icon:'📝', label:'PR · 資格スクエア', title:'スキマ時間で資格合格を狙う', desc:'スマホで完結する法律系資格の対策講座' },
+  { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+6CP0X', icon:'📝', label:'PR · 資格スクエア', title:'オンライン特化の資格対策サイト', desc:'動画×テキストで効率よく合格へ' },
+];
+const _AFF_DEFAULT = [
+  { href:'https://px.a8.net/svt/ejp?a8mat=4B1OTO+ECS9V6+408S+60OXE', icon:'📱', label:'PR · オンスク.JP', title:'スマホで資格学習、はじめよう', desc:'月額1,628円〜・50資格以上が学び放題の動画講義' },
+  { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+6CHB5', icon:'📝', label:'PR · 資格スクエア', title:'資格試験をオンラインで攻略しよう', desc:'行政書士・宅建・司法書士など動画講義が充実' },
+  { href:'https://px.a8.net/svt/ejp?a8mat=4B1SPV+AKG0C2+373C+77ZKH', icon:'📝', label:'PR · 資格スクエア', title:'合格者が選ぶ資格対策サイト', desc:'最短合格を狙うオンライン講座' },
+];
+
 const ENGLISH_JOBS = ['toeic','eiken','toefl','korean','chinese'];
+const LEGAL_JOBS   = ['gyosei','takken','shoshi','sharoushi','shiho','benrishi','fp2','fp3','shoken'];
+
+function _pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
 function getAffiliateAd(){
-  const isEnglish = (selectedJobIds||[]).some(id => ENGLISH_JOBS.includes(id));
-  return isEnglish ? AFFILIATE_ADS.english : AFFILIATE_ADS.default;
+  const ids = selectedJobIds || [];
+  if(ids.some(id => ENGLISH_JOBS.includes(id))) return _pickRandom(_AFF_ENGLISH);
+  if(ids.some(id => LEGAL_JOBS.includes(id)))   return _pickRandom(_AFF_LEGAL);
+  return _pickRandom(_AFF_DEFAULT);
 }
 function affiliateCardHTML(ad, extraStyle=''){
   return `<a href="${ad.href}" rel="nofollow" target="_blank" class="affiliate-card" style="${extraStyle}">
