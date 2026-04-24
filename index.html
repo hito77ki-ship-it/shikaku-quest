@@ -5095,6 +5095,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <div class="sec-title">💾 データ管理</div>
       <div class="prof-action-btns">
         <button class="prof-action-btn" onclick="exportData()">💾 データをJSONで保存</button>
+        <button class="prof-action-btn" onclick="exportCSV()">📁 学習記録をCSVで出力</button>
         <button class="prof-action-btn" onclick="importData()">📂 データを読み込む</button>
         <button class="prof-action-btn danger" onclick="resetConfirm()">🗑 リセット</button>
       </div>
@@ -6365,6 +6366,23 @@ async function loadAll(){
 function exportData(){
   const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),char,sessions,selectedJobIds,selectedSubjectKeys,bosses,examGoals},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='study_quest_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+}
+function exportCSV(){
+  const subjs=allSelectedSubjects();
+  const smap={};subjs.forEach(s=>smap[s.key]=s);
+  const rows=[['日付','開始時刻','終了時刻','科目','種別','時間(分)','EXP','メモ']];
+  [...sessions].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(s=>{
+    const subName=(smap[s.subject]||{name:s.subject||''}).name;
+    const type=s.type==='study'?'勉強':s.type==='exam'?'答練':s.type==='calc'?'計算':'その他';
+    const mins=s.type==='calc'?'':+(sAmount(s)).toFixed(1);
+    const t0=s.startedAt?new Date(s.startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'';
+    const t1=s.endedAt?new Date(s.endedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'';
+    rows.push([s.date||'',t0,t1,subName,type,mins,s.exp||0,(s.note||'').replace(/,/g,'、')]);
+  });
+  const bom='\uFEFF';
+  const csv=bom+rows.map(r=>r.join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='study_quest_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 function importData(){
   const input=document.createElement('input');input.type='file';input.accept='.json';
