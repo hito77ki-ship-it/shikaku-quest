@@ -4861,6 +4861,25 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
           <div class="rpt-section-title">連続学習記録</div>
           <div class="rpt-streak-card" id="rptStreakCard"></div>
         </div>
+
+        <!-- 開始/終了時刻 散布図 -->
+        <div class="rpt-section">
+          <div class="rpt-section-title">⏱ 学習時刻パターン（直近90日）</div>
+          <div class="rpt-chart-wrap">
+            <canvas id="rptScatterChart" height="200"></canvas>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;">● 開始時刻　● 終了時刻</div>
+        </div>
+
+        <!-- RPG風学習パターン診断 -->
+        <div class="rpt-section" id="rptPatternSection">
+          <div class="rpt-section-title">🧙 学習パターン診断</div>
+          <div id="rptPatternCard" style="background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;">
+            <div id="rptPatternEmoji" style="font-size:40px;margin-bottom:8px;">⚔</div>
+            <div id="rptPatternName" style="font-size:16px;font-weight:700;color:var(--accent2);margin-bottom:6px;">—</div>
+            <div id="rptPatternDesc" style="font-size:12px;color:var(--muted);line-height:1.7;">記録が増えると診断できます</div>
+          </div>
+        </div>
       </div>
 
       <!-- ── ヒートマップサブタブ ── -->
@@ -10158,6 +10177,89 @@ function renderAnalysisTab(){
   renderSubjectBars();
   renderMonthChart();
   renderStreakCard();
+  renderScatterChart();
+  renderPatternDiagnosis();
+}
+
+let _scatterChart = null;
+function renderScatterChart(){
+  const canvas = document.getElementById('rptScatterChart');
+  if(!canvas) return;
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
+  const cutoffStr = toLocalDateStr(cutoff);
+  const s90 = sessions.filter(s => (s.type==='study'||s.type==='exam') && s.startedAt && s.endedAt && s.date >= cutoffStr);
+  if(!s90.length){
+    canvas.parentElement.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:12px;">開始/終了時刻の記録が必要です</div>';
+    return;
+  }
+  const toHourFrac = iso => { const d = new Date(iso); return d.getHours() + d.getMinutes()/60; };
+  const startPts = s90.map(s => ({ x: new Date(s.startedAt).getTime(), y: toHourFrac(s.startedAt) }));
+  const endPts   = s90.map(s => ({ x: new Date(s.endedAt).getTime(),   y: toHourFrac(s.endedAt)   }));
+  if(_scatterChart){ _scatterChart.destroy(); _scatterChart = null; }
+  _scatterChart = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label:'開始時刻', data: startPts, backgroundColor:'rgba(140,198,63,.7)', pointRadius:4 },
+        { label:'終了時刻', data: endPts,   backgroundColor:'rgba(96,160,255,.7)',  pointRadius:4 }
+      ]
+    },
+    options: {
+      animation: false,
+      plugins: { legend:{ display:false }, tooltip:{ callbacks:{
+        label: ctx => {
+          const h = Math.floor(ctx.parsed.y), m = Math.round((ctx.parsed.y-h)*60);
+          return `${ctx.dataset.label}: ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        }
+      }}},
+      scales: {
+        x: { type:'linear', display:false },
+        y: { min:0, max:24, ticks:{ stepSize:3, callback:v=>`${v}時`, color:'#999', font:{size:10} }, grid:{ color:'rgba(255,255,255,.05)' } }
+      }
+    }
+  });
+}
+
+function renderPatternDiagnosis(){
+  const el = document.getElementById('rptPatternCard');
+  if(!el) return;
+  const valid = sessions.filter(s => (s.type==='study'||s.type==='exam') && s.startedAt);
+  if(valid.length < 5){
+    document.getElementById('rptPatternName').textContent = '記録が少なすぎます';
+    document.getElementById('rptPatternDesc').textContent = '5回以上の記録があると診断できます';
+    return;
+  }
+  const toH = iso => { const d = new Date(iso); return d.getHours() + d.getMinutes()/60; };
+  const startHours = valid.map(s => toH(s.startedAt));
+  const avgStart = startHours.reduce((a,b)=>a+b,0) / startHours.length;
+  const avgLen = valid.reduce((a,s)=>a+sAmount(s),0) / valid.length;
+  const dowCounts = [0,0,0,0,0,0,0];
+  valid.forEach(s => { if(s.startedAt) dowCounts[new Date(s.startedAt).getDay()]++; });
+  const weekendCount = dowCounts[0] + dowCounts[6];
+  const weekdayCount = valid.length - weekendCount;
+  const isWeekendHeavy = weekendCount / valid.length > 0.5;
+
+  let emoji, name, desc;
+  if(avgStart < 7){
+    emoji='🌅'; name='夜明け型・求道者'; desc='誰もが眠る時間に刃を研ぐ。その静けさが最大の武器。夜明け前の集中力は他の追随を許さない。';
+  } else if(avgStart < 10){
+    emoji='☀'; name='朝型・戦士'; desc='朝の光とともに剣を抜く正統派。規律と継続が体に染みついている。試験当日も万全のコンディションで臨める。';
+  } else if(avgStart < 14){
+    emoji='⚡'; name='昼型・騎士'; desc='太陽が高いうちに全力を尽くすバランス型。頭の回転が最も速い時間帯を制している。';
+  } else if(avgStart < 18){
+    emoji='🌆'; name='夕刻型・賢者'; desc='夕暮れとともに集中スイッチが入る。仕事・授業を終えてからが本番という意志の強さの持ち主。';
+  } else if(avgStart < 22){
+    emoji='🌙'; name='夜型・魔法使い'; desc='夜の静寂を魔力に変える。周囲が休む時間こそ最大の集中タイム。深夜の孤独な戦いが合格への近道。';
+  } else {
+    emoji='🦉'; name='深夜型・ダークナイト'; desc='深夜0時を越えても机に向かう猛者。眠気という敵を倒し続ける精神力は本物。ただし睡眠も戦略のうち。';
+  }
+  if(avgLen < 20) desc += '\n\n⚡ 短期集中型：短いセッションを積み重ねる効率主義者。';
+  else if(avgLen > 90) desc += '\n\n🏰 長期籠城型：一度座ったら離れない持久力の持ち主。';
+  if(isWeekendHeavy) desc += '\n\n📅 週末集中派：平日は温存し、週末に爆発する戦略家。';
+
+  document.getElementById('rptPatternEmoji').textContent = emoji;
+  document.getElementById('rptPatternName').textContent = name;
+  document.getElementById('rptPatternDesc').textContent = desc;
 }
 function renderSubjectBars(){
   const el=document.getElementById('rptSubjectBars');
