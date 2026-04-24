@@ -15658,6 +15658,7 @@ function renderReplyThreadDOM(postId){
       const isOwnReply = (currentUser && r.user_id === currentUser.id) || r.user_name === char.name;
       const likedReply = !!replyLikes[r.id];
       const likeCount = r.likes || 0;
+      const isNested = !!r.reply_to_name;
 
       // @メンション付きテキスト描画
       let noteHtml = escHtml(r.note);
@@ -15666,7 +15667,12 @@ function renderReplyThreadDOM(postId){
         noteHtml = `<span class="tl-mention">${escHtml(mention)}</span> ` + escHtml(r.note.replace(new RegExp('^' + mention.replace('@','\\@') + '\\s*'), ''));
       }
 
-      return `<div class="tl-reply-item" id="tl-reply-${r.id}">
+      // 返信への返信はインデント＋グリーン細ボーダー
+      const nestStyle = isNested
+        ? 'margin-left:20px;padding-left:10px;border-left:2px solid rgba(140,198,63,.3);margin-top:6px;'
+        : '';
+
+      return `<div class="tl-reply-item" id="tl-reply-${r.id}" style="${nestStyle}">
         ${avatarHtml}
         <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
