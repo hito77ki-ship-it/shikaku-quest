@@ -971,6 +971,30 @@ body[data-theme="dark"] .timer-dmg-track{background:rgba(255,255,255,.04);}
   border:1px solid var(--border);border-radius:4px;
   padding:4px 14px;font-family:'Share Tech Mono',monospace;
 }
+/* ── アフィリエイトカード ── */
+.affiliate-card{
+  margin:16px 14px 4px;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;
+  display:flex;align-items:center;gap:14px;
+  transition:border-color .2s,box-shadow .2s;
+  text-decoration:none;color:inherit;
+}
+.affiliate-card:hover{
+  border-color:var(--accent);
+  box-shadow:0 2px 12px rgba(140,198,63,.12);
+}
+.affiliate-card-icon{
+  font-size:28px;flex-shrink:0;
+  width:44px;height:44px;border-radius:10px;
+  background:rgba(140,198,63,.1);
+  display:flex;align-items:center;justify-content:center;
+}
+.affiliate-card-body{flex:1;min-width:0;}
+.affiliate-card-label{font-size:9px;letter-spacing:.15em;color:var(--muted);margin-bottom:3px;font-family:'Share Tech Mono',monospace;}
+.affiliate-card-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.35;}
+.affiliate-card-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5;}
+.affiliate-card-arrow{font-size:14px;color:var(--accent);flex-shrink:0;}
 
 /* レポート外枠 */
 .rpt-shell{background:var(--panel);border-radius:8px;padding:0 0 20px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI',sans-serif;border:1px solid var(--border);}
@@ -4143,10 +4167,15 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <div id="quickRecResult" style="font-size:10px;color:var(--accent2);font-family:'Share Tech Mono',monospace;margin-top:6px;min-height:16px;"></div>
     </div>
     <!-- 広告スペース（将来のAdSense用） -->
-    <div class="ad-placeholder" style="grid-column:1/-1;" aria-hidden="true">
-      <div class="ad-placeholder-label">Sponsored</div>
-      <div class="ad-placeholder-inner">広告スペース — 320×50</div>
-    </div>
+    <a href="https://px.a8.net/svt/ejp?a8mat=4B1OTO+ECS9V6+408S+60OXE" rel="nofollow" target="_blank" class="affiliate-card" style="grid-column:1/-1;margin:4px 0;">
+      <div class="affiliate-card-icon">📱</div>
+      <div class="affiliate-card-body">
+        <div class="affiliate-card-label">PR · オンスク.JP</div>
+        <div class="affiliate-card-title">スマホで資格学習、はじめよう</div>
+        <div class="affiliate-card-desc">月額1,628円〜・50資格以上が学び放題</div>
+      </div>
+      <div class="affiliate-card-arrow">›</div>
+    </a>
   </div>
 
   <!-- MATERIALS (教材) -->
@@ -4953,11 +4982,17 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         </div>
       </div>
 
-    <!-- 広告スペース（将来のAdSense用） -->
-    <div class="ad-placeholder" aria-hidden="true">
-      <div class="ad-placeholder-label">Sponsored</div>
-      <div class="ad-placeholder-inner">広告スペース — 320×50</div>
-    </div>
+    <!-- アフィリエイト：オンスク.JP -->
+    <a href="https://px.a8.net/svt/ejp?a8mat=4B1OTO+ECS9V6+408S+60OXE" rel="nofollow" target="_blank" class="affiliate-card">
+      <div class="affiliate-card-icon">📱</div>
+      <div class="affiliate-card-body">
+        <div class="affiliate-card-label">PR · オンスク.JP</div>
+        <div class="affiliate-card-title">スマホで資格学習、はじめよう</div>
+        <div class="affiliate-card-desc">月額1,628円〜・50資格以上が学び放題の動画講義サービス</div>
+      </div>
+      <div class="affiliate-card-arrow">›</div>
+    </a>
+    <img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4B1OTO+ECS9V6+408S+60OXE" alt="">
 
     </div>
   </div>
