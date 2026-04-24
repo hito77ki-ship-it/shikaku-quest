@@ -15801,13 +15801,16 @@ async function submitReply(postId){
   if(currentUser){
     try {
       await sb.from('timeline_replies').insert({
-        post_id:    postId,
-        user_id:    currentUser.id,
-        user_name:  reply.user_name,
-        user_level: reply.user_level,
-        avatar_url: reply.avatar_url,
-        note:       reply.note,
-        created_at: reply.created_at,
+        id:            reply.id,
+        post_id:       postId,
+        user_id:       currentUser.id,
+        user_name:     reply.user_name,
+        user_level:    reply.user_level,
+        avatar_url:    reply.avatar_url,
+        note:          reply.note,
+        reply_to_name: reply.reply_to_name || null,
+        likes:         0,
+        created_at:    reply.created_at,
       });
       const post = tlAllPostsFlat().find(p => p.id === postId);
       if(post && post.user_id && post.user_id !== currentUser.id){
