@@ -11551,22 +11551,48 @@ async function assignDuelRival(duel){
       .limit(100);
     if(data && data.length>0){
       const goal = duel.declaredGoalMins;
-      const candidates = data.map(p=>({...p,dailyAvg:Math.round((p.week_study_mins||0)/7)}))
-        .sort((a,b)=>Math.abs(a.dailyAvg-goal)-Math.abs(b.dailyAvg-goal));
-      const pool = candidates.slice(0, Math.min(5, candidates.length));
-      const rival = pool[Math.floor(Math.random()*pool.length)];
+
+      // ── 再戦候補チェック ──
+      const yesterday = toLocalDateStr(new Date(Date.now()-86400000));
+      const hist = loadDuelHistory();
+      const prev = hist[0];
+      let rematchTarget = null;
+      if(prev && prev.rivalId && prev.date===yesterday){
+        const goalRatio = Math.abs((prev.declaredGoalMins||0) - goal) / Math.max(goal, 1);
+        const prev2 = hist[1];
+        const tooFrequent = prev2 && prev2.rivalId===prev.rivalId; // 2連続なら抑制
+        if(goalRatio <= 0.5 && !tooFrequent && Math.random() < 0.35){
+          rematchTarget = data.find(p=>p.id===prev.rivalId)||null;
+        }
+      }
+
+      let rival, isRematch=false;
+      if(rematchTarget){
+        rival = {...rematchTarget, dailyAvg:Math.round((rematchTarget.week_study_mins||0)/7)};
+        isRematch = true;
+      } else {
+        const candidates = data.map(p=>({...p,dailyAvg:Math.round((p.week_study_mins||0)/7)}))
+          .sort((a,b)=>Math.abs(a.dailyAvg-goal)-Math.abs(b.dailyAvg-goal));
+        const pool = candidates.slice(0, Math.min(5, candidates.length));
+        rival = pool[Math.floor(Math.random()*pool.length)];
+      }
+
       duel.rivalId = rival.id;
       duel.rivalName = maskName(rival.display_name);
       duel.rivalLevel = rival.level||1;
       duel.rivalTitle = rival.char_title||'冒険者';
       duel.rivalJobIds = rival.job_ids||[];
       duel.rivalRecord = rival.dailyAvg||30;
+      duel.isRematch = isRematch;
     }
   }catch(e){ console.warn('[duel] assign',e); }
   duel.confirmedAt = new Date().toISOString();
   saveDuel(duel);
   renderDuelCard();
-  if(duel.rivalId) spawnDmgNumber('⚔️ 決闘ライバル確定！','#ff6688',true);
+  if(duel.rivalId){
+    const msg = duel.isRematch ? '🔁 昨日の相手が再び現れた！' : '⚔️ 決闘ライバル確定！';
+    spawnDmgNumber(msg,'#ff6688',true);
+  }
 }
 
 function processDuelResult(duel){
@@ -11602,6 +11628,7 @@ function addToDuelHistory(duel, doneMins){
     declaredGoalMins:duel.declaredGoalMins, actualMins:doneMins,
     rivalName:duel.rivalName||null, rivalLevel:duel.rivalLevel||null,
     rivalTitle:duel.rivalTitle||null, rivalRecord:duel.rivalRecord||0,
+    rivalId:duel.rivalId||null,
   });
   saveDuelHistory(hist.slice(0,60)); // 最大60件
 }
@@ -11783,7 +11810,7 @@ function renderDuelCard(){
   if(now.getHours()>=23 && now.getMinutes()>=30 && !duel.rewardGiven){ processDuelResult(duel); renderDuelCard(); return; }
 
   card.innerHTML=`<div class="duel-card duel-card-active">
-    <div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘 — 進行中</div><div class="duel-sub">今日の23:59に決着がつく</div></div></div>
+    <div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘 — 進行中</div><div class="duel-sub">今日の23:59に決着がつく</div></div>${duel.isRematch?'<span class="duel-rematch-badge">🔁 再戦</span>':''}</div>
     <div class="duel-body">
       <div class="duel-rival-info">
         <div class="duel-rival-lv">Lv.${duel.rivalLevel} ${escHtml(duel.rivalTitle||'冒険者')}${rivalJob?' '+rivalJob:''}</div>
@@ -20268,6 +20295,7 @@ if ('serviceWorker' in navigator) {
 .duel-result-block{border:1px solid rgba(255,215,0,.3);border-radius:10px;padding:16px;text-align:center;margin-bottom:8px;}
 .duel-result-msg{font-size:13px;color:var(--text);line-height:1.6;}
 .duel-rival-ref{font-size:10px;color:var(--muted);text-align:center;font-family:'Share Tech Mono',monospace;}
+.duel-rematch-badge{margin-left:auto;font-size:9px;color:#ffaa44;border:1px solid rgba(255,170,68,.4);border-radius:6px;padding:2px 7px;font-family:'Share Tech Mono',monospace;white-space:nowrap;align-self:center;}
 
 /* ═══ 週間ライバル討伐クエスト ═══ */
 .rival-quest-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
