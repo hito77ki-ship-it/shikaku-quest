@@ -15912,9 +15912,9 @@ async function renderPartyRaidCard(){
   const members = raid.members || [];
   const memberSlots = Array.from({length:4}, (_,i) => {
     const m = members[i];
-    if(!m) return `<div class="party-raid-member">
-      <div class="party-raid-member-av empty">＋</div>
-      <div class="party-raid-member-name">空き</div>
+    if(!m) return `<div class="party-raid-member" onclick="openRaidInviteModal('${raid.id}')" style="cursor:pointer;" title="メンバーを招待">
+      <div class="party-raid-member-av empty" style="transition:all .15s;">＋</div>
+      <div class="party-raid-member-name" style="color:var(--accent2);">招待</div>
     </div>`;
     const isMe = m.id === currentUser.id;
     const av = m.avatar_url
@@ -16022,6 +16022,41 @@ function subscribePartyRaid(raidId){
     .on('postgres_changes', { event:'UPDATE', schema:'public', table:'party_raids', filter:`id=eq.${raidId}` }, () => {
       renderPartyRaidCard();
     }).subscribe();
+}
+
+/* ── メンバー招待（空きスロットから） ── */
+async function openRaidInviteModal(raidId){
+  if(!currentUser){ alert('ログインが必要です'); return; }
+  const followData = loadFollowData();
+  const following = followData.following || [];
+
+  // 現在のメンバーIDを取得
+  const { data: raid } = await sb.from('party_raids').select('members').eq('id', raidId).single().catch(()=>({ data:null }));
+  if(!raid){ alert('レイドが見つかりません'); return; }
+  const currentMemberIds = new Set((raid.members||[]).map(m => m.id));
+
+  if(following.length === 0){ alert('フォロー中のユーザーがいません'); return; }
+
+  const candidates = following.filter(f => !currentMemberIds.has(f.id));
+  if(candidates.length === 0){ alert('招待できるフォロー中ユーザーがいません'); return; }
+
+  // シンプルなセレクトで選ばせる
+  const names = candidates.map((f,i) => `${i+1}: ${f.name}`).join('\n');
+  const input = prompt(`招待するメンバーの番号を入力してください:\n\n${names}`);
+  const idx = parseInt(input) - 1;
+  if(isNaN(idx) || idx < 0 || idx >= candidates.length) return;
+
+  const target = candidates[idx];
+  const newMember = { id: target.id, name: target.name, avatar_url: null, level: 1, damage: 0 };
+  const newMembers = [...(raid.members||[]), newMember];
+
+  try {
+    await sb.from('party_raids').update({ members: newMembers }).eq('id', raidId);
+    showNotifToast('⚔️', `${target.name}を招待しました`, 'パーティーに参加しました！');
+    renderPartyRaidCard();
+  } catch(e) {
+    alert('招待に失敗しました: ' + (e.message||e));
+  }
 }
 
 /* ── 攻撃ログ表示 ── */
