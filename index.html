@@ -7615,6 +7615,8 @@ function initDashboard(){
   scheduleStudyReminder();
   // チュートリアル（ログイン後・ダッシュボード表示後に起動）
   setTimeout(showTutorial, 800);
+  // 忘却の霧チェック
+  setTimeout(checkFogOfOblivion, 2500);
 }
 function renderAll(){
   const smins=studyMins(sessions);
@@ -8658,8 +8660,21 @@ async function finishTimer(){
   sessions.push({date,subject,type:'study',amount:minutes,amountSecs:totalSecs,exp,note,startedAt,endedAt,condition});
   const smins1=studyMins(sessions),lv1=computeLevel(smins1);
   char.level=lv1;
+  // 忘却の霧ボーナス
+  const _fogActive = window._fogTimerActive && minutes >= 15;
+  if(_fogActive){
+    window._fogTimerActive = false;
+    const fogBonusG = Math.ceil(minutes / 5) * 10;
+    char.gold = (char.gold||0) + fogBonusG;
+    setTimeout(()=>spawnDmgNumber(`🌫 霧の加護 +${fogBonusG}G`, '#88ccff', true), 600);
+  }
+  char.lastSessionAt = new Date().toISOString();
   await saveAll();
   renderAll();
+  // ライバルの影チェック
+  setTimeout(checkRivalShadow, 2500);
+  // 幸運の宝箱
+  if(minutes >= 25 && Math.random() < 0.15) setTimeout(showLuckyChest, 2800);
 
   if(isFirstSession) setTimeout(showFirstSessionCelebration, 1500);
   cancelStudyReminder();
@@ -8713,6 +8728,113 @@ async function finishTimer(){
     window.scrollTo(0,0);
   }, 1200);
 }
+
+/* ═══════════════════════════════════════
+   幸運の宝箱 (LUCKY CHEST)
+═══════════════════════════════════════ */
+let _chestOpened = false;
+function showLuckyChest(){
+  _chestOpened = false;
+  [0,1,2].forEach(i=>{
+    const btn=document.getElementById('chest'+i);
+    const res=document.getElementById('chestResult'+i);
+    if(btn){btn.style.pointerEvents='';btn.classList.remove('opened');btn.querySelector('.lucky-chest-icon').textContent='📦';}
+    if(res)res.textContent='';
+  });
+  const cl=document.getElementById('luckyChestClose');
+  if(cl)cl.classList.remove('show');
+  const ov=document.getElementById('luckyChestOverlay');
+  if(ov)ov.classList.add('show');
+}
+function openChest(idx){
+  if(_chestOpened)return;
+  _chestOpened=true;
+  const r=Math.random();
+  const reward=r<0.70?100:r<0.95?500:1000;
+  [0,1,2].forEach(i=>{
+    const btn=document.getElementById('chest'+i);
+    const res=document.getElementById('chestResult'+i);
+    btn.style.pointerEvents='none';
+    if(i===idx){
+      btn.classList.add('opened');
+      btn.querySelector('.lucky-chest-icon').textContent='🎁';
+      if(res)res.textContent='+'+reward+'G';
+    }else{
+      btn.querySelector('.lucky-chest-icon').textContent='💀';
+      if(res)res.textContent='ハズレ';
+    }
+  });
+  char.gold=(char.gold||0)+reward;
+  const goldEl=document.getElementById('goldBadge');
+  if(goldEl)goldEl.textContent='💰 '+char.gold+'G';
+  saveAll();
+  spawnDmgNumber(`🎁 +${reward}G`, '#FFD700', true);
+  setTimeout(()=>{const cl=document.getElementById('luckyChestClose');if(cl)cl.classList.add('show');},1000);
+}
+function closeLuckyChest(){
+  const ov=document.getElementById('luckyChestOverlay');
+  if(ov)ov.classList.remove('show');
+}
+
+/* ═══════════════════════════════════════
+   忘却の霧 (FOG OF OBLIVION)
+═══════════════════════════════════════ */
+function checkFogOfOblivion(){
+  if(!char.lastSessionAt||window._fogShownThisSession)return;
+  if(Date.now()-new Date(char.lastSessionAt).getTime()<24*60*60*1000)return;
+  window._fogShownThisSession=true;
+  const ov=document.getElementById('fogOverlay');
+  if(ov)ov.classList.add('show');
+}
+function closeFogOverlay(){
+  const ov=document.getElementById('fogOverlay');
+  if(ov)ov.classList.remove('show');
+}
+function startFogTimer(){
+  closeFogOverlay();
+  window._fogTimerActive=true;
+  timerGoalMins=15;
+  const disp=document.getElementById('timerGoalDisp');
+  if(disp)disp.textContent='目標: 15分（霧の復習）';
+  spawnDmgNumber('🌫 霧の復習タイマー！ゴールド2倍！', '#88ccff', true);
+  setTimeout(()=>{
+    const tp=document.querySelector('.timer-panel');
+    if(tp)tp.scrollIntoView({behavior:'smooth',block:'center'});
+  }, 300);
+}
+
+/* ═══════════════════════════════════════
+   ライバルの影 (SHADOW OF RIVAL)
+═══════════════════════════════════════ */
+function checkRivalShadow(){
+  const today=getTodayStr();
+  const goalMins=getTodayGoalMins(getThisWeekGoalHours()*60);
+  if(!goalMins)return;
+  const todayMins=getTodayMins();
+  const pct=todayMins/goalMins;
+  if(char.rivalDate!==today){char.rivalDate=today;char.rivalState=null;}
+  if(pct>=1.0&&char.rivalState!=='defeated'){
+    char.rivalState='defeated';saveAll();
+    _showRivalCutin('🏆','ライバルを撃破！','今日の目標達成！お前の勝利だ！',true);
+    spawnDmgNumber('🏆 RIVAL DEFEATED!','#FFD700',true);
+  }else if(pct>=0.8&&char.rivalState==null){
+    char.rivalState='warned';saveAll();
+    _showRivalCutin('👤','ライバルが背後に迫っている…！','目標まであと20%！ここで止まるな！',false);
+    spawnDmgNumber('⚔ RIVAL APPROACHING!','#ff4466',true);
+  }
+}
+function _showRivalCutin(icon,title,msg,isDefeated){
+  const el=document.getElementById('rivalCutin');
+  const inner=document.getElementById('rivalCutinInner');
+  if(!el)return;
+  document.getElementById('rivalCutinIcon').textContent=icon;
+  document.getElementById('rivalCutinTitle').textContent=title;
+  document.getElementById('rivalCutinMsg').textContent=msg;
+  if(inner)inner.className='rival-cutin-inner'+(isDefeated?' rival-defeated':'');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3500);
+}
+
 let scoreRecords = []; // [{id, name, date, scores:{key:{score,max}}}]
 let scoreChartInstances = {};
 
@@ -19638,6 +19760,49 @@ if ('serviceWorker' in navigator) {
 .tut-btns{display:flex;gap:8px;}
 .tut-btn-skip{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#888;font-size:12px;cursor:pointer;}
 .tut-btn-next{flex:2;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#8CC63F,#5C9A1A);color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(140,198,63,.4);}
+
+/* ═══ 幸運の宝箱 ═══ */
+.lucky-chest-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9900;display:none;align-items:center;justify-content:center;}
+.lucky-chest-overlay.show{display:flex;}
+.lucky-chest-box{background:linear-gradient(135deg,#1a1400,#2a2000);border:2px solid #C9A84C;border-radius:16px;padding:28px 20px;width:min(92vw,380px);text-align:center;animation:scaleIn .35s cubic-bezier(.34,1.56,.64,1);}
+.lucky-chest-title{font-family:'Cinzel',serif;font-size:18px;color:#FFD700;letter-spacing:.15em;margin-bottom:4px;}
+.lucky-chest-sub{font-size:11px;color:#C9A84C;letter-spacing:.1em;margin-bottom:22px;}
+.lucky-chest-row{display:flex;gap:12px;justify-content:center;margin-bottom:16px;}
+.lucky-chest-btn{background:#1a1000;border:2px solid #C9A84C44;border-radius:12px;padding:16px 8px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0;}
+.lucky-chest-btn:hover{border-color:#FFD700;background:#2a2000;transform:translateY(-4px);}
+.lucky-chest-btn.opened{border-color:#FFD700;}
+.lucky-chest-icon{font-size:36px;transition:transform .2s;display:block;}
+.lucky-chest-btn:hover .lucky-chest-icon{transform:scale(1.1);}
+.lucky-chest-label{font-size:9px;color:#C9A84C;font-family:'Share Tech Mono',monospace;}
+.lucky-chest-result{font-size:14px;color:#FFD700;font-weight:700;min-height:20px;}
+.lucky-chest-close{margin-top:16px;padding:9px 28px;background:transparent;border:1px solid #C9A84C44;border-radius:8px;color:#888;font-size:12px;cursor:pointer;display:none;}
+.lucky-chest-close:hover{border-color:#C9A84C;color:#C9A84C;}
+.lucky-chest-close.show{display:inline-block;}
+
+/* ═══ 忘却の霧 ═══ */
+.fog-overlay{position:fixed;inset:0;background:rgba(0,8,28,.92);z-index:9800;display:none;align-items:center;justify-content:center;}
+.fog-overlay.show{display:flex;}
+.fog-box{background:linear-gradient(135deg,#080e22,#101830);border:2px solid #4488cc;border-radius:16px;padding:28px 24px;width:min(92vw,360px);text-align:center;animation:scaleIn .35s cubic-bezier(.34,1.56,.64,1);}
+.fog-icon{font-size:52px;margin-bottom:12px;display:block;animation:fogPulse 2.5s ease-in-out infinite;}
+@keyframes fogPulse{0%,100%{filter:drop-shadow(0 0 8px rgba(100,180,255,.5));}50%{filter:drop-shadow(0 0 20px rgba(100,180,255,.9));}}
+.fog-title{font-family:'Cinzel',serif;font-size:15px;color:#88aaff;letter-spacing:.15em;margin-bottom:8px;}
+.fog-msg{font-size:13px;color:#aabbdd;line-height:1.7;margin-bottom:20px;}
+.fog-timer-btn{width:100%;padding:13px;background:linear-gradient(135deg,#1a3a6a,#0f2040);border:2px solid #4488cc;border-radius:10px;color:#88aaff;font-size:14px;font-family:inherit;cursor:pointer;margin-bottom:10px;transition:all .2s;}
+.fog-timer-btn:hover{background:linear-gradient(135deg,#2a4a8a,#1f3050);border-color:#88bbff;color:#aaccff;}
+.fog-skip-btn{width:100%;padding:10px;background:transparent;border:1px solid #22446644;border-radius:8px;color:#445566;font-size:12px;cursor:pointer;font-family:inherit;}
+.fog-skip-btn:hover{color:#667788;}
+
+/* ═══ ライバルの影 ═══ */
+.rival-cutin{position:fixed;inset:0;z-index:9700;display:none;align-items:center;justify-content:center;pointer-events:none;}
+.rival-cutin.show{display:flex;}
+.rival-cutin-inner{background:linear-gradient(135deg,#200008,#3a0010);border:2px solid #ff4466;border-radius:14px;padding:22px 32px;text-align:center;animation:rivalSlide .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes rivalSlide{0%{transform:scale(.7) translateY(30px);opacity:0;}100%{transform:scale(1) translateY(0);opacity:1;}}
+.rival-cutin-icon{font-size:46px;margin-bottom:8px;display:block;}
+.rival-cutin-title{font-family:'Cinzel',serif;font-size:15px;color:#ff6688;letter-spacing:.12em;margin-bottom:4px;}
+.rival-cutin-msg{font-size:11px;color:#cc8899;letter-spacing:.08em;}
+.rival-cutin-inner.rival-defeated{background:linear-gradient(135deg,#150a00,#2a1800);border-color:#FFD700;}
+.rival-cutin-inner.rival-defeated .rival-cutin-title{color:#FFD700;}
+.rival-cutin-inner.rival-defeated .rival-cutin-msg{color:#C9A84C;}
 </style>
 
 <!-- ════ 通知オンボーディングモーダル ════ -->
@@ -20337,6 +20502,52 @@ async function submitDeleteAccount(){
     <div class="invite-modal-title">⚔️ INVITE MEMBER — 仲間を招待</div>
     <div class="invite-candidate-list" id="inviteCandidateList"></div>
     <button class="invite-modal-cancel" onclick="closeInviteModal()">キャンセル</button>
+  </div>
+</div>
+
+<!-- ════ 幸運の宝箱 ════ -->
+<div class="lucky-chest-overlay" id="luckyChestOverlay">
+  <div class="lucky-chest-box">
+    <div class="lucky-chest-title">✨ LUCKY CHEST ✨</div>
+    <div class="lucky-chest-sub">宝箱を1つ選べ！</div>
+    <div class="lucky-chest-row">
+      <div class="lucky-chest-btn" id="chest0" onclick="openChest(0)">
+        <span class="lucky-chest-icon">📦</span>
+        <span class="lucky-chest-label">LEFT</span>
+        <div class="lucky-chest-result" id="chestResult0"></div>
+      </div>
+      <div class="lucky-chest-btn" id="chest1" onclick="openChest(1)">
+        <span class="lucky-chest-icon">📦</span>
+        <span class="lucky-chest-label">CENTER</span>
+        <div class="lucky-chest-result" id="chestResult1"></div>
+      </div>
+      <div class="lucky-chest-btn" id="chest2" onclick="openChest(2)">
+        <span class="lucky-chest-icon">📦</span>
+        <span class="lucky-chest-label">RIGHT</span>
+        <div class="lucky-chest-result" id="chestResult2"></div>
+      </div>
+    </div>
+    <button class="lucky-chest-close" id="luckyChestClose" onclick="closeLuckyChest()">閉じる</button>
+  </div>
+</div>
+
+<!-- ════ 忘却の霧 ════ -->
+<div class="fog-overlay" id="fogOverlay">
+  <div class="fog-box">
+    <span class="fog-icon">🌫️</span>
+    <div class="fog-title">FOG OF OBLIVION</div>
+    <div class="fog-msg">霧が発生した！<br>知識が失われる前に復習せよ！<br><span style="color:#445566;font-size:10px;">15分復習タイマー完了でゴールド2倍ボーナス</span></div>
+    <button class="fog-timer-btn" onclick="startFogTimer()">🌫️ 15分復習タイマーを開始</button>
+    <button class="fog-skip-btn" onclick="closeFogOverlay()">今は復習しない</button>
+  </div>
+</div>
+
+<!-- ════ ライバルの影 ════ -->
+<div class="rival-cutin" id="rivalCutin">
+  <div class="rival-cutin-inner" id="rivalCutinInner">
+    <span class="rival-cutin-icon" id="rivalCutinIcon">👤</span>
+    <div class="rival-cutin-title" id="rivalCutinTitle">ライバルが背後に迫っている…！</div>
+    <div class="rival-cutin-msg" id="rivalCutinMsg">目標まであと20%！ここで止まるな！</div>
   </div>
 </div>
 </body>
