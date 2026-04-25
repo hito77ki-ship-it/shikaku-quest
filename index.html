@@ -867,6 +867,21 @@ body[data-theme="dark"] .timer-dmg-track{background:rgba(255,255,255,.04);}
 .raid-member-item.disabled{opacity:.4;cursor:not-allowed;}
 .raid-start-btn{width:100%;padding:16px;background:linear-gradient(135deg,#EF4444,#B91C1C);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:'Cinzel',serif;letter-spacing:.1em;cursor:pointer;margin-top:20px;transition:all .2s;}
 .raid-start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(239,68,68,.4);}
+/* ── メンバー招待モーダル ── */
+.invite-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;}
+.invite-modal-overlay.show{display:flex;}
+.invite-modal{background:var(--panel);border-radius:16px;padding:20px 16px 16px;width:100%;max-width:360px;max-height:80vh;display:flex;flex-direction:column;gap:12px;}
+.invite-modal-title{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.15em;color:var(--accent2);display:flex;align-items:center;gap:8px;}
+.invite-candidate-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:300px;}
+.invite-candidate-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;background:var(--panel2);}
+.invite-candidate-item:hover{border-color:var(--accent);background:rgba(140,198,63,.06);}
+.invite-candidate-item:active{transform:scale(.98);}
+.invite-candidate-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.1);}
+.invite-candidate-name{font-size:14px;font-weight:700;color:var(--text);flex:1;}
+.invite-candidate-badge{font-size:10px;color:var(--muted);margin-top:2px;}
+.invite-candidate-arrow{font-size:16px;color:var(--accent);opacity:.7;}
+.invite-modal-cancel{width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:13px;font-family:inherit;cursor:pointer;transition:all .15s;}
+.invite-modal-cancel:hover{border-color:var(--text);color:var(--text);}
 /* ── ランダムRPGイベントポップアップ ── */
 .rpg-event-popup{
   position:fixed;left:50%;bottom:28%;
@@ -16025,12 +16040,18 @@ function subscribePartyRaid(raidId){
 }
 
 /* ── メンバー招待（空きスロットから） ── */
+let _inviteRaidId = null;
+
+function closeInviteModal(){
+  document.getElementById('inviteModal').classList.remove('show');
+  _inviteRaidId = null;
+}
+
 async function openRaidInviteModal(raidId){
   if(!currentUser){ alert('ログインが必要です'); return; }
   const followData = loadFollowData();
   const following = followData.following || [];
 
-  // 現在のメンバーIDを取得
   let raid;
   try { const { data } = await sb.from('party_raids').select('members').eq('id', raidId).single(); raid = data; } catch(e){ raid = null; }
   if(!raid){ alert('レイドが見つかりません'); return; }
@@ -16038,22 +16059,50 @@ async function openRaidInviteModal(raidId){
 
   if(following.length === 0){ alert('フォロー中のユーザーがいません'); return; }
 
-  const candidates = following.filter(f => !currentMemberIds.has(f.id));
+  // 重複排除
+  const seen = new Set();
+  const candidates = following.filter(f => {
+    if(seen.has(f.id) || currentMemberIds.has(f.id)) return false;
+    seen.add(f.id); return true;
+  });
   if(candidates.length === 0){ alert('招待できるフォロー中ユーザーがいません'); return; }
 
-  // シンプルなセレクトで選ばせる
-  const names = candidates.map((f,i) => `${i+1}: ${f.name}`).join('\n');
-  const input = prompt(`招待するメンバーの番号を入力してください:\n\n${names}`);
-  const idx = parseInt(input) - 1;
-  if(isNaN(idx) || idx < 0 || idx >= candidates.length) return;
+  _inviteRaidId = raidId;
 
-  const target = candidates[idx];
-  const newMember = { id: target.id, name: target.name, avatar_url: null, level: 1, damage: 0 };
+  const list = document.getElementById('inviteCandidateList');
+  list.innerHTML = candidates.map(f => {
+    const initial = (f.name||'?')[0];
+    const color = typeof avatarColor==='function' ? avatarColor(f.name) : '#8CC63F';
+    const safeId = f.id.replace(/'/g,"\\'");
+    const safeName = (f.name||'名無し').replace(/'/g,"\\'");
+    return `<div class="invite-candidate-item" onclick="confirmRaidInvite('${safeId}','${safeName}')">
+      <div class="invite-candidate-av" style="background:${color}">${initial}</div>
+      <div style="flex:1;">
+        <div class="invite-candidate-name">${f.name||'名無し'}</div>
+        <div class="invite-candidate-badge">🔗 フォロー中</div>
+      </div>
+      <div class="invite-candidate-arrow">＋</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('inviteModal').classList.add('show');
+}
+
+async function confirmRaidInvite(userId, userName){
+  if(!_inviteRaidId) return;
+  const raidId = _inviteRaidId;
+  closeInviteModal();
+
+  let raid;
+  try { const { data } = await sb.from('party_raids').select('members').eq('id', raidId).single(); raid = data; } catch(e){ raid = null; }
+  if(!raid){ alert('レイドが見つかりません'); return; }
+
+  const newMember = { id: userId, name: userName, avatar_url: null, level: 1, damage: 0 };
   const newMembers = [...(raid.members||[]), newMember];
 
   try {
     await sb.from('party_raids').update({ members: newMembers }).eq('id', raidId);
-    showNotifToast('⚔️', `${target.name}を招待しました`, 'パーティーに参加しました！');
+    showNotifToast('⚔️', `${userName}を招待しました`, 'パーティーに参加しました！');
     renderPartyRaidCard();
   } catch(e) {
     alert('招待に失敗しました: ' + (e.message||e));
@@ -20281,6 +20330,13 @@ async function submitDeleteAccount(){
     </div>
 
     <button class="raid-start-btn" onclick="createPartyRaid()">⚔️ レイド開始！</button>
+  </div>
+</div>
+<div class="invite-modal-overlay" id="inviteModal" onclick="if(event.target===this)closeInviteModal()">
+  <div class="invite-modal">
+    <div class="invite-modal-title">⚔️ INVITE MEMBER — 仲間を招待</div>
+    <div class="invite-candidate-list" id="inviteCandidateList"></div>
+    <button class="invite-modal-cancel" onclick="closeInviteModal()">キャンセル</button>
   </div>
 </div>
 </body>
