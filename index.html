@@ -824,6 +824,49 @@ body[data-theme="dark"] .eb-prog-labels{color:#9ae6b4;}
 body[data-theme="dark"] .timer-dmg-track{background:rgba(255,255,255,.04);}
 .timer-dmg-fill{height:100%;background:linear-gradient(to right,#8CC63F,#6AAF2B);box-shadow:0 0 8px rgba(140,198,63,.4);transition:width .5s;}
 .timer-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* ── パーティーレイド ── */
+.party-raid-card{background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(201,168,76,.06));border:1px solid rgba(239,68,68,.35);border-radius:var(--radius);padding:16px;margin-bottom:0;position:relative;overflow:hidden;}
+.party-raid-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(239,68,68,.04));pointer-events:none;}
+.party-raid-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.party-raid-badge{font-size:9px;letter-spacing:.22em;color:#EF4444;font-family:'Share Tech Mono',monospace;padding:2px 8px;border:1px solid rgba(239,68,68,.4);border-radius:4px;}
+.party-raid-boss-name{font-size:16px;font-weight:700;color:#fff;margin-bottom:2px;}
+.party-raid-boss-desc{font-size:11px;color:rgba(255,255,255,.5);}
+.party-raid-hp-wrap{margin:10px 0 14px;}
+.party-raid-hp-label{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.5);font-family:'Share Tech Mono',monospace;margin-bottom:4px;}
+.party-raid-hp-bar{height:12px;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden;}
+.party-raid-hp-fill{height:100%;background:linear-gradient(90deg,#EF4444,#F97316);border-radius:6px;transition:width .6s ease;}
+.party-raid-members{display:flex;gap:8px;margin-bottom:12px;}
+.party-raid-member{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;max-width:60px;}
+.party-raid-member-av{width:38px;height:38px;border-radius:50%;border:2px solid rgba(239,68,68,.4);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0;}
+.party-raid-member-av.empty{border-style:dashed;opacity:.35;}
+.party-raid-member-name{font-size:9px;color:rgba(255,255,255,.6);text-align:center;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.party-raid-member-dmg{font-size:9px;color:#F97316;font-family:'Share Tech Mono',monospace;}
+.party-raid-footer{display:flex;align-items:center;justify-content:space-between;}
+.party-raid-timer{font-size:11px;color:rgba(255,255,255,.5);font-family:'Share Tech Mono',monospace;}
+.party-raid-timer.danger{color:#EF4444;animation:blink .8s ease-in-out infinite;}
+.party-raid-action-btn{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:8px;padding:6px 14px;font-size:11px;color:#EF4444;cursor:pointer;font-family:inherit;transition:all .15s;}
+.party-raid-action-btn:hover{background:rgba(239,68,68,.25);}
+/* レイド作成モーダル */
+.raid-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;display:none;align-items:flex-end;justify-content:center;}
+.raid-modal-overlay.show{display:flex;}
+.raid-modal{background:var(--panel);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+.raid-modal-title{font-family:'Cinzel',serif;font-size:14px;letter-spacing:.15em;color:var(--accent2);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.raid-modal-section{font-size:11px;color:var(--muted);letter-spacing:.1em;margin:16px 0 8px;}
+.raid-boss-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.raid-boss-btn{background:var(--panel2);border:2px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s;font-family:inherit;}
+.raid-boss-btn.selected{border-color:#EF4444;background:rgba(239,68,68,.08);}
+.raid-boss-btn-emoji{font-size:24px;display:block;margin-bottom:4px;}
+.raid-boss-btn-name{font-size:10px;color:var(--text);line-height:1.3;}
+.raid-boss-btn-hp{font-size:9px;color:var(--muted);margin-top:2px;}
+.raid-diff-row{display:flex;gap:8px;}
+.raid-diff-btn{flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:none;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit;transition:all .15s;text-align:center;}
+.raid-diff-btn.selected{border-color:#EF4444;color:#EF4444;background:rgba(239,68,68,.08);}
+.raid-member-list{display:flex;flex-direction:column;gap:8px;}
+.raid-member-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;}
+.raid-member-item.selected{border-color:var(--accent);background:rgba(140,198,63,.06);}
+.raid-member-item.disabled{opacity:.4;cursor:not-allowed;}
+.raid-start-btn{width:100%;padding:16px;background:linear-gradient(135deg,#EF4444,#B91C1C);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:'Cinzel',serif;letter-spacing:.1em;cursor:pointer;margin-top:20px;transition:all .2s;}
+.raid-start-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(239,68,68,.4);}
 /* ── ランダムRPGイベントポップアップ ── */
 .rpg-event-popup{
   position:fixed;left:50%;bottom:28%;
@@ -4203,6 +4246,14 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
   <div id="panel-status">
     <!-- 修行再開ボタン（全幅） -->
     <div id="resumeButtonWrap" style="grid-column:1/-1;display:none;"></div>
+    <!-- パーティーレイドカード（全幅） -->
+    <div id="partyRaidCardWrap" style="grid-column:1/-1;display:none;"></div>
+    <!-- パーティーレイド開始ボタン（レイドなし時） -->
+    <div id="partyRaidStartBtnWrap" style="grid-column:1/-1;display:none;">
+      <button onclick="openRaidCreateModal()" style="width:100%;padding:12px 20px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);border-radius:var(--radius);color:#EF4444;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;transition:all .2s;">
+        ⚔️ パーティーレイドを始める
+      </button>
+    </div>
     <!-- 初回3日間チャレンジバナー -->
     <div id="onboardingBanner" style="grid-column:1/-1;display:none;"></div>
     <!-- 今日のクエストバナー（全幅） -->
@@ -7599,6 +7650,7 @@ function renderAll(){
   renderDailyMissions();
   renderOnboardingBanner();
   renderResumeButton();
+  renderPartyRaidCard();
   renderTodayQuestBanner();
   renderAffiliateCard();
   // レポート/プロフィールタブが開いていれば即更新
@@ -7888,7 +7940,7 @@ function switchTab(tab){
   else unsubscribeTlRealtime();
   if(tab==='report')  requestAnimationFrame(()=>{ const ml=document.getElementById('mql-list'); if(ml) ml._mqlShowing=5; renderReportTab(); });
   if(tab==='profile') requestAnimationFrame(()=>{ renderProfileTab(); renderWeekPlan(); initProfileQR(); updateReminderUI(); });
-  if(tab==='status')  requestAnimationFrame(()=>{ renderResumeButton(); renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); renderOnboardingBanner(); renderTodayQuestBanner(); renderAffiliateCard(); });
+  if(tab==='status')  requestAnimationFrame(()=>{ renderResumeButton(); renderPartyRaidCard(); renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); renderOnboardingBanner(); renderTodayQuestBanner(); renderAffiliateCard(); });
   // モバイルタブバーも同期
   document.querySelectorAll('.m-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   const activeBtn=document.getElementById('tab-'+tab);
@@ -8603,6 +8655,9 @@ async function finishTimer(){
   if(lv1>lv0){setTimeout(()=>showLevelUp(lv1,smins1),800); checkClassChange(lv0,lv1,smins1);}
   else { checkStreakMilestone(char.streak); }
   if(currentUser) syncToCloud().catch(()=>{});
+
+  // パーティーレイドにダメージ
+  if(currentUser && minutes > 0) dealPartyRaidDamage(minutes, subject);
 
   // タイムラインに自動投稿
   autoPostToTimeline({
@@ -15672,6 +15727,308 @@ function showNotifToast(icon, title, msg){
 /* ── リアクション通知はtoggleReaction内で処理済み ── */
 
 /* ════════════════════════════════════════
+   パーティーレイドシステム
+════════════════════════════════════════ */
+const PARTY_BOSSES = [
+  { id:'fin',   name:'財務会計の龍王',    emoji:'🐉', baseHp:2000, desc:'財務・簿記を統べる最強の龍' },
+  { id:'audit', name:'監査の闇将軍',      emoji:'⚖️', baseHp:1600, desc:'証拠を隠滅する暗黒の将軍' },
+  { id:'corp',  name:'企業法の賢魔王',    emoji:'📜', baseHp:1600, desc:'法の抜け穴に潜む賢き魔王' },
+  { id:'mgmt',  name:'管理会計の機械神',  emoji:'⚙️', baseHp:1400, desc:'数字の迷宮を司る冷徹な神' },
+  { id:'tax',   name:'租税法の呪術師',    emoji:'🧙', baseHp:1400, desc:'複雑な税法で惑わす魔術師' },
+  { id:'final', name:'本試験の最終魔王',  emoji:'👹', baseHp:4000, desc:'全科目を統べる究極の敵' },
+];
+const RAID_DIFF = { easy:0.6, normal:1.0, hard:1.5 };
+const CALC_SUBJ = ['fin_calc','mgmt_calc','z_zai','b1_sho','b1_ko','b2_sho','b2_ko','b3_sho','b3_sho3','us_far'];
+const RAID_DURATION_MS = 24 * 60 * 60 * 1000; // 24時間
+
+let _raidSelectedBoss = null;
+let _raidSelectedDiff = 'easy';
+let _raidSelectedMembers = []; // [{ id, name, avatar_url, level }]
+let _activeRaidId = null;
+let _raidRealtimeChannel = null;
+
+/* ダメージ計算 */
+function calcPartyDamage(minutes, subjectKey, stats){
+  const s = stats || { str:10, vit:10, int:10, agi:10 };
+  const isCalc = CALC_SUBJ.includes(subjectKey);
+  const primaryStat = isCalc ? (s.str||10) : (s.int||10);
+  const base = minutes * 3;
+  const mult = Math.max(0.5, primaryStat / 10);
+  return Math.max(1, Math.floor(base * mult));
+}
+
+/* ── モーダル開閉 ── */
+function openRaidCreateModal(){
+  if(!currentUser){ alert('ログインが必要です'); return; }
+  _raidSelectedBoss = null;
+  _raidSelectedDiff = 'easy';
+  _raidSelectedMembers = [];
+
+  // ボスグリッド描画
+  const grid = document.getElementById('raidBossGrid');
+  if(grid) grid.innerHTML = PARTY_BOSSES.map(b => `
+    <button class="raid-boss-btn" data-boss="${b.id}" onclick="selectRaidBoss('${b.id}')">
+      <span class="raid-boss-btn-emoji">${b.emoji}</span>
+      <div class="raid-boss-btn-name">${b.name}</div>
+      <div class="raid-boss-btn-hp">${b.baseHp} HP</div>
+    </button>`).join('');
+
+  // フォロー中ユーザー一覧を読み込む
+  loadRaidMemberList();
+
+  document.getElementById('raidCreateModal').classList.add('show');
+}
+function closeRaidModal(){
+  document.getElementById('raidCreateModal').classList.remove('show');
+}
+
+function selectRaidBoss(bossId){
+  _raidSelectedBoss = bossId;
+  document.querySelectorAll('.raid-boss-btn').forEach(b => b.classList.toggle('selected', b.dataset.boss === bossId));
+}
+function selectRaidDiff(diff){
+  _raidSelectedDiff = diff;
+  document.querySelectorAll('.raid-diff-btn').forEach(b => b.classList.toggle('selected', b.dataset.diff === diff));
+}
+function toggleRaidMember(userId, userName, avatarUrl, level, el){
+  const idx = _raidSelectedMembers.findIndex(m => m.id === userId);
+  if(idx >= 0){
+    _raidSelectedMembers.splice(idx, 1);
+    el.classList.remove('selected');
+  } else {
+    if(_raidSelectedMembers.length >= 3){ alert('メンバーは最大3人まで（自分を含めて4人）'); return; }
+    _raidSelectedMembers.push({ id:userId, name:userName, avatar_url:avatarUrl||null, level:level||1 });
+    el.classList.add('selected');
+  }
+}
+
+async function loadRaidMemberList(){
+  const list = document.getElementById('raidMemberList');
+  if(!list) return;
+  const followData = loadFollowData();
+  const following = followData.following || [];
+  if(!following.length){
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px;">フォロー中のユーザーがいません</div>';
+    return;
+  }
+  list.innerHTML = following.map(f => {
+    const ac = (f.name||'?')[0];
+    return `<div class="raid-member-item" id="raid-m-${f.id}" onclick="toggleRaidMember('${f.id}','${(f.name||'').replace(/'/g,'')}',null,1,this)">
+      <div class="party-raid-member-av" style="background:${typeof avatarColor==='function'?avatarColor(f.name):'#8CC63F'};width:36px;height:36px;">${ac}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);">${f.name||'名無し'}</div>
+        <div style="font-size:11px;color:var(--muted);">フォロー中</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);">＋</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── レイド作成 ── */
+async function createPartyRaid(){
+  if(!_raidSelectedBoss){ alert('ボスを選んでください'); return; }
+  const boss = PARTY_BOSSES.find(b => b.id === _raidSelectedBoss);
+  if(!boss) return;
+
+  const hp = Math.floor(boss.baseHp * RAID_DIFF[_raidSelectedDiff]);
+  const me = {
+    id: currentUser.id,
+    name: char.name || '冒険者',
+    avatar_url: profileAvatarData || null,
+    level: char.level || 1,
+    damage: 0,
+  };
+  const members = [me, ..._raidSelectedMembers.map(m => ({ ...m, damage:0 }))];
+  const raidId = Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  const expiresAt = new Date(Date.now() + RAID_DURATION_MS).toISOString();
+
+  const raid = {
+    id: raidId,
+    creator_id: currentUser.id,
+    creator_name: char.name,
+    boss_id: boss.id,
+    boss_name: boss.name,
+    boss_emoji: boss.emoji,
+    boss_hp: hp,
+    boss_max_hp: hp,
+    members: members,
+    status: 'active',
+    expires_at: expiresAt,
+    created_at: new Date().toISOString(),
+  };
+
+  try {
+    await sb.from('party_raids').insert(raid);
+    _activeRaidId = raidId;
+    localStorage.setItem('sq2_active_raid_id', raidId);
+    closeRaidModal();
+    showNotifToast('⚔️', 'レイド開始！', `${boss.emoji} ${boss.name} に挑む！`);
+    renderPartyRaidCard();
+    subscribePartyRaid(raidId);
+  } catch(e){
+    console.error('Raid create failed:', e);
+    alert('レイドの作成に失敗しました: ' + (e.message||e));
+  }
+}
+
+/* ── レイドカード描画 ── */
+async function renderPartyRaidCard(){
+  const wrap = document.getElementById('partyRaidCardWrap');
+  if(!wrap) return;
+
+  const savedId = _activeRaidId || localStorage.getItem('sq2_active_raid_id');
+  if(!savedId || !currentUser){ wrap.style.display = 'none'; return; }
+
+  let raid;
+  try {
+    const { data } = await sb.from('party_raids').select('*').eq('id', savedId).single();
+    raid = data;
+  } catch(e){ wrap.style.display = 'none'; return; }
+
+  const startBtn = document.getElementById('partyRaidStartBtnWrap');
+  if(!raid || raid.status !== 'active' || new Date(raid.expires_at) < new Date()){
+    wrap.style.display = 'none';
+    if(startBtn && currentUser) startBtn.style.display = '';
+    localStorage.removeItem('sq2_active_raid_id');
+    _activeRaidId = null;
+    return;
+  }
+  if(startBtn) startBtn.style.display = 'none';
+
+  _activeRaidId = raid.id;
+  const pct = Math.max(0, raid.boss_hp / raid.boss_max_hp * 100);
+  const remaining = new Date(raid.expires_at) - new Date();
+  const remH = Math.floor(remaining / 3600000);
+  const remM = Math.floor((remaining % 3600000) / 60000);
+  const remStr = remH > 0 ? `${remH}h ${remM}m` : `${remM}m`;
+  const isDanger = remH < 2;
+
+  const members = raid.members || [];
+  const memberSlots = Array.from({length:4}, (_,i) => {
+    const m = members[i];
+    if(!m) return `<div class="party-raid-member">
+      <div class="party-raid-member-av empty">＋</div>
+      <div class="party-raid-member-name">空き</div>
+    </div>`;
+    const isMe = m.id === currentUser.id;
+    const av = m.avatar_url
+      ? `<img src="${m.avatar_url}" style="width:100%;height:100%;object-fit:cover;" alt="">`
+      : (m.name||'?')[0];
+    return `<div class="party-raid-member">
+      <div class="party-raid-member-av" style="${m.avatar_url?'background:none;':'background:'+avatarColor(m.name)}">${av}${isMe?'<div style="position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;background:#8CC63F;border-radius:50%;border:1.5px solid var(--panel);"></div>':''}</div>
+      <div class="party-raid-member-name">${m.name||'?'}</div>
+      <div class="party-raid-member-dmg">${m.damage||0}DMG</div>
+    </div>`;
+  }).join('');
+
+  wrap.style.display = '';
+  wrap.innerHTML = `<div class="party-raid-card">
+    <div class="party-raid-header">
+      <span class="party-raid-badge">⚔ PARTY RAID ACTIVE</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:36px;">${raid.boss_emoji}</span>
+      <div>
+        <div class="party-raid-boss-name">${raid.boss_name}</div>
+        <div class="party-raid-boss-desc">HP: ${raid.boss_hp.toLocaleString()} / ${raid.boss_max_hp.toLocaleString()}</div>
+      </div>
+    </div>
+    <div class="party-raid-hp-wrap">
+      <div class="party-raid-hp-label">
+        <span>BOSS HP</span><span>${Math.round(pct)}%</span>
+      </div>
+      <div class="party-raid-hp-bar">
+        <div class="party-raid-hp-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+    <div class="party-raid-members" style="position:relative;">${memberSlots}</div>
+    <div class="party-raid-footer">
+      <div class="party-raid-timer${isDanger?' danger':''}">⏰ 残り ${remStr}</div>
+      <button class="party-raid-action-btn" onclick="openRaidLog('${raid.id}')">攻撃ログ</button>
+    </div>
+  </div>`;
+}
+
+/* ── 学習記録時に自動ダメージ ── */
+async function dealPartyRaidDamage(minutes, subjectKey){
+  const raidId = _activeRaidId || localStorage.getItem('sq2_active_raid_id');
+  if(!raidId || !currentUser || minutes <= 0) return;
+
+  let raid;
+  try {
+    const { data } = await sb.from('party_raids').select('*').eq('id', raidId).single();
+    raid = data;
+  } catch(e){ return; }
+
+  if(!raid || raid.status !== 'active' || new Date(raid.expires_at) < new Date()) return;
+
+  const isMember = (raid.members||[]).some(m => m.id === currentUser.id);
+  if(!isMember) return;
+
+  const damage = calcPartyDamage(minutes, subjectKey, char.stats);
+  const newHp = Math.max(0, raid.boss_hp - damage);
+  const isVictory = newHp <= 0;
+
+  // ダメージログ保存
+  await sb.from('party_damage_log').insert({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,4),
+    raid_id: raidId,
+    user_id: currentUser.id,
+    user_name: char.name,
+    avatar_url: profileAvatarData || null,
+    damage,
+    minutes,
+    subject_name: subjectKey,
+    created_at: new Date().toISOString(),
+  });
+
+  // メンバーのダメージ集計を更新
+  const members = (raid.members||[]).map(m =>
+    m.id === currentUser.id ? { ...m, damage: (m.damage||0) + damage } : m
+  );
+
+  await sb.from('party_raids').update({
+    boss_hp: newHp,
+    members,
+    status: isVictory ? 'victory' : 'active',
+  }).eq('id', raidId);
+
+  // 演出
+  spawnDmgNumber(`⚔ -${damage} DMG!`, '#EF4444', true);
+  showNotifToast('⚔️', `レイドに${damage}ダメージ！`, `${raid.boss_name} 残りHP: ${newHp.toLocaleString()}`);
+
+  if(isVictory){
+    localStorage.removeItem('sq2_active_raid_id');
+    _activeRaidId = null;
+    setTimeout(() => {
+      showNotifToast('🏆', '討伐成功！', `${raid.boss_emoji} ${raid.boss_name}を倒した！`);
+      launchConfetti();
+    }, 800);
+  }
+
+  renderPartyRaidCard();
+}
+
+/* ── リアルタイム購読 ── */
+function subscribePartyRaid(raidId){
+  if(_raidRealtimeChannel) sb.removeChannel(_raidRealtimeChannel);
+  _raidRealtimeChannel = sb.channel('party_raid_' + raidId)
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'party_raids', filter:`id=eq.${raidId}` }, () => {
+      renderPartyRaidCard();
+    }).subscribe();
+}
+
+/* ── 攻撃ログ表示 ── */
+async function openRaidLog(raidId){
+  try {
+    const { data } = await sb.from('party_damage_log').select('*').eq('raid_id', raidId).order('created_at', { ascending:false }).limit(20);
+    if(!data?.length){ alert('まだ攻撃記録がありません'); return; }
+    const lines = data.map(d => `${d.user_name}: -${d.damage}DMG (${d.minutes}分)`).join('\n');
+    alert('⚔️ 攻撃ログ\n\n' + lines);
+  } catch(e){ alert('ログ取得に失敗しました'); }
+}
+
+/* ════════════════════════════════════════
    ピン留めシステム
 ════════════════════════════════════════ */
 const PIN_GOLD_COST     = 500; // 消費ゴールド（変数で後から調整可能）
@@ -19854,6 +20211,34 @@ async function submitDeleteAccount(){
       <button id="deleteAccountConfirmBtn" onclick="submitDeleteAccount()" disabled
         style="flex:1;padding:12px;background:#555;color:#999;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;">削除する</button>
     </div>
+  </div>
+</div>
+<!-- ════ パーティーレイド作成モーダル ════ -->
+<div class="raid-modal-overlay" id="raidCreateModal" onclick="if(event.target===this)closeRaidModal()">
+  <div class="raid-modal">
+    <div class="raid-modal-title">⚔️ PARTY RAID — 仲間とボスを討伐せよ</div>
+
+    <div class="raid-modal-section">BOSS SELECTION — ボスを選べ</div>
+    <div class="raid-boss-grid" id="raidBossGrid"></div>
+
+    <div class="raid-modal-section">DIFFICULTY — 難易度</div>
+    <div class="raid-diff-row">
+      <button class="raid-diff-btn selected" data-diff="easy"   onclick="selectRaidDiff('easy')">🌱 やさしい<br><span style="font-size:9px;opacity:.7;">HP×0.6</span></button>
+      <button class="raid-diff-btn"          data-diff="normal" onclick="selectRaidDiff('normal')">⚔️ 普通<br><span style="font-size:9px;opacity:.7;">HP×1.0</span></button>
+      <button class="raid-diff-btn"          data-diff="hard"   onclick="selectRaidDiff('hard')">💀 難しい<br><span style="font-size:9px;opacity:.7;">HP×1.5</span></button>
+    </div>
+
+    <div class="raid-modal-section">PARTY MEMBERS — 仲間を選ぶ（最大3人）</div>
+    <div class="raid-member-list" id="raidMemberList">
+      <div style="font-size:12px;color:var(--muted);text-align:center;padding:12px;">読み込み中...</div>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.7;">
+      ⏰ 制限時間：<strong style="color:var(--text);">24時間</strong>以内に全員でボスのHPを0にせよ<br>
+      ⚡ ダメージ＝記録した分数×ステータス（計算科目はSTR、理論科目はINT）
+    </div>
+
+    <button class="raid-start-btn" onclick="createPartyRaid()">⚔️ レイド開始！</button>
   </div>
 </div>
 </body>
