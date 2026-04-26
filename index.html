@@ -11735,64 +11735,127 @@ function renderDuelCard(){
     return;
   }
 
-  // ── 状態別レンダリング ──
-
-  // 前日の結果表示（日付が昨日のまま result確定済み）
-  if(duel && duel.date!==today && duel.result){
-    const icons={win:'🏆',lose:'😔',void:'💀'};
-    const msgs={win:`宣言を果たした！<br><strong style="color:#FFD700">+100G</strong> 獲得`,lose:`宣言未達、敗北...<br>戦った証に <strong style="color:#C9A84C">+20G</strong>`,void:`懸賞金は失効した。<br>次は最後まで戦え`};
-    const brd={win:'rgba(255,215,0,.3)',lose:'rgba(255,100,136,.25)',void:'rgba(100,100,100,.2)'};
-    card.innerHTML=`<div class="duel-card">
-      <div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">昨日の決闘 — 結果</div><div class="duel-sub">${duel.date}</div></div></div>
+  // ── 決着カード生成ヘルパー ──
+  function resultCard(r, isYesterday){
+    const icon   = {win:'🏆',lose:'😔',void:'💀'}[r];
+    const msg    = {win:'宣言を果たした！',lose:'惜敗した',void:'懸賞金は失効した'}[r];
+    const reward = {win:'+ 100G',lose:'+ 20G',void:''}[r];
+    const note   = {win:'',lose:'戦った証として',void:'次は最後まで戦え'}[r];
+    const sub    = {win:'勝利',lose:'敗北',void:'失効'}[r];
+    const hdrCls = {win:'duel-hdr-win',lose:'duel-hdr-lose',void:'duel-hdr-void'}[r];
+    const cardCls= {win:'duel-state-win',lose:'duel-state-lose',void:'duel-state-void'}[r];
+    const title  = isYesterday ? '昨日の決闘 — 決着' : '本日の決闘 — 決着';
+    return `<div class="duel-card ${cardCls}">
+      <div class="duel-hdr ${hdrCls}">
+        <span>${icon}</span>
+        <div><div class="duel-title">${title}</div><div class="duel-sub">${sub}</div></div>
+      </div>
       <div class="duel-body">
-        <div class="duel-result-block" style="border-color:${brd[duel.result]}">
-          <div style="font-size:38px;margin-bottom:8px;">${icons[duel.result]}</div>
-          <div class="duel-result-msg">${msgs[duel.result]}</div>
+        <div class="duel-result-hero">
+          <div class="duel-result-hero-icon">${icon}</div>
+          <div class="duel-result-hero-msg ${r}">${msg}</div>
+          ${reward?`<div class="duel-result-hero-reward ${r}">${reward}</div>`:''}
+          ${note?`<div class="duel-result-hero-note">${note}</div>`:''}
         </div>
-        ${duel.rivalId?`<div class="duel-rival-ref">相手の記録: ${fmt(duel.rivalRecord)} / 自分の宣言: ${fmt(duel.declaredGoalMins)}</div>`:''}
       </div>
     </div>`;
+  }
+
+  // ── 状態別レンダリング ──
+
+  // 前日の結果表示
+  if(duel && duel.date!==today && duel.result){
+    card.innerHTML = resultCard(duel.result, true);
     return;
   }
 
   // 今日の宣言なし → 状態別案内
   if(!duel || duel.date!==today){
     if(isAfterNoon){
-      card.innerHTML=`<div class="duel-card"><div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘</div><div class="duel-sub">今日の参加受付は終了</div></div></div><div class="duel-body"><div class="duel-miss">📅<br>午前中の宣言がありません。<br>今日の決闘は不参加です。<br><small>明日の11:59までに宣言して参加しよう！</small></div></div></div>`;
+      card.innerHTML=`<div class="duel-card">
+        <div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘</div><div class="duel-sub">今日の参加受付は終了</div></div></div>
+        <div class="duel-body"><div class="duel-entry-prompt">
+          <div class="duel-entry-icon">📅</div>
+          <div class="duel-entry-msg">今日は不参加</div>
+          <div class="duel-entry-hint">明日の11:59までに宣言して参加しよう</div>
+        </div></div>
+      </div>`;
     } else {
-      card.innerHTML=`<div class="duel-card"><div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘</div><div class="duel-sub">朝の誓いを立てた者だけが選ばれる</div></div></div><div class="duel-body"><div class="duel-miss">🌅<br>朝の誓いを立てよ<br><small>上の宣言フォームで目標を設定すると<br>決闘にエントリーされます</small><div class="duel-deadline">⏰ エントリー締切: 11:59</div></div></div></div>`;
+      card.innerHTML=`<div class="duel-card">
+        <div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘</div><div class="duel-sub">朝の誓いを立てた者だけが選ばれる</div></div></div>
+        <div class="duel-body"><div class="duel-entry-prompt">
+          <div class="duel-entry-icon">🌅</div>
+          <div class="duel-entry-msg">朝の誓いを立てよ</div>
+          <div class="duel-entry-hint">上の宣言フォームで目標を設定して参加</div>
+          <div class="duel-deadline-lg">⏰ 参加受付 〜 11:59</div>
+        </div></div>
+      </div>`;
     }
     return;
   }
 
   // 結果確定済み（今日分）
   if(duel.result){
-    const icons={win:'🏆',lose:'😔',void:'💀'};
-    const msgs={win:`宣言を果たした！ <strong style="color:#FFD700">+100G 獲得</strong>`,lose:`敗北... 戦った証に <strong style="color:#C9A84C">+20G</strong>`,void:`懸賞金は失効した`};
-    const brd={win:'rgba(255,215,0,.3)',lose:'rgba(255,100,136,.25)',void:'rgba(100,100,100,.2)'};
-    card.innerHTML=`<div class="duel-card"><div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘 — 決着</div><div class="duel-sub">今日の結果</div></div></div><div class="duel-body"><div class="duel-result-block" style="border-color:${brd[duel.result]}"><div style="font-size:38px;margin-bottom:8px;">${icons[duel.result]}</div><div class="duel-result-msg">${msgs[duel.result]}</div></div></div></div>`;
+    card.innerHTML = resultCard(duel.result, false);
     return;
   }
 
   // 不参加（午後宣言）
   if(!duel.eligible){
-    card.innerHTML=`<div class="duel-card"><div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘</div><div class="duel-sub">今日は観戦のみ</div></div></div><div class="duel-body"><div class="duel-miss">午後に宣言したため、今日の決闘は不参加。<br><small>明日の11:59までに宣言して参加しよう！</small></div></div></div>`;
+    card.innerHTML=`<div class="duel-card">
+      <div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘</div><div class="duel-sub">今日は観戦のみ</div></div></div>
+      <div class="duel-body"><div class="duel-entry-prompt">
+        <div class="duel-entry-icon">👀</div>
+        <div class="duel-entry-msg">午後の宣言のため不参加</div>
+        <div class="duel-entry-hint">明日の11:59までに宣言して参加しよう</div>
+      </div></div>
+    </div>`;
     return;
   }
 
-  // 正午前：待機中
+  // エントリー済み（正午前待機）
   if(!duel.confirmedAt && !isAfterNoon){
     const noonMs = new Date(); noonMs.setHours(12,0,0,0);
     const msLeft = Math.max(0, noonMs-now);
     const hL=Math.floor(msLeft/3600000), mL=Math.floor((msLeft%3600000)/60000);
     const cStr = hL>0?`${hL}h${mL}m`:mL+'分';
-    card.innerHTML=`<div class="duel-card duel-card-active"><div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘 — エントリー済み</div><div class="duel-sub">正午にライバルが現れる</div></div></div><div class="duel-body"><div class="duel-waiting"><div class="duel-waiting-icon">⏳</div><div>宣言: <strong>${fmt(duel.declaredGoalMins)}</strong> の決闘に参加！</div><div class="duel-countdown">正午まで あと ${cStr}</div><div class="duel-reward-hint"><span>🏆 勝利: <strong>+100G</strong></span><span>😔 敗北: <strong>+20G</strong></span><span>💀 未挑戦: <strong>0G</strong></span></div></div></div></div>`;
+    card.innerHTML=`<div class="duel-card duel-card-active duel-state-entered">
+      <div class="duel-hdr duel-hdr-entered">
+        <span>⚔️</span>
+        <div><div class="duel-title">本日の決闘 — エントリー済み</div><div class="duel-sub">正午にライバルが現れる</div></div>
+      </div>
+      <div class="duel-body">
+        <div class="duel-countdown-hero">
+          <div class="duel-countdown-num">${cStr}</div>
+          <div class="duel-countdown-lbl">正午まで</div>
+          <div class="duel-decl-note">宣言: <strong>${fmt(duel.declaredGoalMins)}</strong></div>
+        </div>
+        <div class="duel-reward-cards">
+          <div class="duel-reward-card win">
+            <div class="duel-reward-card-icon">🏆</div>
+            <div class="duel-reward-card-amount">+100G</div>
+            <div class="duel-reward-card-label">勝利</div>
+          </div>
+          <div class="duel-reward-card lose">
+            <div class="duel-reward-card-icon">😔</div>
+            <div class="duel-reward-card-amount">+20G</div>
+            <div class="duel-reward-card-label">敗北</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
     return;
   }
 
   // 正午後だがライバル未確定 → 召喚
   if(!duel.confirmedAt && isAfterNoon){
-    card.innerHTML=`<div class="duel-card duel-card-active"><div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘</div><div class="duel-sub">ライバルを召喚中...</div></div></div><div class="duel-body"><div class="duel-miss">⚔️ ライバルを探しています...</div></div></div>`;
+    card.innerHTML=`<div class="duel-card duel-card-active">
+      <div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘</div><div class="duel-sub">ライバルを召喚中...</div></div></div>
+      <div class="duel-body"><div class="duel-entry-prompt">
+        <div class="duel-entry-icon">⚔️</div>
+        <div class="duel-entry-msg">ライバルを探しています</div>
+      </div></div>
+    </div>`;
     assignDuelRival(duel);
     return;
   }
@@ -11803,8 +11866,8 @@ function renderDuelCard(){
   const remaining = Math.max(0, duel.declaredGoalMins-doneMins);
   const rivalJob = (duel.rivalJobIds||[]).map(id=>{const j=JOBS?.find(x=>x.id===id);return j?j.icon:'';}).join('');
   const maxBar = Math.max(duel.declaredGoalMins, duel.rivalRecord, 1);
-  const myBarW = Math.round(doneMins/maxBar*100);
-  const rvBarW = Math.round(duel.rivalRecord/maxBar*100);
+  const myBarW = Math.min(100, Math.round(doneMins/maxBar*100));
+  const rvBarW = Math.min(100, Math.round(duel.rivalRecord/maxBar*100));
   let statusMsg, statusCls;
   if(pct>=100){ statusMsg='✅ 宣言達成！勝利確定！'; statusCls='lead'; }
   else if(pct>=80){ statusMsg=`残り${fmt(remaining)}！勝利まであと一息！`; statusCls='close'; }
@@ -11813,22 +11876,29 @@ function renderDuelCard(){
   // 夜11:30以降なら結果を自動処理
   if(now.getHours()>=23 && now.getMinutes()>=30 && !duel.rewardGiven){ processDuelResult(duel); renderDuelCard(); return; }
 
+  const activeSub = duel.isRematch ? '昨日のライバルが再び現れた' : '23:59 決着';
+
   card.innerHTML=`<div class="duel-card duel-card-active">
-    <div class="duel-hdr"><span>⚔️</span><div><div class="duel-title">本日の決闘 — 進行中</div><div class="duel-sub">今日の23:59に決着がつく</div></div>${duel.isRematch?'<span class="duel-rematch-badge">🔁 再戦</span>':''}</div>
+    <div class="duel-hdr">
+      <span>⚔️</span>
+      <div><div class="duel-title">本日の決闘 — 進行中</div><div class="duel-sub">${activeSub}</div></div>
+      ${duel.isRematch?'<span class="duel-rematch-badge">🔁 再戦</span>':''}
+    </div>
     <div class="duel-body">
-      <div class="duel-rival-info">
-        <div class="duel-rival-lv">Lv.${duel.rivalLevel} ${escHtml(duel.rivalTitle||'冒険者')}${rivalJob?' '+rivalJob:''}</div>
-        <div class="duel-rival-name">影の冒険者「${escHtml(duel.rivalName||'???')}」</div>
-        <div class="duel-rival-record">📜 過去の記録: <strong>${fmt(duel.rivalRecord)}</strong></div>
+      <div class="duel-prog-hero">
+        <div class="duel-prog-hero-pct">${pct}%</div>
+        <div class="duel-prog-hero-bar"><div class="duel-prog-hero-fill" style="width:${myBarW}%"></div></div>
+        <div class="duel-prog-hero-sub">${fmt(doneMins)} 達成 / 宣言 ${fmt(duel.declaredGoalMins)}</div>
       </div>
-      <div class="duel-prog-section">
-        <div class="duel-prog-row"><span>あなた ${fmt(doneMins)} / 宣言 ${fmt(duel.declaredGoalMins)}</span><span class="duel-pct">${pct}%</span></div>
-        <div class="duel-prog-track"><div class="duel-prog-my" style="width:${myBarW}%"></div></div>
-        <div class="duel-prog-row" style="margin-top:6px;"><span>ライバルの記録</span><span>${fmt(duel.rivalRecord)}</span></div>
+      <div class="duel-rival-compact">
+        <span>「${escHtml(duel.rivalName||'???')}」${rivalJob?rivalJob+' ':''}Lv.${duel.rivalLevel}</span>
+        <span class="duel-rival-compact-rec">📜 ${fmt(duel.rivalRecord)}</span>
+      </div>
+      <div class="duel-rival-bar">
+        <div class="duel-rival-bar-lbl"><span>ライバルの記録</span><span>${fmt(duel.rivalRecord)}</span></div>
         <div class="duel-prog-track"><div class="duel-prog-rival" style="width:${rvBarW}%"></div></div>
       </div>
       <div class="duel-status ${statusCls}">${statusMsg}</div>
-      <div class="duel-reward-hint"><span>🏆 勝利: <strong>+100G</strong></span><span>😔 敗北: <strong>+20G</strong></span><span>💀 未挑戦: <strong>0G</strong></span></div>
     </div>
   </div>`;
 }
@@ -20271,34 +20341,78 @@ if ('serviceWorker' in navigator) {
 /* ═══ 本日の決闘 ═══ */
 .duel-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
 .duel-card-active{border-color:rgba(255,68,102,.35);}
+/* 状態別ボーダー */
+.duel-state-entered{border-color:rgba(100,160,255,.3)!important;}
+.duel-state-win{border-color:rgba(255,215,0,.4)!important;}
+.duel-state-lose{border-color:rgba(255,68,102,.2)!important;}
+.duel-state-void{border-color:rgba(80,80,80,.3)!important;}
+/* ヘッダー共通 */
 .duel-hdr{background:linear-gradient(135deg,#1e0010,#100020);padding:11px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,68,102,.2);}
 .duel-hdr>span{font-size:20px;}
+/* 状態別ヘッダー */
+.duel-hdr-entered{background:linear-gradient(135deg,#0c1428,#0e1830)!important;border-bottom-color:rgba(100,160,255,.2)!important;}
+.duel-hdr-win{background:linear-gradient(135deg,#1c1400,#221a00)!important;border-bottom-color:rgba(255,215,0,.25)!important;}
+.duel-hdr-lose{background:linear-gradient(135deg,#120008,#0d0008)!important;border-bottom-color:rgba(180,100,120,.15)!important;}
+.duel-hdr-void{background:linear-gradient(135deg,#080808,#0e0e0e)!important;border-bottom-color:rgba(80,80,80,.2)!important;}
+/* タイトル・サブ */
 .duel-title{font-family:'Cinzel',serif;font-size:11px;color:#ff9aaa;letter-spacing:.12em;}
-.duel-sub{font-size:9px;color:#663344;margin-top:1px;font-family:'Share Tech Mono',monospace;}
+.duel-sub{font-size:9px;color:#553344;margin-top:1px;font-family:'Share Tech Mono',monospace;}
+.duel-hdr-win .duel-title{color:#FFD700;}.duel-hdr-win .duel-sub{color:#665500;}
+.duel-hdr-void .duel-title{color:#888;}.duel-hdr-void .duel-sub{color:#444;}
+.duel-hdr-entered .duel-title{color:#7eb8ff;}.duel-hdr-entered .duel-sub{color:#334466;}
+/* ボディ */
 .duel-body{padding:12px 14px;}
-.duel-miss{text-align:center;padding:14px 8px;font-size:12px;color:var(--muted);line-height:1.7;}
-.duel-deadline{display:inline-block;margin-top:8px;font-size:10px;color:#ff9aaa;font-family:'Share Tech Mono',monospace;border:1px solid rgba(255,68,102,.3);border-radius:6px;padding:3px 10px;}
-.duel-waiting{text-align:center;padding:8px;font-size:12px;color:var(--text);line-height:1.7;}
-.duel-waiting-icon{font-size:32px;margin-bottom:6px;}
-.duel-countdown{font-family:'Share Tech Mono',monospace;font-size:13px;color:#ff9aaa;margin:6px 0 10px;}
-.duel-rival-info{background:var(--panel);border:1px solid rgba(255,68,102,.2);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
-.duel-rival-lv{font-size:10px;color:var(--muted);font-family:'Share Tech Mono',monospace;margin-bottom:2px;}
-.duel-rival-name{font-family:'Cinzel',serif;font-size:13px;color:#ff9aaa;margin-bottom:4px;}
-.duel-rival-record{font-size:11px;color:var(--muted);}
-.duel-prog-section{margin-bottom:10px;}
-.duel-prog-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px;font-family:'Share Tech Mono',monospace;}
-.duel-pct{color:var(--accent2);font-weight:700;}
+/* 未参加・不参加 共通エリア */
+.duel-entry-prompt{text-align:center;padding:16px 8px;}
+.duel-entry-icon{font-size:28px;margin-bottom:8px;}
+.duel-entry-msg{font-family:'Cinzel',serif;font-size:13px;color:var(--text);margin-bottom:5px;}
+.duel-entry-hint{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:10px;}
+.duel-deadline-lg{display:inline-block;font-size:12px;font-family:'Share Tech Mono',monospace;color:#ff9aaa;border:1px solid rgba(255,68,102,.4);border-radius:8px;padding:5px 14px;letter-spacing:.04em;}
+/* エントリー済みカウントダウン */
+.duel-countdown-hero{text-align:center;padding:8px 0 10px;}
+.duel-countdown-num{font-family:'Share Tech Mono',monospace;font-size:36px;font-weight:700;color:#7eb8ff;line-height:1;}
+.duel-countdown-lbl{font-size:10px;color:var(--muted);margin:4px 0 8px;font-family:'Share Tech Mono',monospace;letter-spacing:.06em;text-transform:uppercase;}
+.duel-decl-note{font-size:11px;color:var(--muted);margin-bottom:10px;}
+/* 報酬カード */
+.duel-reward-cards{display:flex;gap:8px;}
+.duel-reward-card{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:9px 4px;text-align:center;}
+.duel-reward-card.win{border-color:rgba(255,215,0,.2);}
+.duel-reward-card.lose{border-color:rgba(255,68,102,.12);}
+.duel-reward-card-icon{font-size:18px;margin-bottom:3px;}
+.duel-reward-card-amount{font-family:'Share Tech Mono',monospace;font-size:15px;font-weight:700;}
+.duel-reward-card.win .duel-reward-card-amount{color:#FFD700;}
+.duel-reward-card.lose .duel-reward-card-amount{color:#C9A84C;}
+.duel-reward-card-label{font-size:9px;color:var(--muted);margin-top:2px;}
+/* 進行中：達成率ヒーロー */
+.duel-prog-hero{text-align:center;padding:4px 0 12px;}
+.duel-prog-hero-pct{font-family:'Share Tech Mono',monospace;font-size:42px;font-weight:700;color:var(--accent2);line-height:1;}
+.duel-prog-hero-bar{height:14px;background:var(--panel);border:1px solid var(--border);border-radius:99px;overflow:hidden;margin:8px 0 5px;}
+.duel-prog-hero-fill{height:100%;background:linear-gradient(to right,var(--accent),var(--gold2));border-radius:99px;transition:width .6s ease;}
+.duel-prog-hero-sub{font-size:10px;color:var(--muted);font-family:'Share Tech Mono',monospace;}
+/* 進行中：ライバルコンパクト行 */
+.duel-rival-compact{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--panel);border:1px solid rgba(255,68,102,.15);border-radius:7px;margin-bottom:7px;font-size:10px;color:#ff9aaa;}
+.duel-rival-compact-rec{color:var(--muted);font-family:'Share Tech Mono',monospace;white-space:nowrap;}
+/* 進行中：ライバルバー */
+.duel-rival-bar{margin-bottom:10px;}
+.duel-rival-bar-lbl{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:3px;font-family:'Share Tech Mono',monospace;}
 .duel-prog-track{height:8px;background:var(--panel);border:1px solid var(--border);border-radius:99px;overflow:hidden;}
-.duel-prog-my{height:100%;background:linear-gradient(to right,var(--accent),var(--gold2));border-radius:99px;transition:width .6s ease;}
 .duel-prog-rival{height:100%;background:linear-gradient(to right,#cc1133,#ff4466);border-radius:99px;transition:width .6s ease;}
+/* ステータスメッセージ */
 .duel-status{font-size:11px;text-align:center;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--panel);margin-bottom:8px;}
 .duel-status.lead{border-color:rgba(140,198,63,.3);color:var(--accent2);}
 .duel-status.behind,.duel-status.close{border-color:rgba(255,68,102,.3);color:#ff9aaa;}
-.duel-reward-hint{display:flex;justify-content:space-around;font-size:10px;color:var(--muted);padding:4px 0;}
-.duel-reward-hint strong{color:var(--text);}
-.duel-result-block{border:1px solid rgba(255,215,0,.3);border-radius:10px;padding:16px;text-align:center;margin-bottom:8px;}
-.duel-result-msg{font-size:13px;color:var(--text);line-height:1.6;}
-.duel-rival-ref{font-size:10px;color:var(--muted);text-align:center;font-family:'Share Tech Mono',monospace;}
+/* 決着：結果ヒーロー */
+.duel-result-hero{text-align:center;padding:18px 8px 12px;}
+.duel-result-hero-icon{font-size:46px;line-height:1;margin-bottom:8px;}
+.duel-result-hero-msg{font-family:'Cinzel',serif;font-size:14px;margin-bottom:8px;}
+.duel-result-hero-msg.win{color:#FFD700;}
+.duel-result-hero-msg.lose{color:#ff9aaa;}
+.duel-result-hero-msg.void{color:var(--muted);}
+.duel-result-hero-reward{font-family:'Share Tech Mono',monospace;font-size:24px;font-weight:700;margin-bottom:4px;}
+.duel-result-hero-reward.win{color:#FFD700;}
+.duel-result-hero-reward.lose{color:#C9A84C;}
+.duel-result-hero-note{font-size:10px;color:var(--muted);margin-top:2px;}
+/* 再戦バッジ */
 .duel-rematch-badge{margin-left:auto;font-size:9px;color:#ffaa44;border:1px solid rgba(255,170,68,.4);border-radius:6px;padding:2px 7px;font-family:'Share Tech Mono',monospace;white-space:nowrap;align-self:center;}
 
 /* ═══ 週間ライバル討伐クエスト ═══ */
