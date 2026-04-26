@@ -7180,7 +7180,7 @@ async function loadWeeklyRanking(){
 
   // week_start が今週の月曜と一致するユーザーを取得
   const {data, error} = await sb.from('profiles')
-    .select('id,display_name,level,avatar_emoji,char_title,streak,week_study_mins,week_start,job_ids')
+    .select('id,display_name,level,avatar_url,avatar_emoji,char_title,streak,week_study_mins,week_start,job_ids')
     .eq('week_start', ws)
     .gt('week_study_mins', 0)
     .order('week_study_mins', {ascending:false})
