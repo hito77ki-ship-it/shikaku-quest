@@ -14233,8 +14233,8 @@ const HELP_CONTENT = {
           a: '学習記録はブラウザのlocalStorageに保存されます。\n\nGoogleアカウントでログインすると、Supabase（クラウドDB）にも同期され、複数端末で使えます。\n\n定期的に「データを保存（JSON）」でバックアップを取ることをおすすめします。'
         },
         {
-          q: 'ゲーム（RPG）とどう連携していますか？',
-          a: '「⚔ ゲームを始める」ボタンからRPG風のミニゲームを遊べます。\n\n学習記録のEXPと独立したゲームですが、学習の息抜きやモチベーション維持に活用できます。'
+          q: '本日の決闘とは何ですか？',
+          a: '毎朝11:59までに「今日の宣言」を設定すると参加できる日次バトルです。\n\n正午になるとランダムなライバルが選ばれ、23:59に勝敗が確定します。\n\n自分の宣言目標（時間）を達成すれば勝利 +100G、達成できなくても挑んだ証として +20G を獲得。\n\nQUESTタブのホーム画面のカード内「？」ボタンをタップすると詳細が確認できます。'
         },
         {
           q: 'プロフィールアイコンはどこで変えられますか？',
@@ -14264,13 +14264,15 @@ const HELP_CONTENT = {
         { icon:'fa-solid fa-medal',         name:'TITLES',     desc:'累計時間・連続日数・得点などで解放される称号バッジ' },
         { icon:'fa-solid fa-ranking-star',  name:'RANKING',    desc:'フォロー中ユーザーとのレベル・学習時間ランキング（累計・週間）' },
         { icon:'fa-solid fa-chart-bar',     name:'SCORE',      desc:'模試得点の入力・合計点推移グラフ・科目別正答率・レーダーチャート' },
-        { icon:'fa-solid fa-chart-line',    name:'レポート',   desc:'Day/Week/Month/Year の学習時間グラフ・科目別円グラフ・週間目標・日付ナビゲーション' },
-        { icon:'fa-solid fa-users',         name:'タイムライン', desc:'学習宣言・目標投稿・フォロー中ユーザーの投稿を閲覧・いいね' },
+        { icon:'fa-solid fa-chart-line',    name:'レポート',   desc:'Day/Week/Month/Year の学習時間グラフ・科目別円グラフ・週間目標・学習計画（試験日逆算）' },
+        { icon:'fa-solid fa-users',         name:'タイムライン', desc:'学習宣言・目標投稿・フォロー中ユーザーの投稿を閲覧・いいね・返信スレッド' },
         { icon:'fa-solid fa-envelope',      name:'DM',         desc:'相互フォロー中のユーザーとダイレクトメッセージ' },
-        { icon:'fa-solid fa-circle-user',   name:'自分',       desc:'プロフィールアイコン（画像アップロード）・表示名・公開/非公開設定・データ管理' },
+        { icon:'fa-solid fa-circle-user',   name:'自分',       desc:'プロフィールアイコン（画像アップロード）・表示名・公開/非公開設定・データ管理・決闘戦績' },
         { icon:'fa-solid fa-clock',         name:'バックグラウンドタイマー', desc:'タブ非表示でも計測継続・自動保存・クラッシュ復元・Web通知' },
         { icon:'fa-solid fa-lock',          name:'週間目標',   desc:'月〜日の学習目標を設定・週終了まで変更不可のロック機能' },
-        { icon:'fa-solid fa-gamepad',       name:'RPGミニゲーム', desc:'RPG風のマップ探索・バトル・呪文システム（β版）' },
+        { icon:'fa-solid fa-swords',        name:'本日の決闘', desc:'毎朝11:59までに宣言すると正午にライバルが確定。23:59に勝敗が決まる日次バトル。宣言達成で+100G' },
+        { icon:'fa-solid fa-crosshairs',    name:'週間ライバル討伐クエスト', desc:'週に1人、自分の学習量に近いライバルが選ばれる。今週中に上回れば討伐クエスト達成' },
+        { icon:'fa-solid fa-shield-halved', name:'パーティーレイド', desc:'最大4人でパーティーを組んでレイドに挑む。メンバーの合計学習量でボスを攻略' },
       ];
       return `<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
         スタディクエストで使える全機能の一覧です。タブ名と機能が一致するようになっています。
