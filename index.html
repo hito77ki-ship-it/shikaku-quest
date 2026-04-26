@@ -164,8 +164,9 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif JP',serif;mi
 .logo-en{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.45em;color:var(--accent);opacity:.8;margin-bottom:4px;}
 .logo-jp{font-family:'Cinzel',serif;font-size:30px;color:var(--accent2);text-shadow:0 0 30px rgba(140,198,63,.4);letter-spacing:.12em;}
 .section{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow);}
-.sec-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;color:var(--accent2);margin-bottom:18px;display:flex;align-items:center;gap:10px;font-weight:700;}
+.sec-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;color:var(--accent2);margin-bottom:6px;display:flex;align-items:center;gap:10px;font-weight:700;}
 .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--accent),transparent);opacity:.3;}
+.sec-sub{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:16px;font-family:'Share Tech Mono',monospace;opacity:.7;}
 .screen{display:none;}.screen.active{display:block;min-height:100dvh;overflow-y:auto;}
 
 /* AUTH */
@@ -1104,7 +1105,8 @@ body[data-theme="dark"] .rpt-header-tabs{border-bottom-color:rgba(255,255,255,.1
 
 /* セクション */
 .rpt-section{padding:16px 14px 0;}
-.rpt-section-title{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.15em;margin-bottom:12px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.rpt-section-title{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.15em;margin-bottom:4px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.rpt-section-sub{font-size:8px;color:var(--muted);letter-spacing:.08em;margin-bottom:12px;font-family:'Share Tech Mono',monospace;opacity:.5;}
 
 /* 統計カード3枚 */
 /* 期間セレクター */
@@ -4318,7 +4320,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         <button class="achieve-share-btn" onclick="openMaterialForm()">＋ 教材を追加</button>
       </div>
       <div id="materialCategoryList">
-        <div class="no-data">教材を追加してタイムラインに学習ログを流そう</div>
+        <div class="no-data">冒険の武器がまだない。<br><small style="color:var(--muted)">教材を登録すると学習記録がつけられる。</small></div>
       </div>
     </div>
   </div>
@@ -4656,7 +4658,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         <div class="ql-stat">今月<span id="qlMonth">0分</span></div>
         <div class="ql-stat">総計<span id="qlTotal">0h</span></div>
       </div>
-      <div class="session-list" id="sessionList"><div class="no-data">クエスト記録なし</div></div>
+      <div class="session-list" id="sessionList"><div class="no-data">クエスト記録がまだない。<br><small style="color:var(--muted)">タイマーで学習を完了させると記録される。</small></div></div>
       <!-- アンドゥバー -->
       <div class="session-undo-bar" id="undoBar">
         <span id="undoMsg">記録を削除しました</span>
@@ -4737,6 +4739,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     <!-- サマリー -->
     <div class="section" id="scoreSummarySection">
       <div class="sec-title">EXAM SUMMARY</div>
+      <div class="sec-sub">試練の戦績</div>
       <div class="no-score-data">記録がありません</div>
     </div>
 
@@ -5008,6 +5011,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
         <!-- 📅 学習計画自動生成 -->
         <div class="rpt-section" id="studyPlanSection">
           <div class="rpt-section-title">📅 学習計画（試験日から逆算）</div>
+          <div class="rpt-section-sub">合格への地図を描く</div>
           <div id="studyPlanContent"></div>
         </div>
 
@@ -5026,7 +5030,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
             <div class="rpt-section-title" style="margin-bottom:0;">QUEST LOG</div>
           </div>
           <div class="quest-log-stats" id="mql-stats"></div>
-          <div id="mql-list"><div class="no-data">クエスト記録なし</div></div>
+          <div id="mql-list"><div class="no-data">クエスト記録がまだない。<br><small style="color:var(--muted)">タイマーで学習を完了させると記録される。</small></div></div>
         </div>
       </div>
 
@@ -7124,7 +7128,7 @@ function switchRankTab(tab){
 
 async function loadRanking(){
   const listEl=document.getElementById('rankingList');
-  if(!currentUser||isGuest){listEl.innerHTML='<div class="no-data">ランキングを見るにはGoogleログインが必要です<br><small style="color:var(--muted)">ゲストはランキングに参加できません</small></div>';return;}
+  if(!currentUser||isGuest){listEl.innerHTML='<div class="no-data">ランキングを見るにはGoogleログインが必要です<br><small style="color:var(--muted)">冒険者として名を刻むにはログインが必要だ。</small></div>';return;}
   listEl.innerHTML='<div class="no-data">読み込み中...</div>';
   const {data,error}=await sb.from('profiles').select('*').gt('total_study_mins',0).order('level',{ascending:false}).order('total_study_mins',{ascending:false}).limit(50);
   if(error||!data||!data.length){
@@ -7164,7 +7168,7 @@ async function loadWeeklyRanking(){
   const listEl = document.getElementById('rankingWeeklyList');
   if(!listEl) return;
   if(!currentUser||isGuest){
-    listEl.innerHTML='<div class="no-data">週間ランキングを見るにはGoogleログインが必要です<br><small style="color:var(--muted)">ゲストはランキングに参加できません</small></div>';
+    listEl.innerHTML='<div class="no-data">週間ランキングを見るにはGoogleログインが必要です<br><small style="color:var(--muted)">冒険者として名を刻むにはログインが必要だ。</small></div>';
     return;
   }
   listEl.innerHTML='<div class="no-data">読み込み中...</div>';
@@ -9327,7 +9331,7 @@ function renderScoreTab(){
 function renderScoreSummary(){
   const con=document.getElementById('scoreSummarySection');
   if(!scoreRecords.length){
-    con.innerHTML='<div class="sec-title">EXAM SUMMARY</div><div class="no-score-data">答練・模試の記録がありません<br><small style="color:var(--muted)">下のフォームから追加してください</small></div>';
+    con.innerHTML='<div class="sec-title">EXAM SUMMARY</div><div class="sec-sub">試練の戦績</div><div class="no-score-data">まだ試験に挑んでいない。<br><small style="color:var(--muted)">下のフォームから模試・答練を追加しよう。</small></div>';
     return;
   }
   const latest=scoreRecords[scoreRecords.length-1];
@@ -13572,7 +13576,7 @@ function renderSessions(subjs, showing){
   const smap={};subjs.forEach(s=>smap[s.key]=s);
   const list=document.getElementById('sessionList');
   renderQuestLogStats();
-  if(!sessions.length){list.innerHTML='<div class="no-data">クエスト記録なし</div>';return;}
+  if(!sessions.length){list.innerHTML='<div class="no-data">クエスト記録がまだない。<br><small style="color:var(--muted)">タイマーで学習を完了させると記録される。</small></div>';return;}
   const STEP = 30;
   const reversed = [...sessions].reverse();
   const count = showing || STEP;
@@ -13633,7 +13637,7 @@ function renderMobileQuestLog(){
   // リスト
   const listEl = document.getElementById('mql-list');
   if(!listEl) return;
-  if(!sessions.length){ listEl.innerHTML='<div class="no-data">クエスト記録なし</div>'; return; }
+  if(!sessions.length){ listEl.innerHTML='<div class="no-data">クエスト記録がまだない。<br><small style="color:var(--muted)">タイマーで学習を完了させると記録される。</small></div>'; return; }
 
   const reversed = [...sessions].reverse();
   const INITIAL = 5;
@@ -18707,7 +18711,7 @@ function renderMaterials(){
   });
 
   if(!materials.length){
-    container.innerHTML = '<div class="no-data">教材を追加してタイムラインに学習ログを流そう</div>';
+    container.innerHTML = '<div class="no-data">冒険の武器がまだない。<br><small style="color:var(--muted)">教材を登録すると学習記録がつけられる。</small></div>';
     return;
   }
 
