@@ -14195,6 +14195,11 @@ const HELP_CONTENT = {
           desc:'模試や答練が近づいたら「BOSS」タブで登録。目標勉強時間をHPで可視化し、終わったらそのまま点数も記録できます。',
           tip:'模試がない時期はスキップしてOK'
         },
+        {
+          n:'⑥', title:'他アプリの勉強時間を引き継ぐ',
+          desc:'スタディプラスなど他のアプリで記録してきた勉強時間を引き継げます。「プロフ」タブを開き、「過去の勉強時間を引き継ぐ」に総学習時間を入力すると、経験値・レベルに反映されます。',
+          tip:'乗り換えでも今までの努力がゼロにならない'
+        },
       ];
       const tutBtn = `<div style="margin-top:20px;text-align:center;">
         <button onclick="restartTutorial()" style="
@@ -14258,6 +14263,10 @@ const HELP_CONTENT = {
         {
           q: 'プロフィールアイコンはどこで変えられますか？',
           a: '「自分」タブを開き、「プロフィールアイコン」セクションの「📷 写真をアップロード」から画像を選択します。円形にクロップされてステータスバーやキャラクター表示に反映されます。'
+        },
+        {
+          q: '他のアプリからの勉強時間を引き継げますか？',
+          a: 'はい！「プロフ」タブに「過去の勉強時間を引き継ぐ」という機能があります。\n\nスタディプラスなど他のアプリで記録してきた総学習時間（時間・分）を入力すると、その分が経験値・レベルに反映されます。\n\n入力した引き継ぎ記録はいつでも「🗑 引き継ぎをリセット」からやり直せます。'
         },
       ];
       return faqs.map((f,i)=>`
@@ -20709,6 +20718,7 @@ if ('serviceWorker' in navigator) {
     <div class="tut-dot" id="td2"></div>
     <div class="tut-dot" id="td3"></div>
     <div class="tut-dot" id="td4"></div>
+    <div class="tut-dot" id="td5"></div>
   </div>
   <div class="tut-arrow" id="tutArrow" style="display:none"></div>
   <div class="tut-icon" id="tutIcon"></div>
@@ -20747,6 +20757,12 @@ const TUT_STEPS = [
     target: ()=> findVisibleEl('#pcnav-profile', '[data-tab="profile"]', '#tab-profile'),
   },
   {
+    icon:'📂',
+    title:'他アプリの記録を引き継ごう',
+    desc:'スタディプラスなど他のアプリで記録してきた勉強時間がある方は、<strong>プロフ</strong>タブの「過去の勉強時間を引き継ぐ」から入力できます。今までの努力をそのまま引き継げます！',
+    target: ()=> findVisibleEl('#pcnav-profile', '[data-tab="profile"]', '#tab-profile'),
+  },
+  {
     icon:'📣',
     title:'今日の目標を宣言しよう',
     desc:'QUESTタブを開いて、今日の目標を宣言してから勉強スタート！',
@@ -20782,7 +20798,7 @@ function renderTutStep() {
   document.getElementById('tutIcon').textContent = s.icon;
   document.getElementById('tutTitle').textContent = s.title;
   document.getElementById('tutDesc').innerHTML = s.desc;
-  [0,1,2,3,4].forEach(i => document.getElementById('td'+i).classList.toggle('active', i===tutStep));
+  [0,1,2,3,4,5].forEach(i => document.getElementById('td'+i).classList.toggle('active', i===tutStep));
   const isLast = tutStep === TUT_STEPS.length - 1;
   document.getElementById('tutNextBtn').textContent = isLast ? '始める ⚔' : '次へ →';
 
