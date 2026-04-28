@@ -14385,6 +14385,11 @@ function renderBoss(){
     list.innerHTML='<div class="no-boss-wrap"><span style="font-size:32px;display:block;margin-bottom:8px;opacity:.3">💀</span><div>模試・答練がまだ登録されていません</div></div>';
     return;
   }
+  const allPassed = bosses.every(b=>{
+    const ed=new Date(b.date); ed.setHours(0,0,0,0);
+    const today=new Date(); today.setHours(0,0,0,0);
+    return ed<today;
+  });
   const today = new Date(); today.setHours(0,0,0,0);
   const doneH = studyMins(sessions)/60;
 
@@ -14440,13 +14445,21 @@ function renderBoss(){
               </div>
             </div>`;
           }
-          return `<button onclick="recordBossResult('${b.id}')" style="margin-top:12px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(140,198,63,.15),rgba(140,198,63,.05));border:1px solid rgba(140,198,63,.4);border-radius:6px;color:#8cc63f;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">✏ 結果を記録する → SCORE</button>`;
+          return `<button onclick="recordBossResult('${b.id}')" style="margin-top:12px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(140,198,63,.15),rgba(140,198,63,.05));border:1px solid rgba(140,198,63,.4);border-radius:6px;color:#8cc63f;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">✏ 結果を記録する → SCORE</button>
+            <button onclick="openBossForm()" style="margin-top:8px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.4);border-radius:6px;color:#a855f7;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">⚔ 次のボスを設定する</button>`;
         })() : ''}
       </div>
       <button class="boss-card-del" onclick="editBoss('${b.id}')">✎</button>
       <button class="boss-card-del" style="top:36px;" onclick="deleteBoss('${b.id}')">🗑</button>
     </div>`;
   }).join('');
+  if(allPassed){
+    list.innerHTML += `<div style="margin-top:16px;padding:16px 20px;background:linear-gradient(135deg,rgba(168,85,247,.1),rgba(140,198,63,.05));border:1px solid rgba(168,85,247,.3);border-radius:12px;text-align:center;">
+      <div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:6px;">🏆 すべての試験が終了しました</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">次の目標を設定して冒険を続けよう</div>
+      <button onclick="openBossForm()" style="background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-size:13px;font-weight:700;padding:10px 24px;border-radius:100px;cursor:pointer;">⚔ 次のボスを設定する</button>
+    </div>`;
+  }
 }
 
 function recordBossResult(bossId){
