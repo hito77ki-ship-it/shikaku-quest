@@ -10918,29 +10918,38 @@ function renderActionSuggestions(){
     }
   }
 
-  // ② 弱点科目（直近7日）
+  // ② 今日まだ学習していない
+  const todayStr = toLocalDateStr(today);
+  const studiedToday = sessions.some(s=>isStudyType(s)&&s.date===todayStr);
+  if(!studiedToday){
+    suggestions.push({icon:'🌅',color:'#60a0ff',title:'今日はまだ学習記録がありません',action:'10分でも記録しよう。小さな一歩がストリークを守ります。',btn:null});
+  }
+
+  // ③ 弱点科目（直近7日）— 具体的な目標時間付き
   const subjs = allSelectedSubjects();
   if(subjs.length>=2){
     const w7dist = subjs.map(s=>({
-      name:s.name, color:s.color,
+      key:s.key, name:s.name, color:s.color,
       mins:week7Sessions.filter(x=>x.subject===s.key).reduce((a,x)=>a+sAmount(x),0)
     }));
     const max7 = Math.max(...w7dist.map(s=>s.mins));
     if(max7>0){
       const weak = w7dist.filter(s=>s.mins<max7*0.25).sort((a,b)=>a.mins-b.mins);
       if(weak.length){
-        suggestions.push({icon:'⚔',color:'#8cc63f',title:`弱点科目：${weak[0].name}`,action:`直近7日の学習時間が他の科目より大幅に少ないです。今週は${weak[0].name}を優先して取り組むと全体のバランスが整います。`});
+        const targetH = Math.max(2, Math.round(max7/60*0.5));
+        suggestions.push({icon:'⚔',color:'#8cc63f',title:`今週の重点科目：${weak[0].name}`,action:`直近7日の学習時間が他の科目の25%未満です。今週は${weak[0].name}を目標${targetH}時間取り組むことでバランスが整います。`,btn:{label:`${weak[0].name}を記録する`,tab:'record'}});
       }
     }
   }
 
-  // ③ 今週ペースが先週比-30%以上
+  // ④ 今週ペースが先週比-30%以上
   if(prevWeekMins>60 && thisWeekMins < prevWeekMins*0.7){
     const diff = ((prevWeekMins-thisWeekMins)/60).toFixed(1);
-    suggestions.push({icon:'📉',color:'#60a0ff',title:`今週は先週より${diff}時間少ないペースです`,action:'先週のペースに戻すには、今日から少し多めに取り組むのがおすすめです。'});
+    const dailyNeeded = ((prevWeekMins-thisWeekMins)/60/7).toFixed(1);
+    suggestions.push({icon:'📉',color:'#60a0ff',title:`今週は先週より${diff}時間少ないペースです`,action:`先週のペースに戻すには、今日から1日約${dailyNeeded}時間多めに取り組むのがおすすめです。`,btn:null});
   }
 
-  // ④ ボスの残り日数と必要ペース
+  // ⑤ ボスの残り日数と必要ペース
   if(bosses.length){
     const active = bosses.find(b=>{ const ed=new Date(b.date); ed.setHours(0,0,0,0); return ed>=today; });
     if(active){
@@ -10950,11 +10959,17 @@ function renderActionSuggestions(){
       const neededH = (active.targetHours||100)-doneH;
       if(neededH>0 && daysLeft>0){
         const daily = (neededH/daysLeft).toFixed(1);
-        if(parseFloat(daily)>2){
-          suggestions.push({icon:'💀',color:'#ff9e4d',title:`${active.name}まで残り${daysLeft}日`,action:`目標まで残り${Math.round(neededH)}h。ペースを保つには1日${daily}h必要です。`});
+        const weekly = Math.min(70, (parseFloat(daily)*7).toFixed(1));
+        if(parseFloat(daily)>1.5){
+          suggestions.push({icon:'💀',color:'#ff9e4d',title:`${active.name}まで残り${daysLeft}日`,action:`目標まで残り${Math.round(neededH)}h。今週${weekly}h・1日${daily}hのペースが必要です。`,btn:{label:'ボス状況を確認',tab:'boss'}});
         }
       }
     }
+  }
+
+  // ⑥ 長い連続記録中（激励）
+  if(char.streak>=7 && char.streak<30){
+    suggestions.push({icon:'🔥',color:'#ff9e4d',title:`${char.streak}日連続学習中！`,action:'素晴らしいストリークです。今日も記録してこのペースを守り続けよう。',btn:null});
   }
 
   if(!suggestions.length){
@@ -10962,12 +10977,15 @@ function renderActionSuggestions(){
     return;
   }
   el.innerHTML = suggestions.map(s=>`
-    <div style="display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--border);border-left:3px solid ${s.color};border-radius:10px;padding:12px 14px;margin-bottom:8px;">
-      <div style="font-size:18px;flex-shrink:0;">${s.icon}</div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:${s.color};margin-bottom:3px;">${s.title}</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.6;">${s.action}</div>
+    <div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid ${s.color};border-radius:10px;padding:12px 14px;margin-bottom:8px;">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="font-size:18px;flex-shrink:0;">${s.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:700;color:${s.color};margin-bottom:3px;">${s.title}</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;">${s.action}</div>
+        </div>
       </div>
+      ${s.btn?`<button onclick="switchTab('${s.btn.tab}')" style="margin-top:8px;width:100%;padding:7px;background:none;border:1px solid ${s.color}44;border-radius:6px;color:${s.color};font-size:11px;font-weight:600;cursor:pointer;">${s.btn.label} →</button>`:''}
     </div>`).join('');
 }
 
@@ -14492,7 +14510,7 @@ function renderBoss(){
       <div class="boss-card-icon">💀</div>
       <div class="boss-card-body">
         <div class="boss-card-name">${escHtml(b.name)}</div>
-        <div class="boss-card-sub">${passed?'終了済み':'— 中ボス戦まで —'}</div>
+        <div class="boss-card-sub">${passed?(b.result==='pass'?'🏆 合格済み':b.result==='fail'?'❌ 不合格':'終了済み'):'— 中ボス戦まで —'}</div>
         <div class="boss-card-countdown">
           <div>
             <div class="boss-card-cd-num" style="color:${cdColor}">${wk}</div>
@@ -14531,7 +14549,30 @@ function renderBoss(){
               </div>
             </div>`;
           }
-          return `<button onclick="recordBossResult('${b.id}')" style="margin-top:12px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(140,198,63,.15),rgba(140,198,63,.05));border:1px solid rgba(140,198,63,.4);border-radius:6px;color:#8cc63f;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">✏ 結果を記録する → SCORE</button>
+          if(b.result==='pass'){
+            return `<div style="margin-top:12px;padding:12px;background:linear-gradient(135deg,rgba(140,198,63,.12),rgba(140,198,63,.04));border:1px solid rgba(140,198,63,.4);border-radius:8px;text-align:center;">
+              <div style="font-size:20px;margin-bottom:4px;">🏆</div>
+              <div style="font-size:13px;font-weight:700;color:#8cc63f;margin-bottom:2px;">合格おめでとう！</div>
+              <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">この試験はクリアしました</div>
+            </div>
+            <button onclick="recordBossResult('${b.id}')" style="margin-top:8px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(140,198,63,.15),rgba(140,198,63,.05));border:1px solid rgba(140,198,63,.4);border-radius:6px;color:#8cc63f;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">✏ 詳細スコアを記録する</button>
+            <button onclick="openBossForm()" style="margin-top:8px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.4);border-radius:6px;color:#a855f7;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">⚔ 次のボスを設定する</button>`;
+          }
+          if(b.result==='fail'){
+            return `<div style="margin-top:12px;padding:12px;background:rgba(255,80,80,.06);border:1px solid rgba(255,80,80,.3);border-radius:8px;text-align:center;">
+              <div style="font-size:11px;color:#ff6e6e;margin-bottom:6px;">次は必ず突破しよう ⚔</div>
+            </div>
+            <button onclick="recordBossResult('${b.id}')" style="margin-top:8px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(140,198,63,.15),rgba(140,198,63,.05));border:1px solid rgba(140,198,63,.4);border-radius:6px;color:#8cc63f;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">✏ 結果を記録する → SCORE</button>
+            <button onclick="openBossForm()" style="margin-top:8px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.4);border-radius:6px;color:#a855f7;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">⚔ リベンジ戦を追加する</button>`;
+          }
+          return `<div style="margin-top:12px;padding:10px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-align:center;">この試験の結果を記録しよう</div>
+              <div style="display:flex;gap:8px;">
+                <button onclick="markBossResult('${b.id}','pass')" style="flex:1;padding:8px;background:linear-gradient(135deg,rgba(140,198,63,.2),rgba(140,198,63,.08));border:1px solid rgba(140,198,63,.5);border-radius:6px;color:#8cc63f;font-size:12px;font-weight:700;cursor:pointer;">✅ 合格した！</button>
+                <button onclick="markBossResult('${b.id}','fail')" style="flex:1;padding:8px;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.3);border-radius:6px;color:#ff6e6e;font-size:12px;font-weight:700;cursor:pointer;">❌ 不合格だった</button>
+              </div>
+            </div>
+            <button onclick="recordBossResult('${b.id}')" style="margin-top:8px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(140,198,63,.15),rgba(140,198,63,.05));border:1px solid rgba(140,198,63,.4);border-radius:6px;color:#8cc63f;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">✏ スコア詳細を記録する → SCORE</button>
             <button onclick="openBossForm()" style="margin-top:8px;width:100%;padding:8px;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(168,85,247,.05));border:1px solid rgba(168,85,247,.4);border-radius:6px;color:#a855f7;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.05em;">⚔ 次のボスを設定する</button>`;
         })() : ''}
       </div>
@@ -14545,6 +14586,17 @@ function renderBoss(){
       <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">次の目標を設定して冒険を続けよう</div>
       <button onclick="openBossForm()" style="background:linear-gradient(135deg,#a855f7,#7c3aed);border:none;color:#fff;font-size:13px;font-weight:700;padding:10px 24px;border-radius:100px;cursor:pointer;">⚔ 次のボスを設定する</button>
     </div>`;
+  }
+}
+
+function markBossResult(bossId, result){
+  const b = bosses.find(x=>x.id===bossId);
+  if(!b) return;
+  b.result = result;
+  saveAll();
+  renderBoss();
+  if(result==='pass'){
+    showToast('🏆 合格おめでとう！次の目標も設定しよう');
   }
 }
 
