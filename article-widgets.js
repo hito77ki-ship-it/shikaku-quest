@@ -35,19 +35,27 @@ const ARTICLES = {
   'takken-vs-gyosei.html':  {label:'資格比較',    title:'宅建 vs 行政書士 どっちを先に取るべき？'},
   'itp-vs-fe.html':         {label:'資格比較',    title:'ITパスポート vs 基本情報 どっちを先に取るべき？'},
   'osusume-shikaku.html':   {label:'まとめ',      title:'社会人におすすめの資格ランキング2026'},
+  'toroku-hanbai.html':     {label:'登録販売者',  title:'登録販売者の独学合格ガイド'},
+  'eisei-kanri.html':       {label:'衛生管理者',  title:'衛生管理者（第一種・第二種）の独学合格ガイド'},
+  'hisho.html':             {label:'秘書検定',    title:'秘書検定2級・準1級の独学合格ガイド'},
+  'kanken.html':            {label:'漢字検定',    title:'漢字検定（漢検）2級の独学合格ガイド'},
+  'gaibuin.html':           {label:'証券外務員',  title:'証券外務員一種・二種の独学合格ガイド'},
+  'kenchiku.html':          {label:'二級建築士',  title:'二級建築士の独学合格ガイド'},
+  'toefl.html':             {label:'TOEFL',       title:'TOEFL iBTの独学スコアアップ戦略'},
+  'eiken1.html':            {label:'英検準1級',   title:'英検準1級の独学合格ガイド'},
 };
 
 const CATS = {
   'IT・技術系':      {color:'#10B981', files:['itp.html','fe.html','ap.html','mos.html']},
-  'ビジネス・経済系': {color:'#3B82F6', files:['boki.html','boki2.html','boki1.html','fp.html','shindanshi.html']},
+  'ビジネス・経済系': {color:'#3B82F6', files:['boki.html','boki2.html','boki1.html','fp.html','shindanshi.html','gaibuin.html','hisho.html','eisei-kanri.html']},
   '法律・会計系':    {color:'#8B5CF6', files:['cpa.html','takken.html','gyosei.html','sharoshi.html','zeirishi.html','shihoshoshi.html','mansion.html']},
   '医療・福祉系':    {color:'#EC4899', files:['kaigo.html','nurse.html','hoikushi.html','shakai-fukushi.html','iryo-jimu.html','kaigo-fukushi.html']},
-  '技術・工業系':    {color:'#F97316', files:['kiken.html','denki.html','chori.html']},
-  '語学・教養系':    {color:'#F59E0B', files:['toeic.html','eiken.html']},
+  '技術・工業系':    {color:'#F97316', files:['kiken.html','denki.html','chori.html','kenchiku.html']},
+  '語学・教養系':    {color:'#F59E0B', files:['toeic.html','eiken.html','toefl.html','eiken1.html','kanken.html']},
   '継続・ツール':    {color:'#8CC63F', files:['keizoku.html','shikaku-app.html']},
 };
 
-const LATEST = ['boki-vs-fp.html','takken-vs-gyosei.html','itp-vs-fe.html','mansion.html','boki1.html','kaigo-fukushi.html'];
+const LATEST = ['toroku-hanbai.html','eisei-kanri.html','hisho.html','kanken.html','gaibuin.html','kenchiku.html','toefl.html','eiken1.html'];
 
 const PAGE = location.pathname.split('/').pop() || '';
 
