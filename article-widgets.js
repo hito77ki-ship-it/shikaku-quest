@@ -31,9 +31,10 @@ const ARTICLES = {
   'kaigo-fukushi.html':  {label:'介護福祉士',        title:'介護福祉士の独学合格ガイド'},
   'keizoku.html':        {label:'勉強継続',          title:'資格勉強が続かない原因と解決策7つ'},
   'shikaku-app.html':    {label:'アプリ比較',        title:'資格勉強アプリ比較ランキング2026'},
-  'boki-vs-fp.html':     {label:'資格比較',          title:'簿記2級 vs FP2級 どっちを先に取るべき？'},
-  'takken-vs-gyosei.html':{label:'資格比較',         title:'宅建 vs 行政書士 どっちを先に取るべき？'},
-  'itp-vs-fe.html':      {label:'資格比較',          title:'ITパスポート vs 基本情報 どっちを先に取るべき？'},
+  'boki-vs-fp.html':        {label:'資格比較',    title:'簿記2級 vs FP2級 どっちを先に取るべき？'},
+  'takken-vs-gyosei.html':  {label:'資格比較',    title:'宅建 vs 行政書士 どっちを先に取るべき？'},
+  'itp-vs-fe.html':         {label:'資格比較',    title:'ITパスポート vs 基本情報 どっちを先に取るべき？'},
+  'osusume-shikaku.html':   {label:'まとめ',      title:'社会人におすすめの資格ランキング2026'},
 };
 
 const CATS = {
@@ -238,6 +239,41 @@ function insertMidCTA(){
   target.insertAdjacentElement('beforebegin', cta);
 }
 
+/* ── BreadcrumbList JSON-LD ── */
+function injectBreadcrumbLD(){
+  const base = 'https://hito77ki-ship-it.github.io/study-quest/';
+  const items = Array.from(document.querySelectorAll('.breadcrumb a, .breadcrumb')).reduce((acc, el) => {
+    if(el.tagName === 'A'){
+      acc.push({name: el.textContent.trim(), url: base.replace(/\/$/, '') + '/' + el.getAttribute('href')});
+    }
+    return acc;
+  }, []);
+
+  // ホームのURLを正規化
+  if(items[0]) items[0].url = base + 'lp.html';
+
+  // 現在ページをラストに追加
+  const h1 = document.querySelector('h1');
+  if(h1) items.push({name: h1.textContent.trim(), url: base + PAGE});
+
+  if(items.length < 2) return;
+
+  const ld = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": items.map((item, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": item.name,
+      "item": item.url
+    }))
+  };
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify(ld);
+  document.head.appendChild(script);
+}
+
 /* ── 著者プロフィール ── */
 function buildAuthorBox(){
   const container = document.querySelector('.container');
@@ -341,6 +377,7 @@ function buildWidgets(){
 
 document.addEventListener('DOMContentLoaded',function(){
   injectStyles();
+  injectBreadcrumbLD();
   const sidebar = buildLayout();
   buildTOC(sidebar);
   buildCatBadge();
