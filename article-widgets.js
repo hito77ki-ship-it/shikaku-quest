@@ -23,19 +23,27 @@ const ARTICLES = {
   'hoikushi.html':    {label:'保育士',       title:'保育士試験の独学合格ガイド'},
   'keizoku.html':     {label:'勉強継続',     title:'資格勉強が続かない原因と解決策7つ'},
   'shikaku-app.html': {label:'アプリ比較',   title:'資格勉強アプリ比較ランキング2026'},
+  'shakai-fukushi.html': {label:'社会福祉士', title:'社会福祉士の独学合格ガイド'},
+  'iryo-jimu.html':   {label:'医療事務',     title:'医療事務の独学合格ガイド'},
+  'shihoshoshi.html': {label:'司法書士',     title:'司法書士の独学合格ガイド'},
+  'mos.html':         {label:'MOS',          title:'MOS（Microsoft Office Specialist）の独学合格ガイド'},
+  'chori.html':       {label:'調理師免許',   title:'調理師免許の独学合格ガイド'},
+  'kaigo-fukushi.html': {label:'介護福祉士', title:'介護福祉士の独学合格ガイド'},
+  'boki1.html':       {label:'簿記1級',      title:'日商簿記1級の独学合格ガイド'},
+  'mansion.html':     {label:'マンション管理士', title:'マンション管理士の独学合格ガイド'},
 };
 
 const CATS = {
-  'IT・技術系':       {color:'#10B981', files:['itp.html','fe.html','ap.html']},
-  'ビジネス・経済系':  {color:'#3B82F6', files:['boki.html','boki2.html','fp.html','shindanshi.html']},
-  '法律・会計系':     {color:'#8B5CF6', files:['cpa.html','takken.html','gyosei.html','sharoshi.html','zeirishi.html']},
-  '医療・福祉系':     {color:'#EC4899', files:['kaigo.html','nurse.html','hoikushi.html']},
-  '技術・工業系':     {color:'#F97316', files:['kiken.html','denki.html']},
+  'IT・技術系':       {color:'#10B981', files:['itp.html','fe.html','ap.html','mos.html']},
+  'ビジネス・経済系':  {color:'#3B82F6', files:['boki.html','boki2.html','boki1.html','fp.html','shindanshi.html']},
+  '法律・会計系':     {color:'#8B5CF6', files:['cpa.html','takken.html','gyosei.html','sharoshi.html','zeirishi.html','shihoshoshi.html','mansion.html']},
+  '医療・福祉系':     {color:'#EC4899', files:['kaigo.html','nurse.html','hoikushi.html','shakai-fukushi.html','iryo-jimu.html','kaigo-fukushi.html']},
+  '技術・工業系':     {color:'#F97316', files:['kiken.html','denki.html','chori.html']},
   '語学・教養系':     {color:'#F59E0B', files:['toeic.html','eiken.html']},
   '継続・ツール':     {color:'#8CC63F', files:['keizoku.html','shikaku-app.html']},
 };
 
-const LATEST = ['denki.html','hoikushi.html','nurse.html','kaigo.html','ap.html','zeirishi.html'];
+const LATEST = ['mansion.html','boki1.html','kaigo-fukushi.html','chori.html','mos.html','shihoshoshi.html','iryo-jimu.html','shakai-fukushi.html'];
 
 const PAGE = location.pathname.split('/').pop() || '';
 
