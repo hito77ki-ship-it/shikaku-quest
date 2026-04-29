@@ -46,17 +46,30 @@ const CATS = {
 const LATEST = ['mansion.html','boki1.html','kaigo-fukushi.html','chori.html','mos.html','shihoshoshi.html','iryo-jimu.html','shakai-fukushi.html'];
 
 const PAGE = location.pathname.split('/').pop() || '';
-const IS_DESKTOP = window.innerWidth >= 960;
 
 /* ── スタイル ── */
 function injectStyles(){
   const s = document.createElement('style');
   s.textContent = `
-/* 2カラムレイアウト（デスクトップ） */
-@media(min-width:960px){
-  .sq-wrap{max-width:1120px;margin:0 auto;padding:88px 32px 0;display:grid;grid-template-columns:1fr 264px;gap:48px;align-items:start;box-sizing:border-box;}
-  .sq-wrap .container{max-width:none;margin:0;padding:0 0 80px;}
-  .sq-sidebar{position:sticky;top:72px;display:flex;flex-direction:column;gap:16px;padding-bottom:40px;}
+/* サイドバー：fixed で記事の右に配置（1100px以上のみ） */
+@media(min-width:1100px){
+  .sq-sidebar{
+    position:fixed;
+    top:72px;
+    left:min(calc(50% + 420px), calc(100vw - 276px - 12px));
+    width:260px;
+    max-height:calc(100vh - 88px);
+    overflow-y:auto;
+    scrollbar-width:thin;
+    scrollbar-color:#E2E8F0 transparent;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    padding-bottom:40px;
+    z-index:10;
+  }
+  .sq-sidebar::-webkit-scrollbar{width:3px;}
+  .sq-sidebar::-webkit-scrollbar-thumb{background:#E2E8F0;}
   .sq-sidebar-box{background:#F7FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:16px;}
   .sq-sidebar-box-title{font-size:11px;font-weight:700;color:#6AAF2B;margin-bottom:10px;letter-spacing:.08em;text-transform:uppercase;}
   .sq-sidebar-cta{background:linear-gradient(135deg,#1A2A0A,#2D4A10);border-radius:10px;padding:16px;text-align:center;}
@@ -102,22 +115,12 @@ function injectStyles(){
   document.head.appendChild(s);
 }
 
-/* ── 2カラムレイアウト構築 ── */
+/* ── サイドバー構築（position:fixed、コンテナは触らない） ── */
 function buildLayout(){
-  const container = document.querySelector('.container');
-  if(!container) return null;
-  if(!IS_DESKTOP) return null;
-
-  const wrap = document.createElement('div');
-  wrap.className = 'sq-wrap';
-  container.parentNode.insertBefore(wrap, container);
-  // コンテナのpadding-topは不要（wrapが88px確保）
-  container.style.cssText = 'max-width:none;margin:0;padding:0 0 80px;';
-  wrap.appendChild(container);
-
+  if(window.innerWidth < 1100) return null;
   const sidebar = document.createElement('aside');
   sidebar.className = 'sq-sidebar';
-  wrap.appendChild(sidebar);
+  document.body.appendChild(sidebar);
   return sidebar;
 }
 
