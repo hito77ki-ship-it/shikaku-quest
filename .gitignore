@@ -1,0 +1,15 @@
+# Android signing
+*.keystore
+*.jks
+
+# Android build
+.gradle/
+app/build/
+build/
+*.aab
+*.apk
+*.idsig
+
+# Misc
+*.txt
+次.json
