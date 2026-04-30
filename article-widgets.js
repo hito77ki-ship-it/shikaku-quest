@@ -257,15 +257,6 @@ function buildSidebarCTA(sidebar){
   sidebar.appendChild(box);
 }
 
-/* ── サイドバー広告枠 ── */
-function buildSidebarAd(sidebar){
-  if(!sidebar) return;
-  const box = document.createElement('div');
-  box.className = 'sq-sidebar-box sq-sidebar-ad';
-  box.textContent = '広告';
-  sidebar.appendChild(box);
-}
-
 /* ── 左サイドバー（回遊導線） ── */
 function buildLeftSidebar(leftbar){
   if(!leftbar) return;
@@ -302,31 +293,6 @@ function buildLeftSidebar(leftbar){
       relList.innerHTML += `<a href="${f}" class="sq-side-link"><div class="sq-side-link-label">${a.label}</div><div class="sq-side-link-title">${a.title}</div></a>`;
     });
     leftbar.appendChild(rel);
-  }
-}
-
-/* ── 本文内広告枠（lead後・記事末） ── */
-function insertContentAds(){
-  const container = document.querySelector('.container');
-  if(!container) return;
-
-  // lead直後
-  const lead = container.querySelector('.lead');
-  if(lead){
-    const ad = document.createElement('div');
-    ad.className = 'sq-ad-slot';
-    ad.textContent = '広告';
-    lead.insertAdjacentElement('afterend', ad);
-  }
-
-  // まとめの直前（記事末）
-  const h2s = Array.from(container.querySelectorAll('h2'));
-  const matome = h2s.find(h=>h.textContent.includes('まとめ'));
-  if(matome){
-    const ad = document.createElement('div');
-    ad.className = 'sq-ad-slot';
-    ad.textContent = '広告';
-    matome.insertAdjacentElement('beforebegin', ad);
   }
 }
 
@@ -487,9 +453,7 @@ document.addEventListener('DOMContentLoaded',function(){
   buildTOC(layout.right);
   buildCatBadge();
   buildSidebarCTA(layout.right);
-  buildSidebarAd(layout.right);
   buildLeftSidebar(layout.left);
-  insertContentAds();
   buildAuthorBox();
   insertMidCTA();
   buildShareButtons();
