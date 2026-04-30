@@ -306,9 +306,9 @@ function buildAuthorBox(){
   box.innerHTML = `
     <div class="sq-author-avatar">⚔</div>
     <div>
-      <div class="sq-author-name">大谷 一輝</div>
+      <div class="sq-author-name">若葉（わかば）</div>
       <div class="sq-author-title">現役CPA受験生 ／ Study Quest 開発者</div>
-      <div class="sq-author-bio">大阪経済大学在学中に公認会計士試験の勉強を開始。「勉強が続かない」課題を解決するため、資格学習RPGアプリ Study Quest を個人開発。自身の受験経験をもとに、各資格の勉強法・スケジュールを発信中。</div>
+      <div class="sq-author-bio">大学在学中に公認会計士試験の勉強を開始。「勉強が続かない」課題を解決するため、資格学習RPGアプリ Study Quest を個人開発。自身の受験経験をもとに、各資格の勉強法・スケジュールを発信中。X: @wakaba_sq</div>
     </div>`;
   meta.insertAdjacentElement('afterend', box);
 }

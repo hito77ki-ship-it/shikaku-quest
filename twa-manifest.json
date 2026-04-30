@@ -1,0 +1,60 @@
+{
+  "packageId": "com.studyquest.app",
+  "host": "hito77ki-ship-it.github.io",
+  "name": "スタディクエスト",
+  "launcherName": "スタクエ",
+  "display": "standalone",
+  "themeColor": "#8CC63F",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#0A0A0F",
+  "enableNotifications": true,
+  "startUrl": "/study-quest/",
+  "iconUrl": "https://hito77ki-ship-it.github.io/study-quest/icons/icon-512.png",
+  "maskableIconUrl": "https://hito77ki-ship-it.github.io/study-quest/icons/app-icon.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "/Users/hitoki/shikaku-quest/android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "タイマーを起動",
+      "shortName": "タイマー",
+      "url": "https://hito77ki-ship-it.github.io/study-quest/?tab=quest",
+      "chosenIconUrl": "https://hito77ki-ship-it.github.io/study-quest/icons/app-icon.png"
+    },
+    {
+      "name": "ランキングを見る",
+      "shortName": "ランキング",
+      "url": "https://hito77ki-ship-it.github.io/study-quest/?tab=ranking",
+      "chosenIconUrl": "https://hito77ki-ship-it.github.io/study-quest/icons/app-icon.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://hito77ki-ship-it.github.io/study-quest/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://hito77ki-ship-it.github.io/study-quest/",
+  "minSdkVersion": 21,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "1"
+}
