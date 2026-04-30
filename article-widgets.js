@@ -43,6 +43,7 @@ const ARTICLES = {
   'takken-vs-mansion.html':    {label:'資格比較',    title:'宅建 vs マンション管理士 どっちを先に取るべき？'},
   'osusume-shikaku.html':      {label:'まとめ',      title:'社会人におすすめの資格ランキング2026'},
   'cospa-shikaku.html':        {label:'まとめ',      title:'コスパがいい資格ランキング10選'},
+  'tenshoku-shikaku.html':     {label:'まとめ',      title:'転職に有利な資格ランキング10選'},
   'shikaku-women.html':        {label:'まとめ',      title:'女性におすすめ資格ランキング2026'},
   'shikaku-30dai.html':        {label:'まとめ',      title:'30代が取るべき資格ランキング2026'},
   'dokugaku-shikaku.html':     {label:'まとめ',      title:'独学で取れる資格ランキング2026'},
@@ -71,7 +72,7 @@ const CATS = {
   '継続・ツール':    {color:'#8CC63F', files:['keizoku.html','shakaijin-benkyou-jikan.html','shikaku-app.html']},
 };
 
-const LATEST = ['cospa-shikaku.html','shakaijin-benkyou-jikan.html','fp3.html','cpa-yobikou.html','sharoshi-vs-shindanshi.html','toeic-vs-eiken.html','takken-vs-mansion.html','shikaku-20dai.html'];
+const LATEST = ['tenshoku-shikaku.html','cospa-shikaku.html','shakaijin-benkyou-jikan.html','fp3.html','cpa-yobikou.html','sharoshi-vs-shindanshi.html','toeic-vs-eiken.html','takken-vs-mansion.html'];
 
 const PAGE = location.pathname.split('/').pop() || '';
 
