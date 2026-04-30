@@ -31,18 +31,24 @@ const ARTICLES = {
   'kaigo-fukushi.html':  {label:'介護福祉士',        title:'介護福祉士の独学合格ガイド'},
   'keizoku.html':        {label:'勉強継続',          title:'資格勉強が続かない原因と解決策7つ'},
   'shikaku-app.html':    {label:'アプリ比較',        title:'資格勉強アプリ比較ランキング2026'},
-  'boki-vs-fp.html':        {label:'資格比較',    title:'簿記2級 vs FP2級 どっちを先に取るべき？'},
-  'takken-vs-gyosei.html':  {label:'資格比較',    title:'宅建 vs 行政書士 どっちを先に取るべき？'},
-  'itp-vs-fe.html':         {label:'資格比較',    title:'ITパスポート vs 基本情報 どっちを先に取るべき？'},
-  'osusume-shikaku.html':   {label:'まとめ',      title:'社会人におすすめの資格ランキング2026'},
-  'toroku-hanbai.html':     {label:'登録販売者',  title:'登録販売者の独学合格ガイド'},
-  'eisei-kanri.html':       {label:'衛生管理者',  title:'衛生管理者（第一種・第二種）の独学合格ガイド'},
-  'hisho.html':             {label:'秘書検定',    title:'秘書検定2級・準1級の独学合格ガイド'},
-  'kanken.html':            {label:'漢字検定',    title:'漢字検定（漢検）2級の独学合格ガイド'},
-  'gaibuin.html':           {label:'証券外務員',  title:'証券外務員一種・二種の独学合格ガイド'},
-  'kenchiku.html':          {label:'二級建築士',  title:'二級建築士の独学合格ガイド'},
-  'toefl.html':             {label:'TOEFL',       title:'TOEFL iBTの独学スコアアップ戦略'},
-  'eiken1.html':            {label:'英検準1級',   title:'英検準1級の独学合格ガイド'},
+  'boki-vs-fp.html':           {label:'資格比較',    title:'簿記2級 vs FP2級 どっちを先に取るべき？'},
+  'takken-vs-gyosei.html':     {label:'資格比較',    title:'宅建 vs 行政書士 どっちを先に取るべき？'},
+  'itp-vs-fe.html':            {label:'資格比較',    title:'ITパスポート vs 基本情報 どっちを先に取るべき？'},
+  'sharoshi-vs-gyosei.html':   {label:'資格比較',    title:'社労士 vs 行政書士 どっちを先に取るべき？'},
+  'fe-vs-ap.html':             {label:'資格比較',    title:'基本情報 vs 応用情報 どっちを先に取るべき？'},
+  'zeirishi-vs-cpa.html':      {label:'資格比較',    title:'税理士 vs 公認会計士 どっちを目指すべき？'},
+  'osusume-shikaku.html':      {label:'まとめ',      title:'社会人におすすめの資格ランキング2026'},
+  'shikaku-women.html':        {label:'まとめ',      title:'女性におすすめ資格ランキング2026'},
+  'shikaku-30dai.html':        {label:'まとめ',      title:'30代が取るべき資格ランキング2026'},
+  'dokugaku-shikaku.html':     {label:'まとめ',      title:'独学で取れる資格ランキング2026'},
+  'toroku-hanbai.html':        {label:'登録販売者',  title:'登録販売者の独学合格ガイド'},
+  'eisei-kanri.html':          {label:'衛生管理者',  title:'衛生管理者（第一種・第二種）の独学合格ガイド'},
+  'hisho.html':                {label:'秘書検定',    title:'秘書検定2級・準1級の独学合格ガイド'},
+  'kanken.html':               {label:'漢字検定',    title:'漢字検定（漢検）2級の独学合格ガイド'},
+  'gaibuin.html':              {label:'証券外務員',  title:'証券外務員一種・二種の独学合格ガイド'},
+  'kenchiku.html':             {label:'二級建築士',  title:'二級建築士の独学合格ガイド'},
+  'toefl.html':                {label:'TOEFL',       title:'TOEFL iBTの独学スコアアップ戦略'},
+  'eiken1.html':               {label:'英検準1級',   title:'英検準1級の独学合格ガイド'},
 };
 
 const CATS = {
@@ -55,7 +61,7 @@ const CATS = {
   '継続・ツール':    {color:'#8CC63F', files:['keizoku.html','shikaku-app.html']},
 };
 
-const LATEST = ['toroku-hanbai.html','eisei-kanri.html','hisho.html','kanken.html','gaibuin.html','kenchiku.html','toefl.html','eiken1.html'];
+const LATEST = ['sharoshi-vs-gyosei.html','fe-vs-ap.html','zeirishi-vs-cpa.html','shikaku-women.html','shikaku-30dai.html','dokugaku-shikaku.html','toefl.html','eiken1.html'];
 
 const PAGE = location.pathname.split('/').pop() || '';
 
