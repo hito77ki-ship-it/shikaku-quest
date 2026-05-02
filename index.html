@@ -6837,6 +6837,7 @@ async function signInWithGoogle(){
     alert('Googleログインに失敗しました。\n\nゲストとして続けることもできます。\n\n詳細: '+e.message);
   }
 }
+window.signInWithGoogle = signInWithGoogle;
 
 async function signInWithTwitter(){
   try {
@@ -6887,6 +6888,7 @@ function continueAsGuest(){
     alert('エラーが発生しました。ページを再読み込みしてください。\n'+e.message);
   }
 }
+window.continueAsGuest = continueAsGuest;
 
 function openNameEdit(){
   const current = char.name || '';
@@ -18306,6 +18308,7 @@ function pcNavSwitch(tab){
   // スクロールをトップに
   window.scrollTo({top:0, behavior:'smooth'});
 }
+window.pcNavSwitch = pcNavSwitch;
 
 /* サイドバーのユーザー情報を更新 */
 function updatePcSidebar(){
