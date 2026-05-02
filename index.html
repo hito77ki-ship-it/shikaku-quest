@@ -4037,6 +4037,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     </div>
     <div class="job-grid" id="jobGrid"></div>
     <button class="step-btn" onclick="goStep2()">次へ：科目を選ぶ →</button>
+    <button class="step-btn-ghost" id="jobBackBtn" style="display:none;" onclick="returnFromSetupFlow()">← ダッシュボードに戻る</button>
     <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:12px;">利用を開始することで<a href="terms.html" target="_blank" style="color:var(--gold2);text-decoration:underline;">利用規約</a>および<a href="privacy.html" target="_blank" style="color:var(--gold2);text-decoration:underline;">プライバシーポリシー</a>に同意したものとみなします。</p>
   </div>
 </div>
@@ -4060,6 +4061,7 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     <div id="startErrorMsg" style="display:none;background:#2a0808;border:1px solid #ff4444;border-left:3px solid #ff4444;color:#ff9e9e;font-size:12px;padding:10px 14px;margin-bottom:10px;"></div>
     <button class="step-btn" onclick="startAdventure()">◆ 冒険を始める ◆</button>
     <button class="step-btn-ghost" onclick="showScreen('screen-job')">← 資格選択に戻る</button>
+    <button class="step-btn-ghost" id="subjBackBtn" style="display:none;" onclick="returnFromSetupFlow()">← ダッシュボードに戻る</button>
   </div>
 </div>
 
@@ -7634,6 +7636,7 @@ async function startAdventure(){
   try {
     char.name=name;
     await saveAll();
+    setupReturnTarget = null;
     initDashboard();
     showScreen('screen-dash');
     console.log('[startAdventure] SUCCESS: screen-dash shown');
@@ -7978,7 +7981,25 @@ ${SQ_URL}`;
   setTimeout(()=>banner.remove(), 8000);
 }
 function changeJob(){
-  buildJobGrid();if(char.name)document.getElementById('nameInput').value=char.name;showScreen('screen-job');
+  setupReturnTarget = 'screen-dash';
+  buildJobGrid();
+  if(char.name)document.getElementById('nameInput').value=char.name;
+  showScreen('screen-job');
+}
+function returnFromSetupFlow(){
+  if(setupReturnTarget === 'screen-dash'){
+    initDashboard();
+    showScreen('screen-dash');
+    return;
+  }
+  showScreen('screen-auth');
+}
+function updateSetupReturnButtons(screenId){
+  const editing = setupReturnTarget === 'screen-dash';
+  const jobBackBtn = document.getElementById('jobBackBtn');
+  const subjBackBtn = document.getElementById('subjBackBtn');
+  if(jobBackBtn) jobBackBtn.style.display = editing && screenId === 'screen-job' ? '' : 'none';
+  if(subjBackBtn) subjBackBtn.style.display = editing && screenId === 'screen-subj' ? '' : 'none';
 }
 
 /* ═══════════════ UI ═══════════════ */
@@ -7994,6 +8015,7 @@ function showScreen(id){
   if(pcSidebar) pcSidebar.style.display=isDash?'':'none';
   const mobileTabBar=document.getElementById('mobileTabBar');
   if(mobileTabBar) mobileTabBar.style.display=isDash?'':'none';
+  updateSetupReturnButtons(id);
 }
 function switchTab(tab){
   ['status','quest','materials','titles','boss','ranking','score','report','profile','timeline'].forEach(t=>{
@@ -9593,6 +9615,7 @@ let weeklyGoalData = {
 };
 let profileAvatarData = null; // base64
 let rptChartInstances = {};
+let setupReturnTarget = null;
 
 /* ── localStorage からロード ── */
 /* Chart.js グローバルダーク設定 */
