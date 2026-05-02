@@ -7636,6 +7636,9 @@ async function startAdventure(){
   try {
     char.name=name;
     await saveAll();
+    if(currentUser && !isGuest){
+      await syncToCloud();
+    }
     setupReturnTarget = null;
     initDashboard();
     showScreen('screen-dash');
