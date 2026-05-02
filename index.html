@@ -15753,6 +15753,7 @@ const TL_LEGACY_FIELDS = [
   'is_achievement',
   'achievement_data'
 ].join(',');
+let tlFieldMode = 'public';
 let tlPostsByFilter = { all: null, me: null, goal: null, top: null };
 let tlPageByFilter  = { all: 0, me: 0, goal: 0, top: 0 };
 // 後方互換：find系が参照する全投稿
@@ -15934,6 +15935,7 @@ async function loadTlFilter(filter){
   let localPosts = loadLocalPosts().reverse().map(normalizeTimelinePost);
   let cloudPosts = [];
   try {
+    const fieldsForMode = (mode) => mode === 'legacy' ? TL_LEGACY_FIELDS : TL_PUBLIC_FIELDS;
     async function fetchTimelineFields(fields){
       let query = sb.from('timeline_posts')
         .select(fields).order('created_at', { ascending: false }).limit(100);
@@ -15951,10 +15953,11 @@ async function loadTlFilter(filter){
       return query;
     }
 
-    let { data, error } = await fetchTimelineFields(TL_PUBLIC_FIELDS);
-    if(error){
+    let { data, error } = await fetchTimelineFields(fieldsForMode(tlFieldMode));
+    if(error && tlFieldMode === 'public'){
       console.warn('Cloud TL load failed with public fields, retrying legacy fields:', filter, error);
-      const legacyRes = await fetchTimelineFields(TL_LEGACY_FIELDS);
+      tlFieldMode = 'legacy';
+      const legacyRes = await fetchTimelineFields(fieldsForMode(tlFieldMode));
       data = legacyRes.data;
       error = legacyRes.error;
     }
