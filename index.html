@@ -15730,6 +15730,26 @@ const TL_PUBLIC_FIELDS = [
   'visibility',
   'pinned_until'
 ].join(',');
+const TL_LEGACY_FIELDS = [
+  'id',
+  'user_id',
+  'user_name',
+  'user_level',
+  'job_ids',
+  'subject_key',
+  'subject_name',
+  'minutes',
+  'note',
+  'rpg_log',
+  'exp',
+  'likes_count',
+  'created_at',
+  'is_declaration',
+  'is_weekly_goal',
+  'goal_hours',
+  'is_achievement',
+  'achievement_data'
+].join(',');
 let tlPostsByFilter = { all: null, me: null, goal: null, top: null };
 let tlPageByFilter  = { all: 0, me: 0, goal: 0, top: 0 };
 // 後方互換：find系が参照する全投稿
@@ -15911,20 +15931,31 @@ async function loadTlFilter(filter){
   let localPosts = loadLocalPosts().reverse().map(normalizeTimelinePost);
   let cloudPosts = [];
   try {
-    let query = sb.from('timeline_posts')
-      .select(TL_PUBLIC_FIELDS).order('created_at', { ascending: false }).limit(100);
-    if(filter === 'goal' && selectedJobIds.length){
-      query = sb.from('timeline_posts').select(TL_PUBLIC_FIELDS)
-        .overlaps('job_ids', selectedJobIds)
-        .order('created_at', { ascending: false }).limit(100);
+    async function fetchTimelineFields(fields){
+      let query = sb.from('timeline_posts')
+        .select(fields).order('created_at', { ascending: false }).limit(100);
+      if(filter === 'goal' && selectedJobIds.length){
+        query = sb.from('timeline_posts').select(fields)
+          .overlaps('job_ids', selectedJobIds)
+          .order('created_at', { ascending: false }).limit(100);
+      }
+      if(filter === 'top'){
+        const weekAgo = new Date(Date.now() - 7*24*3600*1000).toISOString();
+        query = sb.from('timeline_posts').select(fields)
+          .gte('created_at', weekAgo)
+          .order('likes_count', { ascending: false }).limit(50);
+      }
+      return query;
     }
-    if(filter === 'top'){
-      const weekAgo = new Date(Date.now() - 7*24*3600*1000).toISOString();
-      query = sb.from('timeline_posts').select(TL_PUBLIC_FIELDS)
-        .gte('created_at', weekAgo)
-        .order('likes_count', { ascending: false }).limit(50);
+
+    let { data, error } = await fetchTimelineFields(TL_PUBLIC_FIELDS);
+    if(error){
+      console.warn('Cloud TL load failed with public fields, retrying legacy fields:', filter, error);
+      const legacyRes = await fetchTimelineFields(TL_LEGACY_FIELDS);
+      data = legacyRes.data;
+      error = legacyRes.error;
     }
-    const { data } = await query;
+    if(error) throw error;
     if(data) cloudPosts = data.map(p => normalizeTimelinePost({...p, from_cloud: true}));
   } catch(e){ console.warn('Cloud TL load:', filter, e); }
 
