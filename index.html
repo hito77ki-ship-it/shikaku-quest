@@ -7177,13 +7177,18 @@ async function loadRanking(){
     const bars=topSubjs.map(([k,s])=>`<div class="rank-bar-row"><span class="rank-bar-label">${(s.name||k).slice(0,4)}</span><div class="rank-bar-track"><div class="rank-bar-fill" style="width:${s.pct||0}%;background:${SCOLORS[k]||'#c9a84c'}"></div></div></div>`).join('');
     const item=document.createElement('div');
     item.className='ranking-item'+(isMe?' me':'');
-    const _rankClick = !isMe && p.id ? `onclick="openUserCard('${p.id}','${(p.display_name||'').replace(/'/g,'')}',${p.level||1},'${(p.avatar_url||'').replace(/'/g,'')}','${(p.job_ids||[]).join(',')}')" style="cursor:pointer;"` : '';
+    const canOpenUserCard = !isMe && !!p.id;
     const _rankAvatar = p.avatar_url
       ? `<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="">`
       : p.avatar_emoji && p.avatar_emoji !== '📚'
         ? escHtml(p.avatar_emoji)
         : `<div style="width:100%;height:100%;border-radius:50%;background:${avatarColor(p.display_name)};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;">${escHtml((p.display_name||'？')[0])}</div>`;
-    item.innerHTML=`<div class="rank-pos ${posClass}">${posDisp}</div><div class="rank-avatar" ${_rankClick}>${_rankAvatar}</div><div class="rank-info" ${_rankClick}><div class="rank-name">${escHtml(p.display_name||'名無し')}${isMe?' <span style="font-size:9px;color:var(--gold)">← YOU</span>':''}</div><div class="rank-title-text">${escHtml(p.char_title||'—')}</div>${bars?`<div class="rank-bars">${bars}</div>`:''}</div><div class="rank-right"><div class="rank-level">Lv.${p.level||1}</div><div class="rank-hours">${hours}h</div><div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted)">🔥${p.streak||0}日</div></div>`;
+    item.innerHTML=`<div class="rank-pos ${posClass}">${posDisp}</div><div class="rank-avatar rank-user-open"${canOpenUserCard?' style="cursor:pointer;"':''}>${_rankAvatar}</div><div class="rank-info rank-user-open"${canOpenUserCard?' style="cursor:pointer;"':''}><div class="rank-name">${escHtml(p.display_name||'名無し')}${isMe?' <span style="font-size:9px;color:var(--gold)">← YOU</span>':''}</div><div class="rank-title-text">${escHtml(p.char_title||'—')}</div>${bars?`<div class="rank-bars">${bars}</div>`:''}</div><div class="rank-right"><div class="rank-level">Lv.${p.level||1}</div><div class="rank-hours">${hours}h</div><div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted)">🔥${p.streak||0}日</div></div>`;
+    if(canOpenUserCard){
+      item.querySelectorAll('.rank-user-open').forEach(el=>{
+        el.addEventListener('click', ()=>openUserCard(p.id, p.display_name || '名無し', p.level || 1, p.avatar_url || '', (p.job_ids||[]).join(',')));
+      });
+    }
     listEl.appendChild(item);
   });
   if(!data.find(p=>currentUser&&p.id===currentUser.id)){
@@ -7262,11 +7267,11 @@ async function loadWeeklyRanking(){
 
     const item = document.createElement('div');
     item.className = 'ranking-item' + (isMe?' me':'');
-    const _wkClick = !isMe && p.id ? `onclick="openUserCard('${p.id}','${(p.display_name||'').replace(/'/g,'')}',${p.level||1},'${(p.avatar_url||'').replace(/'/g,'')}','${(p.job_ids||[]).join(',')}')" style="cursor:pointer;"` : '';
+    const canOpenUserCard = !isMe && !!p.id;
     item.innerHTML = `
       <div class="rank-pos ${posClass}">${posDisp}</div>
-      <div class="rank-avatar" ${_wkClick}>${p.avatar_url ? `<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="">` : (p.avatar_emoji && p.avatar_emoji !== '📚') ? escHtml(p.avatar_emoji) : `<div style="width:100%;height:100%;border-radius:50%;background:${avatarColor(p.display_name)};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;">${escHtml((p.display_name||'？')[0])}</div>`}</div>
-      <div class="rank-info" ${_wkClick}>
+      <div class="rank-avatar rank-user-open"${canOpenUserCard?' style="cursor:pointer;"':''}>${p.avatar_url ? `<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="">` : (p.avatar_emoji && p.avatar_emoji !== '📚') ? escHtml(p.avatar_emoji) : `<div style="width:100%;height:100%;border-radius:50%;background:${avatarColor(p.display_name)};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;">${escHtml((p.display_name||'？')[0])}</div>`}</div>
+      <div class="rank-info rank-user-open"${canOpenUserCard?' style="cursor:pointer;"':''}>
         <div class="rank-name">${escHtml(p.display_name||'名無し')}${isMe?' <span style="font-size:9px;color:var(--accent)">← YOU</span>':''}<span style="font-size:9px;color:var(--muted);margin-left:4px;">${job}</span></div>
         <div class="rank-title-text">${escHtml(p.char_title||'—')}</div>
         <div class="rank-week-bar">
@@ -7279,6 +7284,11 @@ async function loadWeeklyRanking(){
         <div class="rank-week-hours">${wHours}</div>
         <div class="rank-week-days">🔥${p.streak||0}日</div>
       </div>`;
+    if(canOpenUserCard){
+      item.querySelectorAll('.rank-user-open').forEach(el=>{
+        el.addEventListener('click', ()=>openUserCard(p.id, p.display_name || '名無し', p.level || 1, p.avatar_url || '', (p.job_ids||[]).join(',')));
+      });
+    }
     listEl.appendChild(item);
   });
 
@@ -15973,7 +15983,13 @@ function renderTlPage(filter, page){
   pagePosts.forEach(post => {
     const el = document.createElement('div');
     el.innerHTML = renderPostHTML(post, likes);
-    feed.appendChild(el.firstElementChild);
+    const node = el.firstElementChild;
+    if(node && post.user_id && !(currentUser && post.user_id === currentUser.id) && post.user_name !== char.name){
+      node.querySelectorAll('.tl-user-open').forEach(target=>{
+        target.addEventListener('click', ()=>openUserCard(post.user_id, post.user_name || '名無し', post.user_level || 1, post.avatar_url || '', (post.job_ids||[]).join(',')));
+      });
+    }
+    feed.appendChild(node);
   });
 
   if(posts.length > start + TL_PAGE_SIZE){
@@ -16043,9 +16059,7 @@ function renderPostHTML(post, likes){
     ? `<div class="tl-avatar" style="background:none;padding:0;"><img src="${escHtml(post.avatar_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>`
     : `<div class="tl-avatar" style="background:${avatarColor(post.user_name)}">${avatarChar}</div>`;
 
-  const _cardClick = !isOwn && post.user_id
-    ? `onclick="openUserCard('${post.user_id}','${escHtml((post.user_name||'').replace(/'/g,''))}',${post.user_level||1},'${escHtml((post.avatar_url||'').replace(/'/g,''))}','${(post.job_ids||[]).join(',')}')" style="cursor:pointer;"`
-    : '';
+  const canOpenUserCard = !isOwn && !!post.user_id;
   const postTypeClass = post.is_declaration ? 'tl-type-decl'
     : post.is_weekly_goal ? 'tl-type-goal'
     : post.is_free_post ? 'tl-type-free'
@@ -16058,7 +16072,7 @@ function renderPostHTML(post, likes){
     ${pinned ? `<div style="margin-bottom:8px;"><span class="tl-pin-badge">📌 ピン留め中</span></div>` : ''}
     <!-- ヘッダー -->
     <div class="tl-post-header">
-      <div ${_cardClick} style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+      <div class="tl-user-open" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;${canOpenUserCard?'cursor:pointer;':''}">
         ${avatarHtml}
         <div class="tl-post-meta">
           <div class="tl-post-name">
