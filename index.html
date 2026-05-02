@@ -14816,6 +14816,7 @@ function calcExamTargetHours(){
   // 目標時間欄に自動セット
   hoursEl.value = hours;
 }
+window.calcExamTargetHours = calcExamTargetHours;
 
 /* ── 多段階試験マスターデータ ── */
 const MULTIPHASE_EXAMS = {
@@ -14857,6 +14858,7 @@ function autoDetectPhase(){
   if(t.includes('短答') || t.includes('tanto')) selectExamPhase('tanto');
   else if(t.includes('論文') || t.includes('ronbun')) selectExamPhase('ronbun');
 }
+window.autoDetectPhase = autoDetectPhase;
 
 function selectExamPhase(phase){
   document.getElementById('examPhase').value = phase || '';
@@ -14864,6 +14866,7 @@ function selectExamPhase(phase){
     document.getElementById('phaseBtn-'+p)?.classList.toggle('active', (phase||'none')===p || (!phase&&p==='none'));
   });
 }
+window.selectExamPhase = selectExamPhase;
 
 /* 昇格お祝いモーダル */
 function showSinshoModal(opts = {}){
@@ -14981,7 +14984,9 @@ function openExamModal(){
   if(lbl) lbl.textContent='＋ 新しい試験日を追加';
   document.getElementById('examModal').classList.add('show');
 }
+window.openExamModal = openExamModal;
 function closeExamModal(){document.getElementById('examModal').classList.remove('show');}
+window.closeExamModal = closeExamModal;
 
 async function saveExamGoal(){
   const date=document.getElementById('examTargetDate').value;
@@ -15008,6 +15013,7 @@ async function saveExamGoal(){
   renderExamBanner(); renderTimerExamMini();
   closeExamModal();
 }
+window.saveExamGoal = saveExamGoal;
 async function deleteExamGoal(id){
   if(!confirm('この試験日を削除しますか？'))return;
   examGoals=examGoals.filter(e=>e.id!==id);
@@ -15017,6 +15023,7 @@ async function deleteExamGoal(id){
   closeExamModal();
   setTimeout(openExamModal,100); // リストを再表示
 }
+window.deleteExamGoal = deleteExamGoal;
 // 旧API互換（clearExamGoal）
 async function clearExamGoal(){
   if(!confirm('すべての試験日設定を削除しますか？'))return;
@@ -15026,6 +15033,7 @@ async function clearExamGoal(){
   renderExamBanner(); renderTimerExamMini();
   closeExamModal();
 }
+window.clearExamGoal = clearExamGoal;
 
 
 /* ════════════════════════════════════════
