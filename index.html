@@ -15779,6 +15779,7 @@ const TL_LEGACY_FIELDS = [
   'avatar_url'
 ].join(',');
 const TL_FIELD_MODE_KEY = 'sq2_tl_field_mode';
+const TL_CACHE_KEY = 'sq2_tl_cache_v1';
 function loadTlFieldMode(){
   try{
     const v = localStorage.getItem(TL_FIELD_MODE_KEY);
@@ -15793,6 +15794,27 @@ function saveTlFieldMode(mode){
 let tlFieldMode = loadTlFieldMode();
 let tlPostsByFilter = { all: null, me: null, goal: null, top: null };
 let tlPageByFilter  = { all: 0, me: 0, goal: 0, top: 0 };
+function loadTlCache(){
+  try{
+    const raw = localStorage.getItem(TL_CACHE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch{
+    return {};
+  }
+}
+function saveTlFilterCache(filter, posts){
+  try{
+    const cache = loadTlCache();
+    cache[filter] = { savedAt: Date.now(), posts };
+    localStorage.setItem(TL_CACHE_KEY, JSON.stringify(cache));
+  }catch{}
+}
+function loadTlFilterCache(filter){
+  const cache = loadTlCache();
+  const entry = cache[filter];
+  if(!entry || !Array.isArray(entry.posts)) return null;
+  return entry.posts.map(normalizeTimelinePost);
+}
 // 後方互換：find系が参照する全投稿
 function tlAllPostsFlat(){
   const seen = new Set(), out = [];
@@ -15959,15 +15981,22 @@ async function loadTimeline(){
   }
   if(!currentUser && !isGuest && loginHint) loginHint.style.display = '';
 
-  // 全フィルターを並列ロード（先にallを確実に開始）
-  await Promise.all(TL_FILTERS.map(f => loadTlFilter(f)));
+  // まず現在のタブだけ描画して体感を速くし、残りは裏で読む
+  await loadTlFilter(tlCurrentFilter);
+  TL_FILTERS.filter(f => f !== tlCurrentFilter).forEach(f => { loadTlFilter(f); });
 }
 
 async function loadTlFilter(filter){
   const feed = document.getElementById('tlFeed-' + filter);
   if(!feed) return;
   tlPageByFilter[filter] = 0;
-  feed.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">読み込み中...</div>';
+  const cachedPosts = loadTlFilterCache(filter);
+  if(cachedPosts && cachedPosts.length){
+    tlPostsByFilter[filter] = cachedPosts;
+    renderTlPage(filter, 0);
+  } else {
+    feed.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">読み込み中...</div>';
+  }
 
   let localPosts = loadLocalPosts().reverse().map(normalizeTimelinePost);
   let cloudPosts = [];
@@ -16048,6 +16077,7 @@ async function loadTlFilter(filter){
   });
 
   tlPostsByFilter[filter] = merged;
+  saveTlFilterCache(filter, merged);
   renderTlPage(filter, 0);
 }
 
