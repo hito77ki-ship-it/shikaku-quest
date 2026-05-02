@@ -6738,6 +6738,57 @@ function allSelectedSubjects(){
   });
   return out;
 }
+function getAllKnownSubjectsMap(){
+  const map = new Map();
+  JOBS.forEach(j=>{
+    const subjectsWithCustom = j.customizable
+      ? [...j.subjects, ...loadCustomSubjects(j.id)]
+      : j.subjects;
+    subjectsWithCustom.forEach(s=>{
+      if(s.key && !map.has(s.key)) map.set(s.key, {...s, color: getSubjColor(s.key, s.color)});
+      if(s.splitInto){
+        s.splitInto.forEach(sp=>{
+          if(sp.key && !map.has(sp.key)) map.set(sp.key, {...sp, color: getSubjColor(sp.key, sp.color)});
+        });
+      }
+    });
+  });
+  return map;
+}
+function getReportSubjects(){
+  const selected = allSelectedSubjects();
+  const knownMap  = getAllKnownSubjectsMap();
+  const out = [];
+  const seen = new Set();
+
+  selected.forEach(s=>{
+    seen.add(s.key);
+    out.push(s);
+  });
+
+  const loggedKeys = [...new Set(
+    (sessions||[])
+      .filter(s=>isStudyType(s) && s.subject)
+      .map(s=>s.subject)
+  )].filter(Boolean);
+
+  loggedKeys
+    .filter(key=>!seen.has(key))
+    .sort((a,b)=>subjStudyMins(sessions,b)-subjStudyMins(sessions,a))
+    .forEach(key=>{
+      const meta = knownMap.get(key);
+      out.push(meta ? {...meta, color:getSubjColor(key, meta.color)} : {
+        key,
+        name:key,
+        color:getSubjColor(key, '#8CC63F'),
+        maxH:0,
+        attrs:{}
+      });
+      seen.add(key);
+    });
+
+  return out;
+}
 /* 秒精度ヘルパー: amountSecs があればそれを/60、なければ amount（旧データ互換） */
 function sAmount(s){ return s.amountSecs !== undefined ? s.amountSecs / 60 : (s.amount || 0); }
 /* 合計秒数を返す */
@@ -9757,7 +9808,7 @@ function getLast6MonthsData(){
   return months;
 }
 function getSubjectDistribution(){
-  const subjs=allSelectedSubjects();
+  const subjs=getReportSubjects();
   return subjs.map(s=>({
     name:s.name, key:s.key, color:s.color,
     mins:subjStudyMins(sessions,s.key)
@@ -10106,7 +10157,7 @@ function getPeriodChartDays(){
     const t = rptSelectedDay;
     const daySessions = sessions.filter(s=>isStudyType(s)&&s.date===t);
     // 科目別・まとめ共通: 科目別データを返す（表示方法で積み上げ/並列を切り替え）
-    const subjs = allSelectedSubjects();
+    const subjs = getReportSubjects();
     if(subjs.length === 0){
       const mins = daySessions.reduce((a,s)=>a+sAmount(s),0);
       return [{date:t, label:'学習', mins}];
@@ -10154,7 +10205,7 @@ function renderWeekBar(){
   if(!canvas) return;
   const days = getPeriodChartDays();
   const period = rptPeriod || 'week';
-  const subjs=allSelectedSubjects();
+  const subjs=getReportSubjects();
 
   // 科目ごとのデータ
   let datasets;
@@ -11053,7 +11104,7 @@ function renderMonthChart(){
     const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
     months.push({label:(d.getMonth()+1)+'月', ym:d.toISOString().slice(0,7)});
   }
-  const subjs=allSelectedSubjects();
+  const subjs=getReportSubjects();
   const datasets=subjs.map(s=>({
     label:s.name,
     data:months.map(m=>+(sessions.filter(x=>isStudyType(x)&&x.date&&x.date.startsWith(m.ym)&&x.subject===s.key).reduce((a,x)=>a+x.amount,0)/60).toFixed(1)),
