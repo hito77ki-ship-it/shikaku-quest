@@ -5208,6 +5208,17 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       <button class="change-job-btn" onclick="changeJob()" style="width:100%;">⚙ 資格・目標を設定</button>
     </div>
 
+    <!-- ─── 自分の投稿 ─── -->
+    <div class="section">
+      <div class="sec-title" style="justify-content:space-between;">
+        <span>📝 自分の投稿</span>
+        <button onclick="switchTab('timeline');switchTlFilter('all')" style="background:none;border:1px solid var(--border);border-radius:16px;padding:4px 10px;font-size:10px;color:var(--muted);cursor:pointer;">タイムラインへ</button>
+      </div>
+      <div id="profileOwnPostsList">
+        <div style="font-size:12px;color:var(--muted);text-align:center;padding:10px;">読み込み中...</div>
+      </div>
+    </div>
+
     <!-- ─── RPGステータス（冒険の証） ─── -->
     <div class="section">
       <div class="sec-title">⚔ 冒険の証</div>
@@ -5451,7 +5462,6 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     <!-- フィルターバー -->
     <div class="tl-filter-bar">
       <button class="tl-filter-btn active" onclick="switchTlFilter('all')">全員</button>
-      <button class="tl-filter-btn" onclick="switchTlFilter('me')">自分</button>
       <button class="tl-filter-btn" onclick="switchTlFilter('goal')">同ジョブ</button>
       <button class="tl-filter-btn" onclick="switchTlFilter('top')">人気</button>
     </div>
@@ -5503,7 +5513,6 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
     <div id="tlViewport">
       <div id="tlTrack">
         <div class="tl-slide" id="tlFeed-all"><div style="text-align:center;padding:30px;color:var(--muted);font-size:13px;">読み込み中...</div></div>
-        <div class="tl-slide" id="tlFeed-me"></div>
         <div class="tl-slide" id="tlFeed-goal"></div>
         <div class="tl-slide" id="tlFeed-top"></div>
       </div>
@@ -13547,6 +13556,55 @@ function renderProfileTab(){
 
   // ── アカウント連携セクション ──
   renderLinkAccountSection();
+  renderProfileOwnPostsSection();
+}
+
+async function renderProfileOwnPostsSection(){
+  const wrap = document.getElementById('profileOwnPostsList');
+  if(!wrap) return;
+
+  let localPosts = loadLocalPosts().reverse().map(normalizeTimelinePost).filter(p =>
+    (currentUser && p.user_id === currentUser.id) || p.user_name === char.name
+  );
+  let cloudPosts = [];
+  if(currentUser){
+    try{
+      const { data, error } = await sb.from('timeline_posts')
+        .select(TL_LEGACY_FIELDS)
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(8);
+      if(error) throw error;
+      if(data) cloudPosts = data.map(p => normalizeTimelinePost({...p, from_cloud:true}));
+    }catch(e){
+      console.warn('Profile own posts load failed:', e);
+    }
+  }
+
+  const mergedMap = new Map();
+  [...cloudPosts, ...localPosts].forEach(post => {
+    const key = timelinePostSignature(post);
+    const prev = mergedMap.get(key);
+    if(!prev){ mergedMap.set(key, post); return; }
+    mergedMap.set(key, {
+      ...post,
+      ...prev,
+      is_free_post: !!(post.is_free_post || prev.is_free_post),
+      post_image: post.post_image || prev.post_image || null,
+      visibility: post.visibility || prev.visibility || 'public',
+    });
+  });
+  const posts = Array.from(mergedMap.values())
+    .sort((a,b)=> new Date(b.created_at||0) - new Date(a.created_at||0))
+    .slice(0, 5);
+
+  if(!posts.length){
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px;">まだ投稿がありません。タイムラインで一言や達成報告をしてみましょう！</div>';
+    return;
+  }
+
+  const likes = loadLocalLikes();
+  wrap.innerHTML = posts.map(post => renderPostHTML(post, likes)).join('');
 }
 
 async function renderLinkAccountSection(){
@@ -15779,7 +15837,7 @@ function setPostVisibility(vis){
 /* ── タイムライン読み込み ── */
 let tlCurrentFilter = 'all';
 const TL_PAGE_SIZE = 15;
-const TL_FILTERS = ['all','me','goal','top'];
+const TL_FILTERS = ['all','goal','top'];
 const TL_PUBLIC_FIELDS = [
   'id',
   'user_id',
@@ -15843,8 +15901,8 @@ function saveTlFieldMode(mode){
   try{ localStorage.setItem(TL_FIELD_MODE_KEY, mode); }catch{}
 }
 let tlFieldMode = loadTlFieldMode();
-let tlPostsByFilter = { all: null, me: null, goal: null, top: null };
-let tlPageByFilter  = { all: 0, me: 0, goal: 0, top: 0 };
+let tlPostsByFilter = { all: null, goal: null, top: null };
+let tlPageByFilter  = { all: 0, goal: 0, top: 0 };
 function loadTlCache(){
   try{
     const raw = localStorage.getItem(TL_CACHE_KEY);
@@ -15906,11 +15964,6 @@ function normalizeTimelinePost(post){
 }
 function prepareTimelinePostsForFilter(filter, posts){
   let prepared = [...posts];
-  if(filter === 'me'){
-    prepared = prepared.filter(p =>
-      (currentUser && p.user_id === currentUser.id) || p.user_name === char.name
-    );
-  }
   if(filter === 'goal' && !currentUser){
     prepared = prepared.filter(p => (p.job_ids||[]).some(j => selectedJobIds.includes(j)));
   }
@@ -15952,7 +16005,6 @@ function subscribeTlRealtime(){
       // 自分の投稿は無視（既に表示済み）
       if(post.user_id === currentUser.id) return;
       // フィルターチェック
-      if(tlCurrentFilter === 'me') return;
       if(tlCurrentFilter === 'goal'){
         const overlap = (post.job_ids||[]).some(j => selectedJobIds.includes(j));
         if(!overlap) return;
@@ -16154,9 +16206,7 @@ function renderTlPage(filter, page){
 
   if(page === 0){
     if(!posts.length){
-      const emptyMsg = filter === 'me'
-        ? '自分の投稿はまだありません。<br>学習を記録すると自動で表示されます！'
-        : filter === 'goal'
+      const emptyMsg = filter === 'goal'
         ? '同ジョブの投稿はまだありません。<br>仲間の参加を待ちましょう！'
         : 'まだ投稿がありません。<br>学習を記録すると自動でここに表示されます！';
       feed.innerHTML = `<div class="section" style="text-align:center;padding:40px 20px;">
@@ -16236,7 +16286,7 @@ function renderPostHTML(post, likes){
   }).join('');
   const isOwn = (currentUser && post.user_id === currentUser.id) ||
                 post.user_name === char.name;
-  const replyCount = (loadLocalReplies()[post.id] || []).length;
+  const replyCount = getReplyCount(post.id);
 
   const h = Math.floor((post.minutes||0)/60);
   const m = (post.minutes||0) % 60;
@@ -17378,6 +17428,7 @@ async function pinPost(postId){
    返信システム
 ════════════════════════════════════════ */
 const TL_REPLIES_KEY = 'sq2_tl_replies'; // { [postId]: [reply,...] }
+const TL_CLOUD_REPLIES_KEY = 'sq2_tl_replies_cloud_v1'; // { [postId]: [reply,...] }
 const QUICK_REPLIES = ['お疲れ様！', 'すごすぎる！', '一緒に頑張ろう！', 'ナイスファイト！', '刺激になります🔥'];
 
 function loadLocalReplies(){
@@ -17386,13 +17437,55 @@ function loadLocalReplies(){
 function saveLocalReplies(r){
   try { localStorage.setItem(TL_REPLIES_KEY, JSON.stringify(r)); } catch {}
 }
+function loadCloudRepliesCache(){
+  try { const v = localStorage.getItem(TL_CLOUD_REPLIES_KEY); return v ? JSON.parse(v) : {}; } catch { return {}; }
+}
+function saveCloudRepliesCache(r){
+  try { localStorage.setItem(TL_CLOUD_REPLIES_KEY, JSON.stringify(r)); } catch {}
+}
+function mergeRepliesByPost(postId){
+  const localReplies = loadLocalReplies()[postId] || [];
+  const cloudReplies = loadCloudRepliesCache()[postId] || [];
+  const merged = new Map();
+  [...cloudReplies, ...localReplies].forEach(reply => {
+    if(!reply?.id) return;
+    const prev = merged.get(reply.id);
+    merged.set(reply.id, prev ? { ...reply, ...prev } : reply);
+  });
+  return Array.from(merged.values()).sort((a,b)=> new Date(a.created_at||0) - new Date(b.created_at||0));
+}
+function getReplyCount(postId){
+  return mergeRepliesByPost(postId).length;
+}
+async function loadCloudRepliesForPost(postId){
+  try{
+    const { data, error } = await sb.from('timeline_replies')
+      .select('id, post_id, user_id, user_name, user_level, avatar_url, note, reply_to_name, likes, created_at')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+    if(error) throw error;
+    const cache = loadCloudRepliesCache();
+    cache[postId] = data || [];
+    saveCloudRepliesCache(cache);
+    return cache[postId];
+  }catch(e){
+    console.warn('Cloud replies load failed:', postId, e);
+    return loadCloudRepliesCache()[postId] || [];
+  }
+}
 
-function toggleReplyThread(postId){
+async function toggleReplyThread(postId){
   const thread = document.getElementById('tl-thread-' + postId);
   if(!thread) return;
   const opening = !thread.classList.contains('open');
   thread.classList.toggle('open', opening);
-  if(opening) renderReplyThreadDOM(postId);
+  if(opening){
+    thread.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px 0;">返信を読み込み中...</div>';
+    await loadCloudRepliesForPost(postId);
+    const countEl = document.getElementById('tl-reply-count-' + postId);
+    if(countEl) countEl.textContent = getReplyCount(postId);
+    renderReplyThreadDOM(postId);
+  }
 }
 
 const TL_REPLY_LIKES_KEY = 'sq2_tl_reply_likes'; // { [replyId]: true }
@@ -17402,8 +17495,7 @@ function saveReplyLikes(l){ try{ localStorage.setItem(TL_REPLY_LIKES_KEY, JSON.s
 function renderReplyThreadDOM(postId){
   const thread = document.getElementById('tl-thread-' + postId);
   if(!thread) return;
-  const allReplies = loadLocalReplies();
-  const replies = allReplies[postId] || [];
+  const replies = mergeRepliesByPost(postId);
   const replyLikes = loadReplyLikes();
   let html = '';
 
@@ -17512,8 +17604,13 @@ async function deleteReply(postId, replyId){
     allReplies[postId] = allReplies[postId].filter(r => r.id !== replyId);
     saveLocalReplies(allReplies);
   }
+  const cloudReplies = loadCloudRepliesCache();
+  if(cloudReplies[postId]){
+    cloudReplies[postId] = cloudReplies[postId].filter(r => r.id !== replyId);
+    saveCloudRepliesCache(cloudReplies);
+  }
   const countEl = document.getElementById('tl-reply-count-' + postId);
-  if(countEl) countEl.textContent = (allReplies[postId]||[]).length;
+  if(countEl) countEl.textContent = getReplyCount(postId);
   renderReplyThreadDOM(postId);
   // Supabase
   if(currentUser){
@@ -17555,9 +17652,13 @@ async function submitReply(postId){
   if(!allReplies[postId]) allReplies[postId] = [];
   allReplies[postId].push(reply);
   saveLocalReplies(allReplies);
+  const cloudReplies = loadCloudRepliesCache();
+  if(!cloudReplies[postId]) cloudReplies[postId] = [];
+  cloudReplies[postId].push(reply);
+  saveCloudRepliesCache(cloudReplies);
 
   const countEl = document.getElementById('tl-reply-count-' + postId);
-  if(countEl) countEl.textContent = allReplies[postId].length;
+  if(countEl) countEl.textContent = getReplyCount(postId);
 
   input.value = '';
   renderReplyThreadDOM(postId);
