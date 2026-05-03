@@ -6841,6 +6841,12 @@ function levelStudyMins(sess){
 function levelStudyMinsForJob(sess, jobId){
   return studyMinsForKeys(sess, getSubjectsForJobId(jobId).map(s=>s.key));
 }
+function getPrimaryJobName(jobIds, fallback='現在資格'){
+  const ids = Array.isArray(jobIds) ? jobIds.filter(Boolean) : [];
+  if(!ids.length) return fallback;
+  const job = JOBS.find(j => j.id === ids[0]);
+  return job?.name || fallback;
+}
 function getCurrentTrackLevelInfo(sess){
   const subjects = allSelectedSubjects();
   const smins = studyMinsForKeys(sess, subjects.map(s=>s.key));
@@ -7272,6 +7278,7 @@ async function loadRanking(){
     const hours=Math.floor((p.total_study_mins||0)/60);
     const overallLv = computeOverallLevel(p.total_study_mins||0);
     const currentLv = p.level || 1;
+    const currentJobName = getPrimaryJobName(p.job_ids, '現在資格');
     const topSubjs=Object.entries(p.subject_stats||{}).slice(0,4);
     const bars=topSubjs.map(([k,s])=>`<div class="rank-bar-row"><span class="rank-bar-label">${(s.name||k).slice(0,4)}</span><div class="rank-bar-track"><div class="rank-bar-fill" style="width:${s.pct||0}%;background:${SCOLORS[k]||'#c9a84c'}"></div></div></div>`).join('');
     const item=document.createElement('div');
@@ -7282,7 +7289,7 @@ async function loadRanking(){
       : p.avatar_emoji && p.avatar_emoji !== '📚'
         ? escHtml(p.avatar_emoji)
         : `<div style="width:100%;height:100%;border-radius:50%;background:${avatarColor(p.display_name)};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;">${escHtml((p.display_name||'？')[0])}</div>`;
-    item.innerHTML=`<div class="rank-pos ${posClass}">${posDisp}</div><div class="rank-avatar rank-user-open"${canOpenUserCard?' style="cursor:pointer;"':''}>${_rankAvatar}</div><div class="rank-info rank-user-open"${canOpenUserCard?' style="cursor:pointer;"':''}><div class="rank-name">${escHtml(p.display_name||'名無し')}${isMe?' <span style="font-size:9px;color:var(--gold)">← YOU</span>':''}</div><div class="rank-title-text">${escHtml(p.char_title||'—')}</div>${bars?`<div class="rank-bars">${bars}</div>`:''}</div><div class="rank-right"><div class="rank-level">総合Lv.${overallLv}</div><div class="rank-hours">${hours}h</div><div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted)">資格Lv.${currentLv} / 🔥${p.streak||0}日</div></div>`;
+    item.innerHTML=`<div class="rank-pos ${posClass}">${posDisp}</div><div class="rank-avatar rank-user-open"${canOpenUserCard?' style="cursor:pointer;"':''}>${_rankAvatar}</div><div class="rank-info rank-user-open"${canOpenUserCard?' style="cursor:pointer;"':''}><div class="rank-name">${escHtml(p.display_name||'名無し')}${isMe?' <span style="font-size:9px;color:var(--gold)">← YOU</span>':''}</div><div class="rank-title-text">${escHtml(p.char_title||'—')}</div>${bars?`<div class="rank-bars">${bars}</div>`:''}</div><div class="rank-right"><div class="rank-level">総合Lv.${overallLv}</div><div class="rank-hours">${hours}h</div><div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted)">${escHtml(currentJobName)} Lv.${currentLv} / 🔥${p.streak||0}日</div></div>`;
     if(canOpenUserCard){
       item.querySelectorAll('.rank-user-open').forEach(el=>{
         el.addEventListener('click', ()=>openUserCard(p.id, p.display_name || '名無し', p.level || 1, p.avatar_url || '', (p.job_ids||[]).join(',')));
@@ -18380,6 +18387,7 @@ async function openUserCard(userId, userName, level, avatarUrl, jobIdsStr){
 
   const canSeeDetail = isPublic || isFollowing || isOwn;
   const jobIds = (profile.job_ids || []).filter(Boolean);
+  const primaryJobName = getPrimaryJobName(jobIds, '現在資格');
   const jobLabels = jobIds.map(j => {
     const job = JOBS.find(x => x.id === j);
     return job ? `<span style="font-size:11px;background:rgba(140,198,63,.12);color:var(--accent2);border:1px solid rgba(140,198,63,.25);border-radius:20px;padding:3px 10px;">${job.icon} ${job.name}</span>` : '';
@@ -18449,7 +18457,7 @@ async function openUserCard(userId, userName, level, avatarUrl, jobIdsStr){
       <div style="flex:1;min-width:0;">
         <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:2px;">${escHtml(dispName)}</div>
         ${title ? `<div style="font-size:11px;color:var(--accent2);margin-bottom:4px;">${escHtml(title)}</div>` : ''}
-        <div style="font-size:12px;color:var(--muted);font-family:'Share Tech Mono',monospace;">資格Lv.${dispLevel} / 総合Lv.${overallLv}</div>
+        <div style="font-size:12px;color:var(--muted);font-family:'Share Tech Mono',monospace;">${escHtml(primaryJobName)} Lv.${dispLevel} / 総合Lv.${overallLv}</div>
         ${!canSeeDetail ? '<div style="font-size:10px;color:var(--muted);margin-top:2px;">🔒 非公開</div>' : ''}
       </div>
     </div>
@@ -18574,7 +18582,7 @@ function updatePcSidebar(){
   const lvEl   = document.getElementById('pcSidebarLevel');
   const avEl   = document.getElementById('pcSidebarAvatar');
   if(nameEl) nameEl.textContent = char.name || '冒険者';
-  if(lvEl)   lvEl.textContent   = `資格Lv.${lp.level} | 総合Lv.${overallLv}`;
+  if(lvEl)   lvEl.textContent   = `${getPrimaryJobName(selectedJobIds, '現在資格')} Lv.${lp.level} | 総合Lv.${overallLv}`;
   if(avEl){
     if(profileAvatarData){
       avEl.innerHTML = `<img src="${profileAvatarData}" alt="">`;
