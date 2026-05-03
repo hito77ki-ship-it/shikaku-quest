@@ -6814,6 +6814,13 @@ function fmtSecs(totalSecs){
 }
 /* 分数（小数可）→ "Xh Ym" 表示（従来互換） */
 function studyMins(sess){return sess.filter(s=>s.type==='study'||s.type==='exam').reduce((a,s)=>a+sAmount(s),0);}
+function levelStudyMins(sess){
+  const keys = new Set(selectedSubjectKeys || []);
+  if(!keys.size) return studyMins(sess);
+  return sess
+    .filter(s=>(s.type==='study'||s.type==='exam') && s.subject && keys.has(s.subject))
+    .reduce((a,s)=>a+sAmount(s),0);
+}
 function subjStudyMins(sess,key){return sess.filter(s=>s.subject===key&&(s.type==='study'||s.type==='exam')).reduce((a,s)=>a+sAmount(s),0);}
 function formatHM(mins){return `${Math.floor(mins/60)}h ${Math.round(mins%60)}m`;}
 function computeAttrs(){
@@ -6979,8 +6986,9 @@ async function signOut(){
 }
 async function syncToCloud(){
   if(!currentUser || isGuest) return;
-  const smins = studyMins(sessions);
-  const lp = getLevelProgress(smins);
+  const totalSmins = studyMins(sessions);
+  const trackSmins = levelStudyMins(sessions);
+  const lp = getLevelProgress(trackSmins);
   const ti = getTitleInfo(lp.level);
   const subjStats = {};
   allSelectedSubjects().forEach(s=>{
@@ -6993,7 +7001,7 @@ async function syncToCloud(){
     id: currentUser.id,
     display_name: char.name || null,
     level: Math.floor(lp.level) || 1,
-    total_study_mins: Math.floor(smins) || 0,
+    total_study_mins: Math.floor(totalSmins) || 0,
     streak: Math.floor(char.streak || 0),
     job_ids: Array.isArray(selectedJobIds) ? selectedJobIds : [],
     subject_keys: Array.isArray(selectedSubjectKeys) ? selectedSubjectKeys : [],
@@ -7752,8 +7760,8 @@ function initDashboard(){
   setInterval(renderDuelCard, 60000);
 }
 function renderAll(){
-  const smins=studyMins(sessions);
-  const lp=getLevelProgress(smins);char.level=lp.level;
+  const trackSmins=levelStudyMins(sessions);
+  const lp=getLevelProgress(trackSmins);char.level=lp.level;
   const ti=getTitleInfo(lp.level);const attrs=computeAttrs();const subjs=allSelectedSubjects();
   const aeEl=document.getElementById('avatarEmoji');
   if(profileAvatarData){
@@ -7931,7 +7939,7 @@ async function addQuest(){
   let amount=qh*60+qm;
   let exp=0;
   if(amount<=0){alert('時間または分を入力してください');return;}exp=Math.round(amount);
-  const smins0=studyMins(sessions),lv0=computeLevel(smins0);
+  const smins0=levelStudyMins(sessions),lv0=computeLevel(smins0);
   const today=getTodayStr();
   if(char.lastLoginDate!==today){
     const yesterday=toLocalDateStr(new Date(Date.now()-86400000));
@@ -7959,7 +7967,7 @@ async function addQuest(){
   const condition = parseInt(document.getElementById('mrecCondition')?.value ?? 1);
   sessions.push({date,subject,type:currentType,amount,exp,note,startedAt,endedAt,condition});
   timerStartedAt = null;
-  const smins1=studyMins(sessions),lv1=computeLevel(smins1);
+  const smins1=levelStudyMins(sessions),lv1=computeLevel(smins1);
   char.level=lv1;
   await saveAll();renderAll();
   if(lv1>lv0){showLevelUp(lv1,smins1); checkClassChange(lv0,lv1,smins1);}
@@ -8210,10 +8218,11 @@ function openXShare(text){
 const SQ_URL = 'https://hito77ki-ship-it.github.io/study-quest/';
 
 async function shareLevelUpToX(){
-  const smins = studyMins(sessions);
-  const lv = getLevelProgress(smins).level;
+  const totalSmins = studyMins(sessions);
+  const trackSmins = levelStudyMins(sessions);
+  const lv = getLevelProgress(trackSmins).level;
   const ti = getTitleInfo(lv);
-  const totalH = Math.floor(smins/60);
+  const totalH = Math.floor(totalSmins/60);
   const streak = char.streak || 0;
   const examInfo = getNextExamDays();
   const examLine = examInfo ? `📅 ${examInfo.title}まであと${examInfo.days}日\n` : '';
@@ -8236,10 +8245,11 @@ ${SQ_URL}`;
   openXShare(text);
 }
 async function shareLevelUpToThreads(){
-  const smins = studyMins(sessions);
-  const lv = getLevelProgress(smins).level;
+  const totalSmins = studyMins(sessions);
+  const trackSmins = levelStudyMins(sessions);
+  const lv = getLevelProgress(trackSmins).level;
   const ti = getTitleInfo(lv);
-  const totalH = Math.floor(smins/60);
+  const totalH = Math.floor(totalSmins/60);
   const text = `${ti.emoji} レベルアップ！ Lv.${lv}「${ti.title}」に到達した。\n累計${totalH}時間の積み重ねが、今ここで報われた。\nまだ終わらない。次のレベルへ。\n\n#スタディクエスト\nhttps://hito77ki-ship-it.github.io/study-quest/`;
   window.open('https://www.threads.net/intent/post?text='+encodeURIComponent(text),'_blank');
 }
@@ -8604,9 +8614,9 @@ function startPomoBreak(){
 }
 
 async function tweetPomo(){
-  const smins = studyMins(sessions);
-  const lv = getLevelProgress(smins).level;
-  const text = `ポモドーロ${pomoCount}/${POMO_SETS}セット完了！🍅\nLv.${lv} ｜ 累計${Math.floor(smins/60)}時間\n今日も勉強がんばった💪\n#スタディクエスト #study_quest\nhttps://hito77ki-ship-it.github.io/study-quest/`;
+  const totalSmins = studyMins(sessions);
+  const lv = getLevelProgress(levelStudyMins(sessions)).level;
+  const text = `ポモドーロ${pomoCount}/${POMO_SETS}セット完了！🍅\nLv.${lv} ｜ 累計${Math.floor(totalSmins/60)}時間\n今日も勉強がんばった💪\n#スタディクエスト #study_quest\nhttps://hito77ki-ship-it.github.io/study-quest/`;
 
   if (navigator.share) {
     try {
@@ -8796,7 +8806,7 @@ async function finishTimer(){
   if(subject) localStorage.setItem('sq2_last_subject', subject);
   const exp=Math.ceil(totalSecs/60); // EXPは切り上げのまま
 
-  const smins0=studyMins(sessions),lv0=computeLevel(smins0);
+  const smins0=levelStudyMins(sessions),lv0=computeLevel(smins0);
   const today=date;
   if(char.lastLoginDate!==today){
     const yesterday=toLocalDateStr(new Date(Date.now()-86400000));
@@ -8810,7 +8820,7 @@ async function finishTimer(){
   const isFirstSession = sessions.length === 0;
   gtag('event','session_record',{subject, minutes, is_first: isFirstSession});
   sessions.push({date,subject,type:'study',amount:minutes,amountSecs:totalSecs,exp,note,startedAt,endedAt,condition});
-  const smins1=studyMins(sessions),lv1=computeLevel(smins1);
+  const smins1=levelStudyMins(sessions),lv1=computeLevel(smins1);
   char.level=lv1;
   // 忘却の霧ボーナス
   const _fogActive = window._fogTimerActive && minutes >= 15;
@@ -10657,8 +10667,7 @@ async function setWeeklyGoal(){
 
 async function postWeeklyGoalToTimeline(hours, d1, d2){
   const name = char.name || 'ゲスト';
-  const smins = studyMins(sessions);
-  const lv = computeLevel(smins);
+  const lv = computeLevel(levelStudyMins(sessions));
   const post = {
     id:           Date.now().toString(36) + Math.random().toString(36).slice(2,6),
     user_id:      currentUser ? currentUser.id : 'guest_' + (char.name || 'anonymous'),
@@ -10823,8 +10832,7 @@ async function postGoalMilestoneToTimeline(milestone, weekMins, goalHours){
     ? `週間目標 ${goalStr} 完全達成！`
     : `週間目標 ${milestone}% 達成（${goalStr}）`;
 
-  const smins = studyMins(sessions);
-  const lv    = computeLevel(smins);
+  const lv    = computeLevel(levelStudyMins(sessions));
   const post  = {
     id:           Date.now().toString(36) + Math.random().toString(36).slice(2,6),
     user_id:      currentUser ? currentUser.id : 'guest',
@@ -10899,8 +10907,9 @@ function showGoalCelebration(){
 function renderExpInfo(){
   const el=document.getElementById('rptExpInfo');
   if(!el) return;
-  const smins=studyMins(sessions);
-  el.textContent=`累計 ${Math.floor(smins/60)}h → Lv.${computeLevel(smins)} / 1分 ＝ 1EXP`;
+  const totalSmins=studyMins(sessions);
+  const trackSmins=levelStudyMins(sessions);
+  el.textContent=`累計 ${Math.floor(totalSmins/60)}h → Lv.${computeLevel(trackSmins)} / 1分 ＝ 1EXP`;
 }
 
 /* ── 分析サブタブ ── */
@@ -12943,7 +12952,7 @@ function updateAvatarPickerPhoto(){
     prev.innerHTML = `<img src="${profileAvatarData}" alt="">`;
     document.getElementById('avPhotoClearBtn').style.display = '';
   } else {
-    const smins = studyMins(sessions);
+    const smins = levelStudyMins(sessions);
     const lp = getLevelProgress(smins);
     const ti = getTitleInfo(lp.level);
     prev.innerHTML = char.profileIconEmoji || ti.emoji;
@@ -12976,7 +12985,7 @@ function clearAvatarPhoto(){
   updateAvatarPickerPhoto();
 }
 function updateAllAvatarDisplays(){
-  const smins = studyMins(sessions);
+  const smins = levelStudyMins(sessions);
   const lp = getLevelProgress(smins);
   const ti = getTitleInfo(lp.level);
   const emoji = char.profileIconEmoji || (char.equippedAvatar ? (SHOP_ITEMS.avatars.find(a=>a.id===char.equippedAvatar)||{}).icon : null) || ti.emoji;
@@ -13433,7 +13442,7 @@ function renderHeatmap(){
    PROFILE TAB
 ════════════════════════════════════════ */
 function renderProfileTab(){
-  const smins = studyMins(sessions);
+  const smins = levelStudyMins(sessions);
   const lp = getLevelProgress(smins);
   const ti = getTitleInfo(lp.level);
   const equip = getCurrentEquipment(smins/60);
@@ -14043,7 +14052,7 @@ async function deleteSession(idx){
   sessions.splice(idx, 1);
   // char.totalEXP 再計算
   char.totalEXP = sessions.reduce((a,s)=>a+(s.exp||0), 0);
-  const smins = studyMins(sessions);
+  const smins = levelStudyMins(sessions);
   char.level   = computeLevel(smins);
 
   await saveAll();
@@ -14073,7 +14082,7 @@ async function undoDelete(){
   clearTimeout(undoTimer);
   sessions.splice(lastDeletedIndex, 0, lastDeletedSession);
   char.totalEXP = sessions.reduce((a,s)=>a+(s.exp||0), 0);
-  const smins = studyMins(sessions);
+  const smins = levelStudyMins(sessions);
   char.level = computeLevel(smins);
   await saveAll();
   renderAll();
@@ -15601,7 +15610,7 @@ async function quickRecord(mins){
   if(!subjs.length){ alert('科目が設定されていません。まず資格を選択してください。'); return; }
   const subj = subjs[0]; // 第1科目に記録
   const exp = mins;
-  const smins0 = studyMins(sessions), lv0 = computeLevel(smins0);
+  const smins0 = levelStudyMins(sessions), lv0 = computeLevel(smins0);
 
   // streak更新
   const yesterday = toLocalDateStr(new Date(Date.now()-86400000));
@@ -15618,7 +15627,7 @@ async function quickRecord(mins){
 
   sessions.push({ date:today, subject:subj.key, type:'study', amount:mins, exp, note:'⚡ クイック記録', startedAt, endedAt, condition });
 
-  const smins1 = studyMins(sessions), lv1 = computeLevel(smins1);
+  const smins1 = levelStudyMins(sessions), lv1 = computeLevel(smins1);
   char.level = lv1;
   await saveAll(); renderAll();
   if(lv1 > lv0){ showLevelUp(lv1, smins1); checkClassChange(lv0, lv1, smins1); }
@@ -16737,8 +16746,9 @@ function generateShareCard(){
   ctx.fillText(char.name || '冒険者', 28, 96);
 
   // 称号・レベル
-  const smins = studyMins(sessions);
-  const lp = getLevelProgress(smins);
+  const trackSmins = levelStudyMins(sessions);
+  const totalSmins = studyMins(sessions);
+  const lp = getLevelProgress(trackSmins);
   const ti = getTitleInfo(lp.level);
   ctx.fillStyle = '#8CC63F';
   ctx.font = 'bold 13px "Share Tech Mono", monospace';
@@ -16778,7 +16788,7 @@ function generateShareCard(){
   ctx.fillText('TOTAL', 286, 160);
   ctx.fillStyle = '#E2E8F0';
   ctx.font = 'bold 36px "Share Tech Mono", monospace';
-  ctx.fillText(`${Math.floor(smins/60)}h`, 286, 210);
+  ctx.fillText(`${Math.floor(totalSmins/60)}h`, 286, 210);
 
   // EXPバー
   const barY = 248, barH = 8, barW = W - 56;
@@ -16828,14 +16838,15 @@ function downloadShareCard(){
 
 async function shareToX(){
   const canvas = document.getElementById('shareCanvas');
-  const smins = studyMins(sessions);
+  const totalSmins = studyMins(sessions);
+  const trackSmins = levelStudyMins(sessions);
   const todayMins = sessions
     .filter(s=>s.type==='study'&&s.date===new Date().toISOString().slice(0,10))
     .reduce((a,s)=>a+s.amount,0);
   const h = Math.floor(todayMins/60), m = todayMins%60;
   const timeStr = h>0 ? `${h}時間${m>0?m+'分':''}` : `${m}分`;
-  const lv = getLevelProgress(smins).level;
-  const text = `今日の学習時間: ${timeStr}　Lv.${lv}\n累計: ${Math.floor(smins/60)}時間\n\n#スタディクエスト #study_quest\nhttps://hito77ki-ship-it.github.io/study-quest/`;
+  const lv = getLevelProgress(trackSmins).level;
+  const text = `今日の学習時間: ${timeStr}　Lv.${lv}\n累計: ${Math.floor(totalSmins/60)}時間\n\n#スタディクエスト #study_quest\nhttps://hito77ki-ship-it.github.io/study-quest/`;
 
   // Web Share API：画像付きネイティブシェア（スマホ対応）
   if (navigator.share) {
@@ -18521,13 +18532,13 @@ window.pcNavSwitch = pcNavSwitch;
 
 /* サイドバーのユーザー情報を更新 */
 function updatePcSidebar(){
-  const smins = studyMins(sessions);
-  const lp = getLevelProgress(smins);
+  const totalSmins = studyMins(sessions);
+  const lp = getLevelProgress(levelStudyMins(sessions));
   const nameEl = document.getElementById('pcSidebarName');
   const lvEl   = document.getElementById('pcSidebarLevel');
   const avEl   = document.getElementById('pcSidebarAvatar');
   if(nameEl) nameEl.textContent = char.name || '冒険者';
-  if(lvEl)   lvEl.textContent   = `Lv.${lp.level} | ${Math.floor(smins/60)}h`;
+  if(lvEl)   lvEl.textContent   = `Lv.${lp.level} | ${Math.floor(totalSmins/60)}h`;
   if(avEl){
     if(profileAvatarData){
       avEl.innerHTML = `<img src="${profileAvatarData}" alt="">`;
