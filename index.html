@@ -7844,7 +7844,7 @@ function renderAll(){
   const barPct=lp.level>=100?100:Math.round(lp.pctInLevel*100);
   document.getElementById('expFill').style.width=barPct+'%';
   document.getElementById('expNumbers').textContent=lp.level>=100?'⭐ MAX LEVEL REACHED ⭐':`Lv${lp.level} → Lv${lp.level+1} まで あと ${formatHM(lp.minsForNext)}`;
-  renderOverallProgress(totalSmins,subjs);
+  renderOverallProgress(lp.smins,subjs);
   renderRadar(attrs);renderAttrs(attrs);
   renderDqStatusCard();
   renderSessions(subjs);renderQuestLogStats&&renderQuestLogStats();renderTitles();
@@ -7870,22 +7870,25 @@ function renderAll(){
 
 function renderOverallProgress(smins,subjs){
   const con=document.getElementById('overallProgressSection');
-  const avgMins=getAvgMins(),maxMins=getMaxMins();
-  const th=smins/60,ah=avgMins/60,mh=maxMins/60;
+  const avgMins=getAvgMins();
+  const scaleMins=Math.max(avgMins*1.25,smins,60);
+  const th=smins/60,ah=avgMins/60,sh=scaleMins/60;
   const remain=Math.max(0,ah-th);
-  const avgPct=Math.min(100,avgMins/maxMins*100);
+  const avgPct=Math.min(100,avgMins/scaleMins*100);
+  const studyPct=Math.min(100,smins/scaleMins*100);
+  const avgRate=ah>0?Math.min(999,Math.round((th/ah)*100)):0;
   con.innerHTML=`<div class="sec-title">OVERALL QUEST PROGRESS</div>
   <div class="prog-numbers-row">
-    <div class="prog-num-item"><span class="prog-num-label">累計勉強時間</span><span class="prog-num-val">${Math.floor(th)}<span style="font-size:12px;color:var(--muted)">h</span></span></div>
+    <div class="prog-num-item"><span class="prog-num-label">現在資格の学習時間</span><span class="prog-num-val">${Math.floor(th)}<span style="font-size:12px;color:var(--muted)">h</span></span></div>
     <div class="prog-num-item"><span class="prog-num-label">平均合格時間</span><span class="prog-num-val" style="font-size:16px;color:#7cff6e">${Math.floor(ah)}<span style="font-size:11px;color:var(--muted)">h</span></span></div>
-    <div class="prog-num-item"><span class="prog-num-label">MAX（×1.5）</span><span class="prog-num-val" style="font-size:16px;color:var(--gold)">${Math.floor(mh)}<span style="font-size:11px;color:var(--muted)">h</span></span></div>
+    <div class="prog-num-item"><span class="prog-num-label">平均到達率</span><span class="prog-num-val" style="font-size:16px;color:var(--gold)">${avgRate}<span style="font-size:11px;color:var(--muted)">%</span></span></div>
     <div class="prog-num-item"><span class="prog-num-label">平均までの残り</span><span class="prog-num-val" style="font-size:16px;color:#ff9e4d">${Math.ceil(remain)}<span style="font-size:11px;color:var(--muted)">h</span></span></div>
   </div>
   <div style="position:relative;margin-bottom:16px;">
     <div class="milestone-avg-line" style="left:${avgPct.toFixed(1)}%"></div>
-    <div class="milestone-max-label">Lv.100 MAX</div>
-    <div class="milestone-bar"><div class="milestone-fill-study" style="width:${Math.min(100,smins/maxMins*100).toFixed(1)}%"></div></div>
-    <div class="milestone-labels"><span>0h</span><span style="color:#7cff6e">▲${Math.floor(ah)}h（平均）</span><span style="color:var(--gold)">${Math.floor(mh)}h</span></div>
+    <div class="milestone-max-label">現在資格ベース</div>
+    <div class="milestone-bar"><div class="milestone-fill-study" style="width:${studyPct.toFixed(1)}%"></div></div>
+    <div class="milestone-labels"><span>0h</span><span style="color:#7cff6e">▲${Math.floor(ah)}h（平均）</span><span style="color:var(--muted)">${Math.ceil(sh)}h スケール</span></div>
   </div>
   <div class="subj-stat-rows-wrap">
     <div style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--muted);margin-bottom:10px;">SUBJECT HP</div>
