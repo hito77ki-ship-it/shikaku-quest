@@ -85,41 +85,57 @@ const LATEST = ['daigakusei-keizoku.html','shukatsu-shikaku.html','hatarakinagar
 const PAGE = location.pathname.split('/').pop() || '';
 const ARTICLE_THEME_KEY = 'sq2_theme';
 const ARTICLE_THEME_MANUAL_KEY = 'sq2_theme_manual';
+const ARTICLE_THEME_MODE_KEY = 'sq2_theme_mode';
 
-function resolveArticleTheme(){
+function getArticleThemeMode(){
+  const mode = localStorage.getItem(ARTICLE_THEME_MODE_KEY);
+  if(mode === 'system' || mode === 'light' || mode === 'dark') return mode;
+
   const saved = localStorage.getItem(ARTICLE_THEME_KEY);
   const manual = localStorage.getItem(ARTICLE_THEME_MANUAL_KEY);
-  const osDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  return (saved && manual) ? saved : (osDark ? 'dark' : 'light');
+  if(saved && manual && (saved === 'light' || saved === 'dark')) return saved;
+  return 'system';
+}
+
+function resolveArticleTheme(mode = getArticleThemeMode()){
+  if(mode === 'light' || mode === 'dark') return mode;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function applyArticleTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.setAttribute('data-theme-mode', getArticleThemeMode());
 }
 
-function toggleArticleTheme(){
-  const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-  const next = current === 'dark' ? 'light' : 'dark';
-  localStorage.setItem(ARTICLE_THEME_KEY, next);
-  localStorage.setItem(ARTICLE_THEME_MANUAL_KEY, '1');
-  applyArticleTheme(next);
-  syncThemeButtonLabel();
+function setArticleThemeMode(mode){
+  if(mode === 'system'){
+    localStorage.setItem(ARTICLE_THEME_MODE_KEY, 'system');
+    localStorage.removeItem(ARTICLE_THEME_MANUAL_KEY);
+  } else {
+    localStorage.setItem(ARTICLE_THEME_MODE_KEY, mode);
+    localStorage.setItem(ARTICLE_THEME_KEY, mode);
+    localStorage.setItem(ARTICLE_THEME_MANUAL_KEY, '1');
+  }
+  applyArticleTheme(resolveArticleTheme(mode));
+  syncThemeControls();
 }
 
-function syncThemeButtonLabel(){
-  const btn = document.getElementById('sq-article-theme-toggle');
-  if(!btn) return;
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  btn.setAttribute('aria-label', isDark ? 'ライトモードに切替' : 'ダークモードに切替');
-  btn.setAttribute('title', isDark ? 'ライトモードに切替' : 'ダークモードに切替');
-  btn.innerHTML = isDark ? '<span class="sq-theme-icon">☀</span><span class="sq-theme-text">Light</span>' : '<span class="sq-theme-icon">☾</span><span class="sq-theme-text">Dark</span>';
+function syncThemeControls(){
+  const group = document.getElementById('sq-article-theme-toggle');
+  if(!group) return;
+  const mode = getArticleThemeMode();
+  group.querySelectorAll('[data-theme-mode]').forEach(btn => {
+    const active = btn.getAttribute('data-theme-mode') === mode;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
 }
 
 applyArticleTheme(resolveArticleTheme());
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-  if(!localStorage.getItem(ARTICLE_THEME_MANUAL_KEY)){
+  if(getArticleThemeMode() === 'system'){
     applyArticleTheme(e.matches ? 'dark' : 'light');
-    syncThemeButtonLabel();
+    syncThemeControls();
   }
 });
 
@@ -269,29 +285,51 @@ html[data-theme="dark"] div[style*="background:#F7FAFC"] div[style*="color:#8CC6
 html[data-theme="dark"] footer{background:#080B12;}
 html[data-theme="dark"] footer a{color:#8F9BB0;}
 html[data-theme="dark"] footer p{color:#6B7280;}
-.sq-article-theme-btn{
+.sq-article-theme-group{
   display:inline-flex;
   align-items:center;
-  gap:8px;
-  min-width:88px;
-  justify-content:center;
+  gap:6px;
+  padding:4px;
   border:1px solid var(--sq-border-strong);
   background:var(--sq-surface);
   color:var(--sq-text);
   border-radius:999px;
-  padding:8px 14px;
+  box-shadow:0 10px 24px rgba(15,23,42,.08);
+}
+.sq-article-theme-option{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-width:74px;
+  border:none;
+  background:transparent;
+  color:var(--sq-soft);
+  border-radius:999px;
+  padding:8px 12px;
   font-size:12px;
   font-weight:700;
   cursor:pointer;
-  transition:transform .2s, box-shadow .2s, border-color .2s;
+  transition:transform .2s, box-shadow .2s, color .2s, background .2s;
 }
-.sq-article-theme-btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(15,23,42,.12);border-color:rgba(140,198,63,.42);}
-.sq-theme-icon{font-size:14px;line-height:1;}
-.sq-theme-text{letter-spacing:.08em;}
-html[data-theme="light"] .sq-article-theme-btn{box-shadow:0 8px 20px rgba(15,23,42,.08);}
-html[data-theme="dark"] .sq-article-theme-btn{background:rgba(17,24,39,.82);border-color:rgba(140,198,63,.24);box-shadow:0 10px 28px rgba(0,0,0,.18);}
+.sq-article-theme-option:hover{
+  transform:translateY(-1px);
+  color:var(--sq-text);
+}
+.sq-article-theme-option.is-active{
+  background:#8CC63F;
+  color:var(--sq-cta-text);
+  box-shadow:0 8px 22px rgba(140,198,63,.22);
+}
+.sq-theme-icon{font-size:13px;line-height:1;}
+.sq-theme-text{letter-spacing:.04em;}
+html[data-theme="dark"] .sq-article-theme-group{
+  background:rgba(17,24,39,.82);
+  border-color:rgba(140,198,63,.24);
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
 @media(max-width:640px){
-  .sq-article-theme-btn{min-width:auto;padding:8px 12px;}
+  .sq-article-theme-option{min-width:auto;padding:8px 10px;}
   .sq-theme-text{display:none;}
 }
 /* サイドバー：fixed で記事の右に配置（1100px以上のみ） */
@@ -404,15 +442,29 @@ html[data-theme="dark"] .sq-article-theme-btn{background:rgba(17,24,39,.82);bord
 function buildThemeToggle(){
   const navInner = document.querySelector('.nav-inner');
   if(!navInner) return;
-  const btn = document.createElement('button');
-  btn.id = 'sq-article-theme-toggle';
-  btn.className = 'sq-article-theme-btn';
-  btn.type = 'button';
-  btn.addEventListener('click', toggleArticleTheme);
+  const group = document.createElement('div');
+  group.id = 'sq-article-theme-toggle';
+  group.className = 'sq-article-theme-group';
+  group.setAttribute('role', 'group');
+  group.setAttribute('aria-label', '記事テーマ');
+  [
+    {mode:'system', icon:'◐', label:'System'},
+    {mode:'light', icon:'☀', label:'Light'},
+    {mode:'dark', icon:'☾', label:'Dark'}
+  ].forEach(({mode, icon, label}) => {
+    const btn = document.createElement('button');
+    btn.className = 'sq-article-theme-option';
+    btn.type = 'button';
+    btn.setAttribute('data-theme-mode', mode);
+    btn.setAttribute('title', `${label} モード`);
+    btn.innerHTML = `<span class="sq-theme-icon">${icon}</span><span class="sq-theme-text">${label}</span>`;
+    btn.addEventListener('click', () => setArticleThemeMode(mode));
+    group.appendChild(btn);
+  });
   const cta = navInner.querySelector('.nav-cta');
-  if(cta) navInner.insertBefore(btn, cta);
-  else navInner.appendChild(btn);
-  syncThemeButtonLabel();
+  if(cta) navInner.insertBefore(group, cta);
+  else navInner.appendChild(group);
+  syncThemeControls();
 }
 
 /* ── サイドバー構築（position:fixed、コンテナは触らない） ── */
