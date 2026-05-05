@@ -1043,15 +1043,20 @@ function buildReactionWidget(){
   wrap.querySelectorAll('.sq-reaction-btn').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       const type = btn.dataset.type;
-      if(_getMyReaction(articleId) === type) return;
+      const prev = _getMyReaction(articleId);
+      if(prev === type) return; // 同じボタンは無視
+      const alreadySent = !!prev; // 一度でも送信済みか
       _setMyReaction(articleId, type);
       wrap.querySelectorAll('.sq-reaction-btn').forEach(b=>b.classList.toggle('sq-reacted', b.dataset.type===type));
       const note = document.getElementById('sqRNote');
-      if(note) note.textContent = 'ありがとうございます！';
-      _gaEvent('article_reaction', {article_id: articleId, reaction_type: type});
-      await _sendReaction(articleId, type);
-      const c = await _fetchCounts(articleId);
-      REACTIONS.forEach(r=>{ const el=document.getElementById('sqRc-'+r.type); if(el) el.textContent=c[r.type]||0; });
+      if(note) note.textContent = alreadySent ? '変更しました！（集計は初回のみ反映）' : 'ありがとうございます！';
+      if(!alreadySent){
+        // 初回のみSupabaseに送信
+        _gaEvent('article_reaction', {article_id: articleId, reaction_type: type});
+        await _sendReaction(articleId, type);
+        const c = await _fetchCounts(articleId);
+        REACTIONS.forEach(r=>{ const el=document.getElementById('sqRc-'+r.type); if(el) el.textContent=c[r.type]||0; });
+      }
     });
   });
 
