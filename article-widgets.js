@@ -1569,8 +1569,18 @@ function trackRelatedArticleClicks(){
   });
 }
 
+function trackPageView(){
+  if(!PAGE) return;
+  fetch(`${_SB_URL}/rest/v1/rpc/increment_view`,{
+    method:'POST',
+    headers:{'apikey':_SB_ANON,'Authorization':'Bearer '+_SB_ANON,'Content-Type':'application/json'},
+    body:JSON.stringify({p_article_id:PAGE})
+  }).catch(()=>{});
+}
+
 document.addEventListener('DOMContentLoaded', async function(){
   injectGA();
+  trackPageView();
   injectStyles();
   buildThemeToggle();
   injectBreadcrumbLD();
