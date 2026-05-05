@@ -4339,6 +4339,8 @@ body[data-theme="dark"] { --hm0:#161b22; --hm1:#0e4429; --hm2:#006d32; --hm3:#26
       </div>
       <div id="quickRecResult" style="font-size:10px;color:var(--accent2);font-family:'Share Tech Mono',monospace;margin-top:6px;min-height:16px;"></div>
     </div>
+    <!-- 攻略記事レコメンド -->
+    <div id="articleRecommendCard" style="grid-column:1/-1;"></div>
     <!-- 広告スペース（将来のAdSense用） -->
     <div id="affiliateCardStatus" style="grid-column:1/-1;margin:4px 0;"></div>
   </div>
@@ -7780,6 +7782,7 @@ function initDashboard(){
   buildTimerSubjSelect();
   const tsel=document.getElementById('timerSubject');
   if(tsel)tsel.addEventListener('change',updateTimerEnemy);
+  renderArticleRecommendCard();
   renderAll();
   // 過去に追加した固定習慣タスクを削除
   (function removeFixedHabits(){
@@ -8168,7 +8171,7 @@ function switchTab(tab){
   else unsubscribeTlRealtime();
   if(tab==='report')  requestAnimationFrame(()=>{ const ml=document.getElementById('mql-list'); if(ml) ml._mqlShowing=5; renderReportTab(); });
   if(tab==='profile') requestAnimationFrame(()=>{ renderProfileTab(); renderWeekPlan(); initProfileQR(); updateReminderUI(); });
-  if(tab==='status')  requestAnimationFrame(()=>{ renderResumeButton(); renderPartyRaidCard(); renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); renderOnboardingBanner(); renderTodayQuestBanner(); renderAffiliateCard(); });
+  if(tab==='status')  requestAnimationFrame(()=>{ renderResumeButton(); renderPartyRaidCard(); renderExamBanner(); renderTodayPlan(); renderPaceDiag(); renderDailyMissions(); renderOnboardingBanner(); renderTodayQuestBanner(); renderAffiliateCard(); renderArticleRecommendCard(); });
   // モバイルタブバーも同期
   document.querySelectorAll('.m-tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   const activeBtn=document.getElementById('tab-'+tab);
@@ -12659,6 +12662,63 @@ const AFFILIATE_DATA = {
     ]
   },
 };
+
+/* ── 攻略記事レコメンドカード ── */
+const ARTICLE_BASE_URL = 'https://hito77ki-ship-it.github.io/study-quest/';
+const JOB_ARTICLE_MAP = {
+  'cpa':         [{f:'cpa.html',lb:'公認会計士',t:'公認会計士試験の勉強法・独学ロードマップ'},{f:'cpa-daigakusei-kakugo.html',lb:'大学生向け',t:'大学生が公認会計士試験に挑む前に知るべきリアル'},{f:'cpa-yobikou.html',lb:'勉強法',t:'公認会計士は予備校と独学どっちがいい？'}],
+  'zeirishi':    [{f:'zeirishi.html',lb:'税理士',t:'税理士試験の科目選択と独学戦略'},{f:'zeirishi-vs-cpa.html',lb:'資格比較',t:'税理士 vs 公認会計士 どっちを目指すべき？'}],
+  'boki1':       [{f:'boki1.html',lb:'簿記1級',t:'日商簿記1級の独学合格ガイド'},{f:'boki1-yobikou.html',lb:'勉強法',t:'日商簿記1級は予備校と独学どっちがいい？'},{f:'cpa-akirameta-boki1.html',lb:'会計士→簿記1級',t:'公認会計士を諦めたら簿記1級は狙える？'}],
+  'boki2':       [{f:'boki2.html',lb:'簿記2級',t:'簿記2級の勉強時間・独学合格ロードマップ'},{f:'boki-vs-fp.html',lb:'資格比較',t:'簿記2級 vs FP2級 どっちを先に取るべき？'}],
+  'boki3':       [{f:'boki.html',lb:'簿記3級・2級',t:'日商簿記3級・2級の独学勉強法と合格スケジュール'}],
+  'fp2':         [{f:'fp.html',lb:'FP2級',t:'FP2級・3級の独学合格ガイド'},{f:'boki-vs-fp.html',lb:'資格比較',t:'簿記2級 vs FP2級 どっちを先に取るべき？'}],
+  'fp3':         [{f:'fp3.html',lb:'FP3級',t:'FP3級の勉強時間・独学合格スケジュール'}],
+  'gyosei':      [{f:'gyosei.html',lb:'行政書士',t:'行政書士試験の独学合格ガイド'},{f:'sharoshi-vs-gyosei.html',lb:'資格比較',t:'社労士 vs 行政書士 どっちを先に取るべき？'},{f:'takken-vs-gyosei.html',lb:'資格比較',t:'宅建 vs 行政書士 どっちを先に取るべき？'}],
+  'takken':      [{f:'takken.html',lb:'宅建',t:'宅建士の独学合格ガイド・スケジュール'},{f:'takken-vs-gyosei.html',lb:'資格比較',t:'宅建 vs 行政書士 どっちを先に取るべき？'},{f:'takken-vs-mansion.html',lb:'資格比較',t:'宅建 vs マンション管理士 どっちを先に取るべき？'}],
+  'shoshi':      [{f:'shihoshoshi.html',lb:'司法書士',t:'司法書士の独学合格ガイド'}],
+  'sharoushi':   [{f:'sharoshi.html',lb:'社労士',t:'社会保険労務士の独学合格ガイド'},{f:'sharoshi-vs-gyosei.html',lb:'資格比較',t:'社労士 vs 行政書士 どっちを先に取るべき？'},{f:'sharoshi-vs-shindanshi.html',lb:'資格比較',t:'社労士 vs 中小企業診断士 どっちを先に取るべき？'}],
+  'chusho':      [{f:'shindanshi.html',lb:'中小企業診断士',t:'中小企業診断士の独学合格ガイド'},{f:'sharoshi-vs-shindanshi.html',lb:'資格比較',t:'社労士 vs 中小企業診断士 どっちを先に取るべき？'}],
+  'mansion':     [{f:'mansion.html',lb:'マンション管理士',t:'マンション管理士の独学合格ガイド'},{f:'takken-vs-mansion.html',lb:'資格比較',t:'宅建 vs マンション管理士 どっちを先に取るべき？'}],
+  'funda':       [{f:'fe.html',lb:'基本情報',t:'基本情報技術者試験の独学合格ガイド'},{f:'itp-vs-fe.html',lb:'資格比較',t:'ITパスポート vs 基本情報 どっちを先に取るべき？'},{f:'fe-vs-ap.html',lb:'資格比較',t:'基本情報 vs 応用情報 どっちを先に取るべき？'}],
+  'itpass':      [{f:'itp.html',lb:'ITパスポート',t:'ITパスポートの独学合格ガイド'},{f:'itp-vs-fe.html',lb:'資格比較',t:'ITパスポート vs 基本情報 どっちを先に取るべき？'}],
+  'ouyou':       [{f:'ap.html',lb:'応用情報',t:'応用情報技術者試験の完全ガイド'},{f:'fe-vs-ap.html',lb:'資格比較',t:'基本情報 vs 応用情報 どっちを先に取るべき？'}],
+  'mos':         [{f:'mos.html',lb:'MOS',t:'MOS（Microsoft Office Specialist）の独学合格ガイド'}],
+  'toeic':       [{f:'toeic.html',lb:'TOEIC',t:'TOEIC L&Rの独学スコアアップ戦略'},{f:'toeic-vs-eiken.html',lb:'資格比較',t:'TOEIC vs 英検 どっちを取るべき？'}],
+  'eiken':       [{f:'eiken.html',lb:'英検2級',t:'英検2級の独学合格ガイド'},{f:'eiken1.html',lb:'英検準1級',t:'英検準1級の独学合格ガイド'},{f:'toeic-vs-eiken.html',lb:'資格比較',t:'TOEIC vs 英検 どっちを取るべき？'}],
+  'toefl':       [{f:'toefl.html',lb:'TOEFL',t:'TOEFL iBTの独学スコアアップ戦略'}],
+  'kanken':      [{f:'kanken.html',lb:'漢字検定',t:'漢字検定（漢検）2級の独学合格ガイド'}],
+  'shoken':      [{f:'gaibuin.html',lb:'証券外務員',t:'証券外務員一種・二種の独学合格ガイド'}],
+  'hisho':       [{f:'hisho.html',lb:'秘書検定',t:'秘書検定2級・準1級の独学合格ガイド'}],
+  'kikenbutsu':  [{f:'kiken.html',lb:'危険物乙4',t:'危険物取扱者（乙4）の独学合格ガイド'}],
+  'toroku':      [{f:'toroku-hanbai.html',lb:'登録販売者',t:'登録販売者の独学合格ガイド'}],
+  'nurse':       [{f:'nurse.html',lb:'看護師',t:'看護師国家試験の勉強法と合格戦略'}],
+  'kaigo':       [{f:'kaigo.html',lb:'ケアマネ',t:'ケアマネジャー試験の独学合格ガイド'}],
+  'careman':     [{f:'kaigo.html',lb:'ケアマネ',t:'ケアマネジャー試験の独学合格ガイド'}],
+  'hoikushi':    [{f:'hoikushi.html',lb:'保育士',t:'保育士試験の独学合格ガイド'}],
+  'shakaifukushi':[{f:'shakai-fukushi.html',lb:'社会福祉士',t:'社会福祉士の独学合格ガイド'}],
+};
+
+function renderArticleRecommendCard(){
+  const el = document.getElementById('articleRecommendCard');
+  if(!el) return;
+  const jobId = (selectedJobIds||[])[0];
+  if(!jobId){ el.innerHTML=''; return; }
+  const arts = JOB_ARTICLE_MAP[jobId];
+  if(!arts||!arts.length){ el.innerHTML=''; return; }
+  const jobName = JOBS.find(j=>j.id===jobId)?.name||'';
+  el.innerHTML = `<div class="section" style="margin-top:4px;">
+    <div class="sec-title" style="margin-bottom:12px;">📖 ${jobName}の攻略記事</div>
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      ${arts.slice(0,3).map(a=>`<a href="${ARTICLE_BASE_URL}${a.f}" target="_blank" rel="noopener"
+        style="display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);text-decoration:none;color:inherit;transition:border-color .2s;"
+        onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        <span style="font-size:9px;color:var(--accent2);font-family:'Share Tech Mono',monospace;padding:2px 6px;background:rgba(140,198,63,.10);border-radius:4px;white-space:nowrap;flex-shrink:0;">${a.lb}</span>
+        <span style="font-size:12px;color:var(--text);line-height:1.4;flex:1;">${a.t}</span>
+        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;color:var(--muted);flex-shrink:0;"></i>
+      </a>`).join('')}
+    </div>
+  </div>`;
+}
 
 function renderAffiliateCard(){
   const el = document.getElementById('affiliateCard');
