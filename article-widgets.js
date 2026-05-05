@@ -85,31 +85,76 @@ const LATEST = ['boki1-yobikou.html','daigakusei-keizoku.html','shukatsu-shikaku
 
 const PAGE = location.pathname.split('/').pop() || '';
 
-/* ── Supabase リアクション ── */
+/* ── Supabase / Auth ── */
 const _SB_URL  = 'https://ydexcwnwrbrfikujocon.supabase.co';
 const _SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZXhjd253cmJyZmlrdWpvY29uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5ODk5ODAsImV4cCI6MjA4OTU2NTk4MH0.dO4PGYDlVrYsrcPgPuQFgzU8fCVvJ0R4gdGBmeAs-OQ';
-const _REACT_LS = 'sq_art_react_v1';
 
-function _getMyReaction(id){ try{ return JSON.parse(localStorage.getItem(_REACT_LS)||'{}')[id]||null; }catch{ return null; } }
-function _setMyReaction(id,type){ try{ const d=JSON.parse(localStorage.getItem(_REACT_LS)||'{}'); if(type) d[id]=type; else delete d[id]; localStorage.setItem(_REACT_LS,JSON.stringify(d)); }catch{} }
-async function _fetchCounts(id){
-  try{
-    const r = await fetch(`${_SB_URL}/rest/v1/article_reactions?article_id=eq.${encodeURIComponent(id)}&select=reaction_type`,
-      {headers:{'apikey':_SB_ANON,'Authorization':'Bearer '+_SB_ANON}});
-    const data = await r.json();
-    const c={helpful:0,learned:0,motivated:0};
-    if(Array.isArray(data)) data.forEach(row=>{ if(c[row.reaction_type]!==undefined) c[row.reaction_type]++; });
-    return c;
-  }catch{ return {helpful:0,learned:0,motivated:0}; }
+let _sb = null;
+let _artUser = null;
+
+async function _initSB() {
+  if (_sb) return;
+  return new Promise(resolve => {
+    const init = () => {
+      _sb = window.supabase.createClient(_SB_URL, _SB_ANON);
+      _sb.auth.getSession().then(({ data }) => {
+        _artUser = data.session?.user || null;
+        resolve();
+      }).catch(() => resolve());
+    };
+    if (window.supabase && window.supabase.createClient) { init(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+    s.onload = init;
+    s.onerror = () => resolve();
+    document.head.appendChild(s);
+  });
 }
-async function _sendReaction(id,type){
-  try{
-    await fetch(`${_SB_URL}/rest/v1/article_reactions`,{
-      method:'POST',
-      headers:{'apikey':_SB_ANON,'Authorization':'Bearer '+_SB_ANON,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({article_id:id,reaction_type:type})
-    });
-  }catch{}
+
+function _loginGoogle() {
+  if (!_sb) return;
+  _sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href } });
+}
+
+async function _logoutArt() {
+  if (_sb) await _sb.auth.signOut();
+  _artUser = null;
+  location.reload();
+}
+
+async function _getToken() {
+  if (!_sb) return _SB_ANON;
+  const { data } = await _sb.auth.getSession();
+  return data.session?.access_token || _SB_ANON;
+}
+
+async function _fetchCounts(id) {
+  try {
+    const r = await fetch(
+      `${_SB_URL}/rest/v1/article_reactions?article_id=eq.${encodeURIComponent(id)}&select=reaction_type`,
+      { headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + _SB_ANON } }
+    );
+    const data = await r.json();
+    const c = { helpful: 0, learned: 0, motivated: 0 };
+    if (Array.isArray(data)) data.forEach(row => { if (c[row.reaction_type] !== undefined) c[row.reaction_type]++; });
+    return c;
+  } catch { return { helpful: 0, learned: 0, motivated: 0 }; }
+}
+
+function _relTime(ts) {
+  const diff = Date.now() - new Date(ts).getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return 'たった今';
+  if (min < 60) return min + '分前';
+  const h = Math.floor(min / 60);
+  if (h < 24) return h + '時間前';
+  const d = Math.floor(h / 24);
+  if (d < 30) return d + '日前';
+  return new Date(ts).toLocaleDateString('ja-JP');
+}
+
+function _escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 const ARTICLE_THEME_KEY = 'sq2_theme';
@@ -763,6 +808,54 @@ html[data-theme="dark"] .sq-article-theme-group{
 .sq-reaction-label{font-size:11px;font-weight:700;letter-spacing:.04em;}
 .sq-reaction-count{font-size:14px;font-weight:700;color:#8CC63F;font-family:'Share Tech Mono',monospace;}
 .sq-reaction-note{font-size:12px;color:#8CC63F;margin-top:12px;min-height:18px;font-weight:700;}
+.sq-reaction-login-hint{font-size:12px;color:var(--sq-muted);font-weight:400;}
+/* Auth bar */
+.sq-art-auth-bar{display:flex;align-items:center;justify-content:flex-end;gap:10px;max-width:800px;margin:0 auto 12px;}
+.sq-google-login-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:100px;border:1px solid var(--sq-border-strong);background:var(--sq-surface);color:var(--sq-text);font-size:13px;font-weight:700;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:inherit;}
+.sq-google-login-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.14);}
+.sq-art-user-info{display:flex;align-items:center;gap:8px;}
+.sq-art-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;}
+.sq-art-avatar-ph{width:28px;height:28px;border-radius:50%;background:#8CC63F;color:#0A0A0F;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.sq-art-user-name{font-size:13px;font-weight:700;color:var(--sq-text);}
+.sq-art-logout-btn{font-size:11px;color:var(--sq-muted);background:none;border:1px solid var(--sq-border);border-radius:100px;padding:4px 10px;cursor:pointer;font-family:inherit;transition:color .2s;}
+.sq-art-logout-btn:hover{color:var(--sq-text);}
+/* Comments */
+.sq-comment-section{padding:32px 24px;background:var(--sq-surface-soft);border-top:1px solid var(--sq-border);}
+.sq-comment-inner{max-width:800px;margin:0 auto;}
+.sq-comment-heading{font-size:15px;font-weight:700;color:var(--sq-text);margin-bottom:20px;padding-left:12px;border-left:3px solid #8CC63F;letter-spacing:.04em;}
+.sq-comment-form-wrap{background:var(--sq-surface);border:1px solid var(--sq-border-strong);border-radius:12px;padding:16px;margin-bottom:24px;}
+.sq-comment-form-title{font-size:13px;font-weight:700;color:var(--sq-text);margin-bottom:10px;}
+.sq-comment-textarea{width:100%;min-height:90px;background:var(--sq-surface-soft);border:1px solid var(--sq-border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--sq-text);font-family:inherit;resize:vertical;box-sizing:border-box;transition:border-color .2s;}
+.sq-comment-textarea:focus{outline:none;border-color:#8CC63F;}
+.sq-comment-textarea::placeholder{color:var(--sq-muted);}
+.sq-comment-form-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.sq-comment-char{font-size:11px;color:var(--sq-muted);}
+.sq-comment-submit{background:#8CC63F;color:#0A0A0F;border:none;border-radius:100px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .2s;font-family:inherit;}
+.sq-comment-submit:hover{opacity:.88;transform:translateY(-1px);}
+.sq-comment-submit:disabled{opacity:.45;cursor:default;transform:none;}
+.sq-comment-login-prompt{text-align:center;padding:20px;color:var(--sq-muted);font-size:13px;background:var(--sq-surface);border:1px solid var(--sq-border);border-radius:12px;margin-bottom:24px;line-height:1.8;}
+.sq-comment-list{display:flex;flex-direction:column;gap:12px;}
+.sq-comment-card{background:var(--sq-surface);border:1px solid var(--sq-border);border-radius:12px;padding:14px 16px;}
+.sq-comment-card-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sq-comment-c-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.sq-comment-c-avatar-ph{width:32px;height:32px;border-radius:50%;background:var(--sq-accent);color:#0A0A0F;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.sq-comment-c-name{font-size:13px;font-weight:700;color:var(--sq-text);}
+.sq-comment-c-time{font-size:11px;color:var(--sq-muted);margin-left:auto;}
+.sq-comment-c-body{font-size:14px;color:var(--sq-text);line-height:1.75;margin-bottom:10px;white-space:pre-wrap;word-break:break-word;}
+.sq-comment-c-actions{display:flex;gap:8px;align-items:center;}
+.sq-comment-like-btn,.sq-comment-report-btn,.sq-comment-del-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;border:1px solid var(--sq-border);background:transparent;color:var(--sq-muted);font-size:12px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:inherit;}
+.sq-comment-like-btn:hover{border-color:#8CC63F;color:#8CC63F;}
+.sq-comment-like-btn.sq-liked{border-color:#8CC63F;color:#8CC63F;background:rgba(140,198,63,.1);}
+.sq-comment-like-btn:disabled{opacity:.5;cursor:default;}
+.sq-comment-report-btn{margin-left:auto;}
+.sq-comment-report-btn:hover{border-color:#EF4444;color:#EF4444;}
+.sq-comment-report-btn.sq-reported{border-color:#EF4444;color:#EF4444;opacity:.6;cursor:default;}
+.sq-comment-del-btn:hover{border-color:#EF4444;color:#EF4444;}
+.sq-comment-empty{text-align:center;color:var(--sq-muted);font-size:13px;padding:24px 0;}
+@media(max-width:959px){
+  .sq-art-auth-bar{justify-content:flex-start;}
+  .sq-comment-section{padding:24px 16px;}
+}
   `;
   document.head.appendChild(s);
 }
@@ -1013,58 +1106,378 @@ function buildShareButtons(){
   }
 }
 
-/* ── リアクションウィジェット ── */
-function buildReactionWidget(){
-  if(!PAGE) return;
+/* ── Auth bar ── */
+const _GOOGLE_ICON = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex-shrink:0"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>`;
+
+function buildAuthBar(container) {
+  const bar = document.createElement('div');
+  bar.className = 'sq-art-auth-bar';
+  if (!_artUser) {
+    bar.innerHTML = `<button class="sq-google-login-btn">${_GOOGLE_ICON}Googleでログイン</button>`;
+    bar.querySelector('button').addEventListener('click', _loginGoogle);
+  } else {
+    const name = _artUser.user_metadata?.full_name || _artUser.email || 'ユーザー';
+    const avatarUrl = _artUser.user_metadata?.avatar_url;
+    const avatarHtml = avatarUrl
+      ? `<img src="${avatarUrl}" class="sq-art-avatar" alt="">`
+      : `<div class="sq-art-avatar-ph">${_escHtml(name[0] || '?')}</div>`;
+    bar.innerHTML = `<div class="sq-art-user-info">${avatarHtml}<span class="sq-art-user-name">${_escHtml(name)}</span></div><button class="sq-art-logout-btn">ログアウト</button>`;
+    bar.querySelector('.sq-art-logout-btn').addEventListener('click', _logoutArt);
+  }
+  container.appendChild(bar);
+}
+
+/* ── リアクションウィジェット（要ログイン） ── */
+async function buildReactionWidget() {
+  if (!PAGE) return;
   const articleId = PAGE;
   const REACTIONS = [
-    {type:'helpful',  emoji:'👍', label:'参考になった'},
-    {type:'learned',  emoji:'💡', label:'勉強になった'},
-    {type:'motivated',emoji:'🔥', label:'モチベ上がった'},
+    { type: 'helpful',   emoji: '👍', label: '参考になった' },
+    { type: 'learned',   emoji: '💡', label: '勉強になった' },
+    { type: 'motivated', emoji: '🔥', label: 'モチベ上がった' },
   ];
 
   const wrap = document.createElement('div');
   wrap.className = 'sq-reaction';
-  wrap.innerHTML = `<div class="sq-reaction-inner">
+  const footer = document.querySelector('footer');
+  if (footer) footer.insertAdjacentElement('beforebegin', wrap);
+
+  const inner = document.createElement('div');
+  inner.className = 'sq-reaction-inner';
+  wrap.appendChild(inner);
+
+  buildAuthBar(inner);
+
+  inner.insertAdjacentHTML('beforeend', `
     <div class="sq-reaction-title">この記事はどうでしたか？</div>
     <div class="sq-reaction-btns">
-      ${REACTIONS.map(r=>`<button class="sq-reaction-btn" data-type="${r.type}">
+      ${REACTIONS.map(r => `<button class="sq-reaction-btn" data-type="${r.type}">
         <span class="sq-reaction-emoji">${r.emoji}</span>
         <span class="sq-reaction-label">${r.label}</span>
         <span class="sq-reaction-count" id="sqRc-${r.type}">—</span>
       </button>`).join('')}
     </div>
-    <div class="sq-reaction-note" id="sqRNote"></div>
-  </div>`;
+    <div class="sq-reaction-note" id="sqRNote">${!_artUser ? '<span class="sq-reaction-login-hint">↑ Googleログインでリアクションできます</span>' : ''}</div>
+  `);
 
-  const footer = document.querySelector('footer');
-  if(footer) footer.insertAdjacentElement('beforebegin', wrap);
-
-  wrap.querySelectorAll('.sq-reaction-btn').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
-      const type = btn.dataset.type;
-      const prev = _getMyReaction(articleId);
-      if(prev === type) return; // 同じボタンは無視
-      const alreadySent = !!prev; // 一度でも送信済みか
-      _setMyReaction(articleId, type);
-      wrap.querySelectorAll('.sq-reaction-btn').forEach(b=>b.classList.toggle('sq-reacted', b.dataset.type===type));
-      const note = document.getElementById('sqRNote');
-      if(note) note.textContent = alreadySent ? '変更しました！（集計は初回のみ反映）' : 'ありがとうございます！';
-      if(!alreadySent){
-        // 初回のみSupabaseに送信
-        _gaEvent('article_reaction', {article_id: articleId, reaction_type: type});
-        await _sendReaction(articleId, type);
-        const c = await _fetchCounts(articleId);
-        REACTIONS.forEach(r=>{ const el=document.getElementById('sqRc-'+r.type); if(el) el.textContent=c[r.type]||0; });
-      }
+  // カウント表示（認証不要）
+  _fetchCounts(articleId).then(c => {
+    REACTIONS.forEach(r => {
+      const el = document.getElementById('sqRc-' + r.type);
+      if (el) el.textContent = c[r.type] || 0;
     });
   });
 
-  _fetchCounts(articleId).then(c=>{
-    REACTIONS.forEach(r=>{ const el=document.getElementById('sqRc-'+r.type); if(el) el.textContent=c[r.type]||0; });
-    const my = _getMyReaction(articleId);
-    if(my) wrap.querySelectorAll('.sq-reaction-btn').forEach(b=>b.classList.toggle('sq-reacted', b.dataset.type===my));
+  if (!_artUser) {
+    wrap.querySelectorAll('.sq-reaction-btn').forEach(btn => {
+      btn.addEventListener('click', _loginGoogle);
+      btn.style.opacity = '.65';
+      btn.title = 'Googleでログインしてリアクション';
+    });
+    return;
+  }
+
+  // ログイン済み：DB から既存リアクション確認
+  let myReaction = null;
+  try {
+    const token = await _getToken();
+    const r = await fetch(
+      `${_SB_URL}/rest/v1/article_reactions?article_id=eq.${encodeURIComponent(articleId)}&user_id=eq.${_artUser.id}&select=reaction_type&limit=1`,
+      { headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + token } }
+    );
+    const rows = await r.json();
+    if (Array.isArray(rows) && rows[0]) myReaction = rows[0].reaction_type;
+  } catch {}
+
+  if (myReaction) {
+    wrap.querySelectorAll('.sq-reaction-btn').forEach(b => b.classList.toggle('sq-reacted', b.dataset.type === myReaction));
+    const note = document.getElementById('sqRNote');
+    if (note) note.textContent = 'リアクション済みです';
+  }
+
+  wrap.querySelectorAll('.sq-reaction-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (myReaction) return;
+      const type = btn.dataset.type;
+      wrap.querySelectorAll('.sq-reaction-btn').forEach(b => b.disabled = true);
+      try {
+        const token = await _getToken();
+        const res = await fetch(`${_SB_URL}/rest/v1/article_reactions`, {
+          method: 'POST',
+          headers: {
+            'apikey': _SB_ANON,
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ article_id: articleId, reaction_type: type, user_id: _artUser.id })
+        });
+        if (res.ok) {
+          myReaction = type;
+          wrap.querySelectorAll('.sq-reaction-btn').forEach(b => b.classList.toggle('sq-reacted', b.dataset.type === type));
+          _gaEvent('article_reaction', { article_id: articleId, reaction_type: type });
+          const c = await _fetchCounts(articleId);
+          REACTIONS.forEach(r => {
+            const el = document.getElementById('sqRc-' + r.type);
+            if (el) el.textContent = c[r.type] || 0;
+          });
+          const note = document.getElementById('sqRNote');
+          if (note) note.textContent = 'ありがとうございます！';
+        }
+      } catch {}
+      wrap.querySelectorAll('.sq-reaction-btn').forEach(b => b.disabled = false);
+    });
   });
+}
+
+/* ── コメントウィジェット ── */
+async function buildCommentWidget() {
+  if (!PAGE) return;
+  const articleId = PAGE;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'sq-comment-section';
+  const footer = document.querySelector('footer');
+  if (footer) footer.insertAdjacentElement('beforebegin', wrap);
+
+  const inner = document.createElement('div');
+  inner.className = 'sq-comment-inner';
+  wrap.appendChild(inner);
+
+  // コメント一覧取得（公開）
+  let comments = [];
+  try {
+    const r = await fetch(
+      `${_SB_URL}/rest/v1/article_comments?article_id=eq.${encodeURIComponent(articleId)}&order=created_at.desc&limit=50`,
+      { headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + _SB_ANON } }
+    );
+    const d = await r.json();
+    if (Array.isArray(d)) comments = d;
+  } catch {}
+
+  // いいね数・自分のいいね取得
+  const likeMap = {};
+  const myLikedSet = new Set();
+  if (comments.length > 0) {
+    try {
+      const ids = comments.map(c => c.id).join(',');
+      const lr = await fetch(
+        `${_SB_URL}/rest/v1/comment_reactions?comment_id=in.(${ids})&select=comment_id`,
+        { headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + _SB_ANON } }
+      );
+      const likes = await lr.json();
+      if (Array.isArray(likes)) likes.forEach(l => { likeMap[l.comment_id] = (likeMap[l.comment_id] || 0) + 1; });
+      if (_artUser) {
+        const token = await _getToken();
+        const mr = await fetch(
+          `${_SB_URL}/rest/v1/comment_reactions?comment_id=in.(${ids})&user_id=eq.${_artUser.id}&select=comment_id`,
+          { headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + token } }
+        );
+        const myLikes = await mr.json();
+        if (Array.isArray(myLikes)) myLikes.forEach(l => myLikedSet.add(l.comment_id));
+      }
+    } catch {}
+  }
+
+  // 見出し
+  const heading = document.createElement('div');
+  heading.className = 'sq-comment-heading';
+  heading.textContent = `💬 コメント（${comments.length}）`;
+  inner.appendChild(heading);
+
+  // フォームまたはログイン促進
+  if (!_artUser) {
+    inner.insertAdjacentHTML('beforeend', `
+      <div class="sq-comment-login-prompt">
+        コメント・いいねをするには <strong>Googleログイン</strong> が必要です。<br>
+        記事の閲覧はログインなしでできます。<br><br>
+        <button class="sq-google-login-btn" id="sqCommentLoginBtn">${_GOOGLE_ICON}Googleでログインする</button>
+      </div>
+    `);
+    document.getElementById('sqCommentLoginBtn').addEventListener('click', _loginGoogle);
+  } else {
+    const userName = _escHtml(_artUser.user_metadata?.full_name || _artUser.email || 'ユーザー');
+    const formWrap = document.createElement('div');
+    formWrap.className = 'sq-comment-form-wrap';
+    formWrap.innerHTML = `
+      <div class="sq-comment-form-title">コメントを投稿する（${userName} として）</div>
+      <textarea class="sq-comment-textarea" id="sqCommentBody" placeholder="この記事の感想・質問など（500文字以内）" maxlength="500"></textarea>
+      <div class="sq-comment-form-footer">
+        <span class="sq-comment-char"><span id="sqCommentLen">0</span> / 500</span>
+        <button class="sq-comment-submit" id="sqCommentSubmit" disabled>投稿する</button>
+      </div>
+    `;
+    inner.appendChild(formWrap);
+
+    const textarea = document.getElementById('sqCommentBody');
+    const submitBtn = document.getElementById('sqCommentSubmit');
+    const lenSpan = document.getElementById('sqCommentLen');
+
+    textarea.addEventListener('input', () => {
+      lenSpan.textContent = textarea.value.length;
+      submitBtn.disabled = textarea.value.trim().length === 0;
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const body = textarea.value.trim();
+      if (!body) return;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '投稿中...';
+      try {
+        const token = await _getToken();
+        const res = await fetch(`${_SB_URL}/rest/v1/article_comments`, {
+          method: 'POST',
+          headers: {
+            'apikey': _SB_ANON,
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify({
+            article_id: articleId,
+            user_id: _artUser.id,
+            user_name: _artUser.user_metadata?.full_name || _artUser.email,
+            avatar_url: _artUser.user_metadata?.avatar_url || null,
+            body: body
+          })
+        });
+        if (res.ok) {
+          const [newComment] = await res.json();
+          textarea.value = '';
+          lenSpan.textContent = '0';
+          submitBtn.disabled = true;
+          const list = document.getElementById('sqCommentList');
+          if (list) {
+            const emptyEl = list.querySelector('.sq-comment-empty');
+            if (emptyEl) emptyEl.remove();
+            list.insertAdjacentElement('afterbegin', _buildCommentCard(newComment, 0, false));
+          }
+          heading.textContent = `💬 コメント（${document.querySelectorAll('.sq-comment-card').length}）`;
+        } else {
+          alert('投稿に失敗しました。しばらくしてから再試行してください。');
+        }
+      } catch {
+        alert('エラーが発生しました。');
+      }
+      submitBtn.disabled = false;
+      submitBtn.textContent = '投稿する';
+    });
+  }
+
+  // コメント一覧
+  const list = document.createElement('div');
+  list.className = 'sq-comment-list';
+  list.id = 'sqCommentList';
+  if (comments.length === 0) {
+    list.innerHTML = '<div class="sq-comment-empty">まだコメントはありません。最初のコメントを投稿しましょう！</div>';
+  } else {
+    comments.forEach(c => list.appendChild(_buildCommentCard(c, likeMap[c.id] || 0, myLikedSet.has(c.id))));
+  }
+  inner.appendChild(list);
+}
+
+function _buildCommentCard(comment, likeCount, isLiked) {
+  const card = document.createElement('div');
+  card.className = 'sq-comment-card';
+  card.dataset.cid = comment.id;
+
+  const avatarHtml = comment.avatar_url
+    ? `<img src="${comment.avatar_url}" class="sq-comment-c-avatar" alt="">`
+    : `<div class="sq-comment-c-avatar-ph">${_escHtml((comment.user_name || '?')[0])}</div>`;
+
+  const isOwn = _artUser && _artUser.id === comment.user_id;
+
+  card.innerHTML = `
+    <div class="sq-comment-card-header">
+      ${avatarHtml}
+      <span class="sq-comment-c-name">${_escHtml(comment.user_name || '匿名')}</span>
+      <span class="sq-comment-c-time">${_relTime(comment.created_at)}</span>
+    </div>
+    <div class="sq-comment-c-body">${_escHtml(comment.body)}</div>
+    <div class="sq-comment-c-actions">
+      <button class="sq-comment-like-btn${isLiked ? ' sq-liked' : ''}" data-liked="${isLiked}">
+        👍 <span class="sq-like-count">${likeCount}</span>
+      </button>
+      ${isOwn ? '<button class="sq-comment-del-btn">🗑 削除</button>' : ''}
+      ${(_artUser && !isOwn) ? '<button class="sq-comment-report-btn">🚩 通報</button>' : ''}
+    </div>
+  `;
+
+  // いいねボタン
+  const likeBtn = card.querySelector('.sq-comment-like-btn');
+  if (!_artUser) {
+    likeBtn.addEventListener('click', _loginGoogle);
+    likeBtn.title = 'Googleログインでいいねできます';
+  } else {
+    likeBtn.addEventListener('click', async () => {
+      const wasLiked = likeBtn.dataset.liked === 'true';
+      const countEl = likeBtn.querySelector('.sq-like-count');
+      likeBtn.disabled = true;
+      try {
+        const token = await _getToken();
+        if (wasLiked) {
+          await fetch(`${_SB_URL}/rest/v1/comment_reactions?comment_id=eq.${comment.id}&user_id=eq.${_artUser.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + token }
+          });
+          likeBtn.dataset.liked = 'false';
+          likeBtn.classList.remove('sq-liked');
+          countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
+        } else {
+          await fetch(`${_SB_URL}/rest/v1/comment_reactions`, {
+            method: 'POST',
+            headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ comment_id: comment.id, user_id: _artUser.id })
+          });
+          likeBtn.dataset.liked = 'true';
+          likeBtn.classList.add('sq-liked');
+          countEl.textContent = parseInt(countEl.textContent) + 1;
+        }
+      } catch {}
+      likeBtn.disabled = false;
+    });
+  }
+
+  // 削除ボタン
+  const delBtn = card.querySelector('.sq-comment-del-btn');
+  if (delBtn) {
+    delBtn.addEventListener('click', async () => {
+      if (!confirm('このコメントを削除しますか？')) return;
+      try {
+        const token = await _getToken();
+        const res = await fetch(`${_SB_URL}/rest/v1/article_comments?id=eq.${comment.id}`, {
+          method: 'DELETE',
+          headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + token }
+        });
+        if (res.ok) {
+          card.remove();
+          const heading = document.querySelector('.sq-comment-heading');
+          if (heading) heading.textContent = `💬 コメント（${document.querySelectorAll('.sq-comment-card').length}）`;
+        }
+      } catch {}
+    });
+  }
+
+  // 通報ボタン
+  const reportBtn = card.querySelector('.sq-comment-report-btn');
+  if (reportBtn) {
+    reportBtn.addEventListener('click', async () => {
+      if (!confirm('このコメントを通報しますか？')) return;
+      try {
+        const token = await _getToken();
+        await fetch(`${_SB_URL}/rest/v1/rpc/report_comment`, {
+          method: 'POST',
+          headers: { 'apikey': _SB_ANON, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ p_comment_id: comment.id })
+        });
+        reportBtn.classList.add('sq-reported');
+        reportBtn.textContent = '🚩 通報済み';
+        reportBtn.disabled = true;
+      } catch {}
+    });
+  }
+
+  return card;
 }
 
 /* ── 新着・同カテゴリウィジェット ── */
@@ -1156,7 +1569,7 @@ function trackRelatedArticleClicks(){
   });
 }
 
-document.addEventListener('DOMContentLoaded',function(){
+document.addEventListener('DOMContentLoaded', async function(){
   injectGA();
   injectStyles();
   buildThemeToggle();
@@ -1168,10 +1581,12 @@ document.addEventListener('DOMContentLoaded',function(){
   buildLeftSidebar(layout.left);
   buildAuthorBox();
   insertMidCTA();
-  buildReactionWidget();
   buildShareButtons();
   buildWidgets();
   trackScrollDepth();
   trackRelatedArticleClicks();
+  await _initSB();
+  await buildReactionWidget();
+  await buildCommentWidget();
 });
 })();
