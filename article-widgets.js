@@ -627,6 +627,43 @@ html[data-theme="dark"] .matome-row .trigger{color:#F8FAFC !important;}
 html[data-theme="dark"] .matome-row .result{color:#B6E27C !important;}
 /* ── ここまで ── */
 
+/* ── ゼロからの簿記シリーズ 共通ダークモード ── */
+/* シリーズナビ */
+html[data-theme="dark"] .series-nav{background:linear-gradient(180deg,#0E2218,#0B1A14) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .series-nav-title{color:#B6E27C !important;}
+html[data-theme="dark"] .series-nav li{color:#CCD6E5 !important;}
+html[data-theme="dark"] .series-nav li a{color:#90CDF4 !important;}
+/* メリットカード（第2回） */
+html[data-theme="dark"] .merit-card{background:linear-gradient(180deg,#151A2A,#111728) !important;border-color:rgba(140,198,63,.16) !important;}
+html[data-theme="dark"] .merit-card .title{color:#F8FAFC !important;}
+html[data-theme="dark"] .merit-card .desc{color:#9BA7BB !important;}
+/* ポイントカード（全記事共通） */
+html[data-theme="dark"] .point-card{background:linear-gradient(180deg,#151A2A,#111728) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .point-card p{color:#F8FAFC !important;}
+/* フローステップ（第3回 簿記の流れ） */
+html[data-theme="dark"] .flow-step{background:linear-gradient(180deg,#151A2A,#111728) !important;border-color:rgba(140,198,63,.14) !important;}
+html[data-theme="dark"] .flow-step-body strong{color:#F8FAFC !important;}
+html[data-theme="dark"] .flow-step-body p{color:#9BA7BB !important;}
+/* 財務諸表カード（第3・5回） */
+html[data-theme="dark"] .fs-card.pl{background:linear-gradient(135deg,#0E2218,#0B1A12) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .fs-card.bs{background:linear-gradient(135deg,rgba(59,130,246,.12),rgba(59,130,246,.06)) !important;border-color:rgba(59,130,246,.3) !important;}
+html[data-theme="dark"] .fs-card .name{color:#F8FAFC !important;}
+html[data-theme="dark"] .fs-card .desc{color:#CCD6E5 !important;}
+/* 比較カード（第4回 貸方/借方） */
+html[data-theme="dark"] .compare-card.tan{background:rgba(246,224,94,.08) !important;border-color:rgba(246,224,94,.28) !important;}
+html[data-theme="dark"] .compare-card.fuku{background:rgba(140,198,63,.10) !important;border-color:rgba(140,198,63,.28) !important;}
+html[data-theme="dark"] .compare-card.tan .badge{background:rgba(246,224,94,.2) !important;color:#F7D774 !important;}
+html[data-theme="dark"] .compare-card.fuku .badge{background:rgba(140,198,63,.2) !important;color:#B6E27C !important;}
+html[data-theme="dark"] .compare-card .eg{background:rgba(255,255,255,.05) !important;color:#9BA7BB !important;}
+html[data-theme="dark"] .compare-card p{color:#CCD6E5 !important;}
+/* 仕訳エントリー（第5回 je-kari/je-kashi） */
+html[data-theme="dark"] .je-kari{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.3) !important;color:#CCD6E5 !important;}
+html[data-theme="dark"] .je-kashi{background:rgba(237,137,54,.10) !important;border-color:rgba(237,137,54,.25) !important;color:#CCD6E5 !important;}
+/* 財務諸表ボックス（第5回） */
+html[data-theme="dark"] .fs-row .label{color:#CCD6E5 !important;}
+html[data-theme="dark"] .grad-card p{color:#CCD6E5 !important;}
+/* ── ここまで ── */
+
 .sq-key,
 .sq-important{
   color:var(--sq-highlight-text);
