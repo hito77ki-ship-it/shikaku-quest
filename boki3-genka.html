@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>減価償却（定額法）の計算と仕訳【日商簿記3級】間接法・売却まで完全解説｜スタディクエスト</title>
+<meta name="description" content="減価償却（定額法）を初心者向けに解説。耐用年数・残存価額の意味から計算式、間接法の仕訳、固定資産売却まで4ステップで完全網羅。日商簿記3級の頻出論点。">
+<meta name="keywords" content="減価償却 定額法,減価償却費 仕訳,減価償却累計額,固定資産売却 仕訳,日商簿記3級 減価償却,間接法">
+<meta property="og:title" content="減価償却（定額法）の計算と仕訳【日商簿記3級】">
+<meta property="og:description" content="耐用年数・残存価額の意味から計算式、間接法の仕訳、固定資産売却まで完全解説。">
+<meta property="og:url" content="https://hito77ki-ship-it.github.io/study-quest/boki3-genka.html">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/ogp_icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8524998392329204"
+     crossorigin="anonymous"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "減価償却（定額法）の計算と仕訳【日商簿記3級】",
+  "description": "耐用年数・残存価額の意味から計算式、間接法の仕訳、固定資産売却まで完全解説。",
+  "url": "https://hito77ki-ship-it.github.io/study-quest/boki3-genka.html",
+  "datePublished": "2026-05-07",
+  "dateModified": "2026-05-07",
+  "author": {"@type": "Person", "name": "大谷 一輝", "url": "https://hito77ki-ship-it.github.io/study-quest/about.html"},
+  "publisher": {"@type": "Organization", "name": "スタディクエスト", "url": "https://hito77ki-ship-it.github.io/study-quest/"}
+}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--green:#8CC63F;--green2:#6AAF2B;--text:#1A202C;--muted:#718096;--border:#E2E8F0;--bg:#FFFFFF;--light:#F7FAFC;}
+body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);line-height:1.9;}
+a{color:var(--green2);text-decoration:none;}
+a:hover{text-decoration:underline;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;}
+.nav-inner{max-width:900px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:15px;font-weight:700;color:var(--green2);}
+.nav-cta{background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:100px;transition:opacity .2s;}
+.nav-cta:hover{opacity:.85;text-decoration:none;}
+.container{max-width:800px;margin:0 auto;padding:88px 24px 80px;}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:24px;}
+.breadcrumb a{color:var(--muted);}
+h1{font-size:clamp(20px,4vw,30px);font-weight:700;line-height:1.4;margin-bottom:8px;}
+.meta{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.lead{font-size:15px;line-height:1.9;margin-bottom:40px;padding:20px;background:var(--light);border-left:3px solid var(--green);border-radius:0 8px 8px 0;}
+h2{font-size:20px;font-weight:700;margin:48px 0 16px;padding-left:12px;border-left:3px solid var(--green);}
+h3{font-size:16px;font-weight:700;margin:28px 0 10px;color:var(--green2);}
+p{font-size:14px;color:#374151;margin-bottom:16px;}
+ul,ol{font-size:14px;color:#374151;margin:0 0 16px 20px;}
+li{margin-bottom:6px;}
+.tip-box{background:#F0FFF4;border:1px solid #9AE6B4;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}
+.tip-box strong{color:#276749;}
+.warn-box{background:#FFFBEB;border:1px solid #F6E05E;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}
+.warn-box strong{color:#975A16;}
+.point-card{background:#fff;border:2px solid var(--green);border-radius:12px;padding:20px 24px;margin:24px 0;}
+.point-card .label{font-size:11px;font-weight:700;color:var(--green2);letter-spacing:.1em;margin-bottom:8px;}
+.point-card p{font-size:15px;font-weight:700;color:var(--text);margin:0;}
+
+/* 計算ボックス */
+.calc-box{background:#fff;border:2px solid var(--green);border-radius:14px;padding:20px 24px;margin:24px 0;}
+.calc-box .calc-title{font-size:11px;font-weight:700;color:var(--green2);letter-spacing:.1em;margin-bottom:16px;}
+.calc-formula{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:15px;font-weight:700;margin-bottom:12px;}
+.calc-formula .num{color:var(--text);}
+.calc-formula .op{color:var(--muted);font-size:18px;}
+.calc-formula .result{color:var(--green2);font-size:18px;}
+.calc-formula .paren{color:var(--muted);}
+
+/* 用語グリッド */
+.term-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0;}
+@media(max-width:540px){.term-grid{grid-template-columns:1fr;}}
+.term-card{border-radius:10px;padding:14px 16px;border:1px solid var(--border);background:var(--light);}
+.term-card .term-name{font-size:12px;font-weight:700;color:var(--green2);margin-bottom:4px;}
+.term-card .term-body{font-size:13px;color:#374151;line-height:1.7;}
+
+/* 仕訳ボックス */
+.shiwake{display:flex;border:2px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0;font-size:14px;}
+.shiwake-col{flex:1;padding:14px 18px;}
+.shiwake-col.kari{background:#EBF8FF;border-right:2px solid var(--border);}
+.shiwake-col.kashi{background:#FFF9F0;}
+.shiwake-label{font-size:10px;font-weight:700;letter-spacing:.1em;margin-bottom:8px;}
+.shiwake-col.kari .shiwake-label{color:#2B6CB0;}
+.shiwake-col.kashi .shiwake-label{color:#C05621;}
+.shiwake-item{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.shiwake-item .kamoku{font-weight:700;font-size:14px;}
+.shiwake-item .amount{font-size:14px;color:var(--muted);}
+
+/* 例題ブロック */
+.mondai{background:#FAFAFA;border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin:20px 0;}
+.mondai .mondai-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;}
+.mondai p{font-size:14px;margin:0;}
+.kaitou-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:#276749;margin:16px 0 6px;}
+
+/* 売却4ステップ */
+.step-list{display:flex;flex-direction:column;gap:0;margin:24px 0;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+.step-item{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);background:#fff;}
+.step-item:last-child{border-bottom:none;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-body strong{display:block;font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text);}
+.step-body p{font-size:13px;color:var(--muted);margin:0;}
+
+/* まとめカード */
+.matome{background:linear-gradient(135deg,#F0FFF4,#E8F7B8);border:2px solid #9AE6B4;border-radius:14px;padding:24px 28px;margin:32px 0;}
+.matome h3{color:#276749;font-size:16px;margin:0 0 16px;}
+.matome-row{display:flex;align-items:baseline;gap:10px;font-size:14px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);}
+.matome-row:last-child{border-bottom:none;}
+.matome-row .trigger{font-weight:700;min-width:200px;flex-shrink:0;}
+.matome-row .result{color:#276749;font-weight:700;}
+@media(max-width:540px){.matome-row{flex-direction:column;gap:2px;}.matome-row .trigger{min-width:auto;}}
+
+/* アプリCTA */
+.app-cta{background:linear-gradient(135deg,#1A2A0A,#2D4A10);border-radius:12px;padding:28px;margin:40px 0;text-align:center;color:#fff;}
+.app-cta h3{color:var(--green);font-size:18px;margin-bottom:8px;}
+.app-cta p{color:#A0C070;font-size:13px;margin-bottom:16px;}
+.app-cta a{background:var(--green);color:#0A0A0F;font-weight:700;padding:12px 28px;border-radius:100px;font-size:14px;display:inline-block;transition:opacity .2s;}
+.app-cta a:hover{opacity:.85;text-decoration:none;}
+
+footer{background:#111827;padding:28px 24px;text-align:center;margin-top:64px;}
+footer a{font-size:12px;color:#4A5568;margin:0 10px;}
+footer p{font-size:11px;color:#2D3748;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="lp.html">⚔ スタディクエスト</a>
+    <a class="nav-cta" href="index.html">無料で始める</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb">
+    <a href="lp.html">TOP</a> &gt; <a href="boki.html">簿記</a> &gt; 減価償却（定額法）の計算と仕訳
+  </div>
+
+  <p class="meta">日商簿記3級 | 公開：2026年5月7日</p>
+  <h1>減価償却（定額法）の計算と仕訳<br>間接法・売却まで完全解説</h1>
+  <p class="meta">著者：大谷 一輝（大阪経済大学3回生・日商簿記1級勉強中）</p>
+
+  <p class="lead">
+    「減価償却費？ 減価償却累計額？ なにが違うの……」と混乱していませんか？<br>
+    この記事では計算式の意味から間接法の仕訳、さらに固定資産売却の処理まで順番に解説します。<br>
+    定額法の計算パターンさえ身につければ、試験で確実に得点できる論点です。
+  </p>
+
+  <div class="sq-chat"></div>
+
+  <h2>減価償却とは？ まず言葉の意味から</h2>
+
+  <p>たとえば100万円のトラックを買ったとします。このトラックは5年後にはボロボロになって10万円の価値しか残りません。</p>
+  <p>「じゃあ、価値が減った分（90万円）をどう記録するの？」という疑問に答えるのが<strong>減価償却</strong>です。毎年少しずつ費用として計上することで、固定資産の価値の目減りを帳簿に反映させます。</p>
+
+  <h3>まず押さえる3つの用語</h3>
+
+  <div class="term-grid">
+    <div class="term-card">
+      <div class="term-name">取得原価</div>
+      <div class="term-body">固定資産を買ったときの値段。購入代金＋付随費用（送料など）も含む。</div>
+    </div>
+    <div class="term-card">
+      <div class="term-name">耐用年数</div>
+      <div class="term-body">その資産を何年使えるか。問題文に必ず書いてある。</div>
+    </div>
+    <div class="term-card">
+      <div class="term-name">残存価額</div>
+      <div class="term-body">耐用年数が終わったあとに残る価値。「取得原価の10%」や「0円」などと指定される。</div>
+    </div>
+    <div class="term-card">
+      <div class="term-name">減価償却費</div>
+      <div class="term-body">1年分の目減り額。費用勘定なので損益計算書に載る。</div>
+    </div>
+  </div>
+
+  <h2>定額法の計算式</h2>
+
+  <div class="calc-box">
+    <div class="calc-title">📐 定額法 計算式</div>
+    <div class="calc-formula">
+      <span class="num">減価償却費</span>
+      <span class="op">=</span>
+      <span class="paren">（</span>
+      <span class="num">取得原価</span>
+      <span class="op">−</span>
+      <span class="num">残存価額</span>
+      <span class="paren">）</span>
+      <span class="op">÷</span>
+      <span class="num">耐用年数</span>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin:0;">毎年同じ金額を費用として計上するのが「定額法」。簿記3級はこれだけ覚えればOK。</p>
+  </div>
+
+  <div class="tip-box">
+    <strong>残存価額が「0円」のパターンも多い！</strong><br>
+    問題文に「残存価額は取得原価の10%」と書いてあれば引き算してから割る。「残存価額ゼロ」なら取得原価そのままを耐用年数で割るだけ。問題文をよく読もう。
+  </div>
+
+  <h2>例題で確認しよう</h2>
+
+  <h3>パターン①：基本の減価償却（間接法）</h3>
+
+  <div class="mondai">
+    <div class="mondai-label">例題</div>
+    <p>¥1,000で購入した備品について定額法により減価償却を行う。残存価額は取得原価の10%、耐用年数は5年とする。間接法で記帳している。</p>
+  </div>
+
+  <div class="kaitou-label">▶ まず計算</div>
+  <div class="calc-box">
+    <div class="calc-title">📐 計算手順</div>
+    <div class="calc-formula">
+      <span class="paren">（</span>
+      <span class="num">1,000</span>
+      <span class="op">−</span>
+      <span class="num">1,000×10%</span>
+      <span class="paren">）</span>
+      <span class="op">÷</span>
+      <span class="num">5年</span>
+      <span class="op">=</span>
+      <span class="result">180</span>
+    </div>
+  </div>
+
+  <div class="kaitou-label">▶ 解答</div>
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item">
+        <span class="kamoku">減価償却費</span>
+        <span class="amount">180</span>
+      </div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item">
+        <span class="kamoku">減価償却累計額</span>
+        <span class="amount">180</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>「間接法」とは？</strong><br>
+    直接「備品」の金額を減らすのではなく、<strong>減価償却累計額</strong>という別の勘定を使う方法。備品の帳簿価額は「備品 − 減価償却累計額」で計算できる。試験では間接法が圧倒的に多く出題される。
+  </div>
+
+  <h2>固定資産を売却したときの仕訳</h2>
+
+  <p>売却の仕訳は一度に書こうとすると混乱します。<strong>4ステップで順番に書く</strong>のがコツです。</p>
+
+  <div class="mondai">
+    <div class="mondai-label">例題</div>
+    <p>5年前に取得した車両（取得原価¥900、減価償却累計額¥600、当期減価償却費¥100）を¥300で売却した。売却代金は翌月末受け取る。</p>
+  </div>
+
+  <div class="kaitou-label">▶ 4ステップで解く</div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>当期分の減価償却費を計上する</strong>
+        <p>期首から売却日までの分を先に費用計上。</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>売却代金の受け取り方を書く</strong>
+        <p>翌月末受け取り → 現金ではなく「未収入金」。即日受け取りなら「現金」。</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>車両と累計額をゼロにする</strong>
+        <p>売却したので「車両」を貸方へ、「減価償却累計額」を借方へ。</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>差額で売却損益を確定</strong>
+        <p>左右のバランスを見て、借方が足りなければ「固定資産売却損（借方）」、貸方が足りなければ「固定資産売却益（貸方）」。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="kaitou-label">▶ 解答</div>
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item"><span class="kamoku">減価償却累計額</span><span class="amount">600</span></div>
+      <div class="shiwake-item"><span class="kamoku">減価償却費</span><span class="amount">100</span></div>
+      <div class="shiwake-item"><span class="kamoku">未収入金</span><span class="amount">300</span></div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item"><span class="kamoku">車両</span><span class="amount">900</span></div>
+      <div class="shiwake-item"><span class="kamoku">固定資産売却益</span><span class="amount">100</span></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>売却益・売却損の見分け方</strong><br>
+    帳簿価額（取得原価 − 累計額 − 当期償却費）= 900 − 600 − 100 = <strong>200</strong><br>
+    売却額300 ＞ 帳簿価額200 → 差額100は<strong>固定資産売却益（貸方）</strong><br>
+    売却額が帳簿価額より低ければ<strong>固定資産売却損（借方）</strong>になる。
+  </div>
+
+  <div class="warn-box">
+    <strong>「未収入金」と「売掛金」の違いに注意！</strong><br>
+    売掛金は商品を売ったときに使う。固定資産の売却代金は営業外取引なので「未収入金」を使う。同じ「後で受け取るお金」でも勘定科目が違う。
+  </div>
+
+  <div class="app-cta">
+    <h3>⚔ Study Quest で学習を記録しよう</h3>
+    <p>簿記3級の学習時間をRPG感覚で記録。ボス（試験日）まであと何時間かリアルタイムで確認できます。</p>
+    <a href="index.html">無料で始める →</a>
+  </div>
+
+  <div class="matome">
+    <h3>📋 まとめ：減価償却（定額法）パターン一覧</h3>
+    <div class="matome-row">
+      <span class="trigger">定額法の計算式</span>
+      <span class="result">（取得原価 − 残存価額）÷ 耐用年数</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">間接法の仕訳（毎年）</span>
+      <span class="result">減価償却費 ／ 減価償却累計額</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">固定資産売却（代金即日）</span>
+      <span class="result">現金 を使う</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">固定資産売却（代金後払い）</span>
+      <span class="result">未収入金 を使う（売掛金NG）</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">売却額 ＞ 帳簿価額</span>
+      <span class="result">固定資産売却益（貸方）</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">売却額 ＜ 帳簿価額</span>
+      <span class="result">固定資産売却損（借方）</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <a href="lp.html">記事トップ</a>
+  <a href="index.html">アプリを使う</a>
+  <p>© 2026 スタディクエスト</p>
+</footer>
+
+<script src="article-widgets.js"></script>
+</body>
+</html>
