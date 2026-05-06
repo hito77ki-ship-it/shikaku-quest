@@ -5794,6 +5794,7 @@ const JOBS = [
     category:'会計ギルド', rpgClass:'上級戦士',
     desc:'商業・工業の高度な知識。就職・転職で最強クラス。',
     color:'#ff9e4d', avgHours:400, maxHours:600,
+    customizable: true,
     subjects:[
       {key:'b1_sho',    name:'商業簿記',desc:'財務会計全般',          color:'#4db8ff',avgH:133,maxH:200,attrs:{atk:.6,mag:.4}},
       {key:'b1_kaikei', name:'会計学',  desc:'会計理論・連結・税効果',color:'#7cff6e',avgH:133,maxH:200,attrs:{int:.7,mag:.3}},
@@ -7703,6 +7704,29 @@ function buildSubjSelect(){
             追加
           </button>`;
         addWrap.appendChild(inputRow);
+
+        // 科目組み合わせUI（既存科目が2つ以上ある場合のみ表示）
+        if(j.subjects.length >= 2){
+          const comboRow = document.createElement('div');
+          comboRow.style.cssText = 'margin-top:4px;padding:10px 12px;background:rgba(140,198,63,.05);border:1px dashed rgba(140,198,63,.3);border-radius:8px;';
+          const checkboxHTML = j.subjects.map(s =>
+            `<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;white-space:nowrap;">
+              <input type="checkbox" data-key="${s.key}" data-name="${s.name}" data-avgh="${s.avgH}" data-maxh="${s.maxH}" data-color="${s.color}"
+                style="width:14px;height:14px;accent-color:var(--accent2);cursor:pointer;">
+              <span style="color:var(--text)">${s.name}</span>
+            </label>`
+          ).join('');
+          comboRow.innerHTML = `
+            <div style="font-size:10px;font-weight:700;color:var(--accent2);letter-spacing:.05em;margin-bottom:8px;">科目を組み合わせる</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;" id="comboChecks_${j.id}">${checkboxHTML}</div>
+            <button onclick="addCombinedSubj('${j.id}')"
+              style="padding:6px 14px;background:rgba(140,198,63,.12);border:1px solid rgba(140,198,63,.4);
+                     border-radius:8px;color:var(--accent2);font-size:12px;font-weight:600;cursor:pointer;width:100%;">
+              組み合わせて追加
+            </button>`;
+          addWrap.appendChild(comboRow);
+        }
+
         list.appendChild(addWrap);
       }
       updateAllBtn();
@@ -7733,6 +7757,23 @@ function deleteCustomSubj(jobId, key){
   const updated = loadCustomSubjects(jobId).filter(s => s.key !== key);
   saveCustomSubjects(jobId, updated);
   selectedSubjectKeys = selectedSubjectKeys.filter(k => k !== key);
+  buildSubjSelect();
+}
+function addCombinedSubj(jobId){
+  const container = document.getElementById('comboChecks_'+jobId);
+  if(!container) return;
+  const checked = [...container.querySelectorAll('input[type=checkbox]:checked')];
+  if(checked.length < 2){ alert('2つ以上の科目を選んでください'); return; }
+  const name  = checked.map(c=>c.dataset.name).join('＋');
+  const avgH  = checked.reduce((s,c)=>s+Number(c.dataset.avgh),0);
+  const maxH  = checked.reduce((s,c)=>s+Number(c.dataset.maxh),0);
+  const color = checked[0].dataset.color;
+  const key   = 'custom_'+jobId+'_'+Date.now();
+  const existing = loadCustomSubjects(jobId);
+  existing.push({key, name, desc:'組み合わせ科目', color, avgH, maxH, attrs:{int:.5,dex:.5}});
+  saveCustomSubjects(jobId, existing);
+  if(!selectedSubjectKeys.includes(key)) selectedSubjectKeys.push(key);
+  checked.forEach(c=>c.checked=false);
   buildSubjSelect();
 }
 
