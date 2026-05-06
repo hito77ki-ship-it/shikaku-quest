@@ -6751,8 +6751,8 @@ function getSubjColor(key, defaultColor){ const m=loadSubjColors(); return m[key
 function allSelectedSubjects(){
   const out=[],seen=new Set();
   JOBS.filter(j=>selectedJobIds.includes(j.id)).forEach(j=>{
-    // カスタム科目を動的にマージ
-    const subjectsWithCustom = j.customizable
+    // カスタム科目を動的にマージ（2科目以上の資格は自動的にカスタム対応）
+    const subjectsWithCustom = (j.customizable || j.subjects.length >= 2)
       ? [...j.subjects, ...loadCustomSubjects(j.id)]
       : j.subjects;
 
@@ -6776,7 +6776,7 @@ function allSelectedSubjects(){
 function getAllKnownSubjectsMap(){
   const map = new Map();
   JOBS.forEach(j=>{
-    const subjectsWithCustom = j.customizable
+    const subjectsWithCustom = (j.customizable || j.subjects.length >= 2)
       ? [...j.subjects, ...loadCustomSubjects(j.id)]
       : j.subjects;
     subjectsWithCustom.forEach(s=>{
@@ -7643,7 +7643,7 @@ function buildSubjSelect(){
 
     const renderSubjBlocks = () => {
       while(list.children.length > 1) list.removeChild(list.lastChild);
-      const customSubjs = j.customizable ? loadCustomSubjects(j.id) : [];
+      const customSubjs = (j.customizable || j.subjects.length >= 2) ? loadCustomSubjects(j.id) : [];
       j.subjects.forEach(s=>renderSubjRow(s, list));
       customSubjs.forEach(s=>{
         renderSubjRow(s, list);
@@ -7657,8 +7657,8 @@ function buildSubjSelect(){
         row.appendChild(delBtn);
       });
 
-      // カスタマイザブルな場合：科目追加UI
-      if(j.customizable){
+      // カスタマイザブルな場合：科目追加UI（2科目以上は自動対応）
+      if(j.customizable || j.subjects.length >= 2){
         const COLORS = ['#EF4444','#3B82F6','#10B981','#F59E0B','#A855F7','#EC4899','#14B8A6','#F97316','#6366F1','#84CC16'];
         const defaultColor = COLORS[loadCustomSubjects(j.id).length % COLORS.length];
 
@@ -7691,16 +7691,16 @@ function buildSubjSelect(){
 
         // テキスト入力 + 追加ボタン行
         const inputRow = document.createElement('div');
-        inputRow.style.cssText = 'display:flex;gap:8px;align-items:center;';
+        inputRow.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
         inputRow.innerHTML = `
           <input id="customSubjInput_${j.id}" type="text" placeholder="+ 科目名を入力（例：化学基礎）"
-            style="flex:1;padding:8px 12px;border:1px dashed var(--border);border-radius:8px;
+            style="flex:1;min-width:120px;padding:8px 12px;border:1px dashed var(--border);border-radius:8px;
                    background:var(--panel);color:var(--text);font-size:12px;"
             onkeydown="if(event.key==='Enter')addCustomSubj('${j.id}')">
           <input type="hidden" id="customSubjColor_${j.id}" value="${defaultColor}">
           <button onclick="addCustomSubj('${j.id}')"
-            style="padding:7px 14px;background:rgba(140,198,63,.12);border:1px solid rgba(140,198,63,.4);
-                   border-radius:8px;color:var(--accent2);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">
+            style="padding:8px 16px;background:rgba(140,198,63,.12);border:1px solid rgba(140,198,63,.4);
+                   border-radius:8px;color:var(--accent2);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;min-height:36px;">
             追加
           </button>`;
         addWrap.appendChild(inputRow);
@@ -7710,18 +7710,18 @@ function buildSubjSelect(){
           const comboRow = document.createElement('div');
           comboRow.style.cssText = 'margin-top:4px;padding:10px 12px;background:rgba(140,198,63,.05);border:1px dashed rgba(140,198,63,.3);border-radius:8px;';
           const checkboxHTML = j.subjects.map(s =>
-            `<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;white-space:nowrap;">
+            `<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;min-width:0;flex:1 1 calc(50% - 4px);max-width:100%;box-sizing:border-box;">
               <input type="checkbox" data-key="${s.key}" data-name="${s.name}" data-avgh="${s.avgH}" data-maxh="${s.maxH}" data-color="${s.color}"
-                style="width:14px;height:14px;accent-color:var(--accent2);cursor:pointer;">
-              <span style="color:var(--text)">${s.name}</span>
+                style="width:14px;height:14px;flex-shrink:0;accent-color:var(--accent2);cursor:pointer;">
+              <span style="color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</span>
             </label>`
           ).join('');
           comboRow.innerHTML = `
             <div style="font-size:10px;font-weight:700;color:var(--accent2);letter-spacing:.05em;margin-bottom:8px;">科目を組み合わせる</div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;" id="comboChecks_${j.id}">${checkboxHTML}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="comboChecks_${j.id}">${checkboxHTML}</div>
             <button onclick="addCombinedSubj('${j.id}')"
-              style="padding:6px 14px;background:rgba(140,198,63,.12);border:1px solid rgba(140,198,63,.4);
-                     border-radius:8px;color:var(--accent2);font-size:12px;font-weight:600;cursor:pointer;width:100%;">
+              style="padding:8px 14px;background:rgba(140,198,63,.12);border:1px solid rgba(140,198,63,.4);
+                     border-radius:8px;color:var(--accent2);font-size:12px;font-weight:600;cursor:pointer;width:100%;min-height:36px;">
               組み合わせて追加
             </button>`;
           addWrap.appendChild(comboRow);
