@@ -569,6 +569,64 @@ html[data-theme="dark"] .sq-card-label,
 html[data-theme="dark"] .sq-sidebar-box-title,
 html[data-theme="dark"] .sq-author-title,
 html[data-theme="dark"] .sq-toc a{color:#B6E27C !important;}
+
+/* ── 簿記3級記事 固有コンポーネント ダークモード ── */
+/* 仕訳ボックス */
+html[data-theme="dark"] .shiwake-col.kari{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.3) !important;}
+html[data-theme="dark"] .shiwake-col.kashi{background:rgba(237,137,54,.10) !important;}
+html[data-theme="dark"] .shiwake-col.kari .shiwake-label{color:#90CDF4 !important;}
+html[data-theme="dark"] .shiwake-col.kashi .shiwake-label{color:#FBD38D !important;}
+html[data-theme="dark"] .shiwake-item .kamoku{color:#F8FAFC !important;}
+html[data-theme="dark"] .shiwake-item .amount{color:#9BA7BB !important;}
+/* 例題・解答 */
+html[data-theme="dark"] .mondai{background:linear-gradient(180deg,#111826,#0E1421) !important;border-color:rgba(140,198,63,.14) !important;}
+html[data-theme="dark"] .mondai p{color:#CCD6E5 !important;}
+html[data-theme="dark"] .kaitou-label{color:#B6E27C !important;}
+/* ポイントカード */
+html[data-theme="dark"] .point-card{background:linear-gradient(180deg,#151A2A,#111728) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .point-card p{color:#F8FAFC !important;}
+/* ○×グリッド */
+html[data-theme="dark"] .mb-card.maru{background:linear-gradient(180deg,#0E2218,#0B1A14) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .mb-card.batu{background:linear-gradient(180deg,#2A0E0E,#1E0A0A) !important;border-color:rgba(252,129,129,.28) !important;}
+html[data-theme="dark"] .mb-card.maru .mb-badge{color:#B6E27C !important;}
+html[data-theme="dark"] .mb-card.batu .mb-badge{color:#FC8181 !important;}
+html[data-theme="dark"] .mb-item{color:#CCD6E5 !important;border-bottom-color:rgba(255,255,255,.06) !important;}
+html[data-theme="dark"] .mb-item .note{color:#9BA7BB !important;}
+/* フローステップ（現金過不足） */
+html[data-theme="dark"] .flow-step.s1{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.3) !important;}
+html[data-theme="dark"] .flow-step.s2{background:rgba(140,198,63,.10) !important;border-color:rgba(140,198,63,.28) !important;}
+html[data-theme="dark"] .flow-step.s3{background:rgba(246,224,94,.08) !important;border-color:rgba(246,224,94,.28) !important;}
+html[data-theme="dark"] .flow-step.s1 .flow-num{color:#90CDF4 !important;}
+html[data-theme="dark"] .flow-step.s2 .flow-num{color:#B6E27C !important;}
+html[data-theme="dark"] .flow-step.s3 .flow-num{color:#F7D774 !important;}
+html[data-theme="dark"] .flow-title{color:#F8FAFC !important;}
+/* 比較カード（現金過不足） */
+html[data-theme="dark"] .compare-card.over{background:linear-gradient(180deg,#0E2218,#0B1A14) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .compare-card.under{background:linear-gradient(180deg,#2A0E0E,#1E0A0A) !important;border-color:rgba(252,129,129,.28) !important;}
+html[data-theme="dark"] .compare-card.over .compare-badge{background:rgba(140,198,63,.22) !important;color:#B6E27C !important;}
+html[data-theme="dark"] .compare-card.under .compare-badge{background:rgba(252,129,129,.22) !important;color:#FC8181 !important;}
+html[data-theme="dark"] .compare-card p{color:#CCD6E5 !important;}
+html[data-theme="dark"] .compare-card .compare-eg{background:rgba(255,255,255,.05) !important;color:#9BA7BB !important;}
+/* 計算ボックス（貸倒引当金） */
+html[data-theme="dark"] .calc-box{background:linear-gradient(180deg,#151A2A,#111728) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .calc-row .label{color:#9BA7BB !important;}
+html[data-theme="dark"] .calc-row .val{color:#F8FAFC !important;}
+html[data-theme="dark"] .calc-operator{color:#9BA7BB !important;}
+/* パターンカード（貸倒引当金） */
+html[data-theme="dark"] .pattern-card.enough{background:linear-gradient(180deg,#0E2218,#0B1A14) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .pattern-card.short{background:linear-gradient(180deg,#2A0E0E,#1E0A0A) !important;border-color:rgba(252,129,129,.28) !important;}
+html[data-theme="dark"] .pattern-card.enough .pattern-badge{background:rgba(140,198,63,.22) !important;color:#B6E27C !important;}
+html[data-theme="dark"] .pattern-card.short .pattern-badge{background:rgba(252,129,129,.22) !important;color:#FC8181 !important;}
+html[data-theme="dark"] .pattern-card p{color:#CCD6E5 !important;}
+html[data-theme="dark"] .pattern-card .pattern-note{color:#9BA7BB !important;}
+/* まとめカード（共通） */
+html[data-theme="dark"] .matome{background:linear-gradient(135deg,#0E2218,#0B1A12) !important;border-color:rgba(140,198,63,.3) !important;}
+html[data-theme="dark"] .matome h3{color:#B6E27C !important;}
+html[data-theme="dark"] .matome-row{color:#CCD6E5 !important;border-bottom-color:rgba(255,255,255,.06) !important;}
+html[data-theme="dark"] .matome-row .trigger{color:#F8FAFC !important;}
+html[data-theme="dark"] .matome-row .result{color:#B6E27C !important;}
+/* ── ここまで ── */
+
 .sq-key,
 .sq-important{
   color:var(--sq-highlight-text);
