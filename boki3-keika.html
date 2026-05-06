@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>経過勘定（前払・未払・前受・未収）の仕訳【日商簿記3級】2パターンで完全攻略｜スタディクエスト</title>
+<meta name="description" content="前払費用・未払費用・前受収益・未収収益を「2パターン」で整理。前払利息・未払利息の決算整理仕訳と期首再振替仕訳まで例題つきで完全解説。日商簿記3級の頻出論点。">
+<meta name="keywords" content="経過勘定 仕訳,前払費用 未払費用,前受収益 未収収益,決算整理仕訳,再振替仕訳,日商簿記3級 経過勘定">
+<meta property="og:title" content="経過勘定（前払・未払・前受・未収）の仕訳【日商簿記3級】">
+<meta property="og:description" content="4つの経過勘定を「2パターン」で整理。前払利息・未払利息を例題つきで完全解説。">
+<meta property="og:url" content="https://hito77ki-ship-it.github.io/study-quest/boki3-keika.html">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/ogp_icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8524998392329204"
+     crossorigin="anonymous"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "経過勘定（前払・未払・前受・未収）の仕訳【日商簿記3級】",
+  "description": "4つの経過勘定を「2パターン」で整理。前払利息・未払利息を例題つきで完全解説。",
+  "url": "https://hito77ki-ship-it.github.io/study-quest/boki3-keika.html",
+  "datePublished": "2026-05-07",
+  "dateModified": "2026-05-07",
+  "author": {"@type": "Person", "name": "大谷 一輝", "url": "https://hito77ki-ship-it.github.io/study-quest/about.html"},
+  "publisher": {"@type": "Organization", "name": "スタディクエスト", "url": "https://hito77ki-ship-it.github.io/study-quest/"}
+}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--green:#8CC63F;--green2:#6AAF2B;--text:#1A202C;--muted:#718096;--border:#E2E8F0;--bg:#FFFFFF;--light:#F7FAFC;}
+body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);line-height:1.9;}
+a{color:var(--green2);text-decoration:none;}
+a:hover{text-decoration:underline;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;}
+.nav-inner{max-width:900px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:15px;font-weight:700;color:var(--green2);}
+.nav-cta{background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:100px;transition:opacity .2s;}
+.nav-cta:hover{opacity:.85;text-decoration:none;}
+.container{max-width:800px;margin:0 auto;padding:88px 24px 80px;}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:24px;}
+.breadcrumb a{color:var(--muted);}
+h1{font-size:clamp(20px,4vw,30px);font-weight:700;line-height:1.4;margin-bottom:8px;}
+.meta{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.lead{font-size:15px;line-height:1.9;margin-bottom:40px;padding:20px;background:var(--light);border-left:3px solid var(--green);border-radius:0 8px 8px 0;}
+h2{font-size:20px;font-weight:700;margin:48px 0 16px;padding-left:12px;border-left:3px solid var(--green);}
+h3{font-size:16px;font-weight:700;margin:28px 0 10px;color:var(--green2);}
+p{font-size:14px;color:#374151;margin-bottom:16px;}
+ul,ol{font-size:14px;color:#374151;margin:0 0 16px 20px;}
+li{margin-bottom:6px;}
+.tip-box{background:#F0FFF4;border:1px solid #9AE6B4;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}
+.tip-box strong{color:#276749;}
+.warn-box{background:#FFFBEB;border:1px solid #F6E05E;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}
+.warn-box strong{color:#975A16;}
+.point-card{background:#fff;border:2px solid var(--green);border-radius:12px;padding:20px 24px;margin:24px 0;}
+.point-card .label{font-size:11px;font-weight:700;color:var(--green2);letter-spacing:.1em;margin-bottom:8px;}
+.point-card p{font-size:15px;font-weight:700;color:var(--text);margin:0;}
+
+/* 2パターン比較カード */
+.pattern-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0;}
+@media(max-width:540px){.pattern-compare{grid-template-columns:1fr;}}
+.pc-card{border-radius:12px;padding:18px 20px;}
+.pc-card.type-a{background:#EBF8FF;border:1px solid #90CDF4;}
+.pc-card.type-b{background:#F0FFF4;border:1px solid #9AE6B4;}
+.pc-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:100px;margin-bottom:10px;}
+.pc-card.type-a .pc-badge{background:#90CDF4;color:#2B6CB0;}
+.pc-card.type-b .pc-badge{background:#9AE6B4;color:#276749;}
+.pc-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.pc-sub{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+.pc-examples{font-size:12px;font-weight:700;}
+.pc-card.type-a .pc-examples{color:#2B6CB0;}
+.pc-card.type-b .pc-examples{color:#276749;}
+
+/* 4勘定科目グリッド */
+.four-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0;}
+@media(max-width:540px){.four-grid{grid-template-columns:1fr;}}
+.fg-card{border-radius:10px;padding:14px 16px;border-left:4px solid;}
+.fg-card.maebara{background:#EBF8FF;border-color:#3B82F6;}
+.fg-card.mibarai{background:#FFF5F5;border-color:#FC8181;}
+.fg-card.maeuke{background:#FFFBEB;border-color:#F6E05E;}
+.fg-card.mishuu{background:#F0FFF4;border-color:#9AE6B4;}
+.fg-card .fg-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.fg-card.maebara .fg-name{color:#2B6CB0;}
+.fg-card.mibarai .fg-name{color:#9B2C2C;}
+.fg-card.maeuke .fg-name{color:#975A16;}
+.fg-card.mishuu .fg-name{color:#276749;}
+.fg-card .fg-type{font-size:10px;font-weight:700;letter-spacing:.05em;margin-bottom:6px;opacity:.8;}
+.fg-card .fg-body{font-size:12px;color:#374151;line-height:1.6;}
+
+/* 仕訳ボックス */
+.shiwake{display:flex;border:2px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0;font-size:14px;}
+.shiwake-col{flex:1;padding:14px 18px;}
+.shiwake-col.kari{background:#EBF8FF;border-right:2px solid var(--border);}
+.shiwake-col.kashi{background:#FFF9F0;}
+.shiwake-label{font-size:10px;font-weight:700;letter-spacing:.1em;margin-bottom:8px;}
+.shiwake-col.kari .shiwake-label{color:#2B6CB0;}
+.shiwake-col.kashi .shiwake-label{color:#C05621;}
+.shiwake-item{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.shiwake-item .kamoku{font-weight:700;font-size:14px;}
+.shiwake-item .amount{font-size:14px;color:var(--muted);}
+
+/* 例題ブロック */
+.mondai{background:#FAFAFA;border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin:20px 0;}
+.mondai .mondai-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;}
+.mondai p{font-size:14px;margin:0;}
+.kaitou-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:#276749;margin:16px 0 6px;}
+
+/* 計算ボックス */
+.calc-box{background:#fff;border:2px solid var(--green);border-radius:14px;padding:20px 24px;margin:16px 0;}
+.calc-box .calc-title{font-size:11px;font-weight:700;color:var(--green2);letter-spacing:.1em;margin-bottom:12px;}
+.calc-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;padding:4px 0;}
+.calc-row .label{color:var(--muted);font-size:13px;}
+.calc-row .val{font-weight:700;color:var(--text);}
+.calc-row .val.result{color:var(--green2);font-size:15px;}
+.calc-operator{color:var(--muted);font-size:16px;margin:0 2px;}
+
+/* 3ステップ */
+.step-list{display:flex;flex-direction:column;gap:0;margin:24px 0;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+.step-item{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);background:#fff;}
+.step-item:last-child{border-bottom:none;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-body strong{display:block;font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text);}
+.step-body p{font-size:13px;color:var(--muted);margin:0;}
+
+/* タイムライン（月数図） */
+.timeline-box{background:var(--light);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:16px 0;}
+.tl-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:10px;}
+.tl-bar{display:flex;height:32px;border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.tl-bar .tl-cur{background:#8CC63F;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
+.tl-bar .tl-next{background:#EBF8FF;border:1px dashed #90CDF4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#2B6CB0;}
+.tl-legend{display:flex;gap:16px;font-size:11px;color:var(--muted);}
+.tl-legend span{display:flex;align-items:center;gap:4px;}
+.tl-dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+
+/* まとめカード */
+.matome{background:linear-gradient(135deg,#F0FFF4,#E8F7B8);border:2px solid #9AE6B4;border-radius:14px;padding:24px 28px;margin:32px 0;}
+.matome h3{color:#276749;font-size:16px;margin:0 0 16px;}
+.matome-row{display:flex;align-items:baseline;gap:10px;font-size:14px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);}
+.matome-row:last-child{border-bottom:none;}
+.matome-row .trigger{font-weight:700;min-width:180px;flex-shrink:0;}
+.matome-row .result{color:#276749;font-weight:700;}
+@media(max-width:540px){.matome-row{flex-direction:column;gap:2px;}.matome-row .trigger{min-width:auto;}}
+
+/* アプリCTA */
+.app-cta{background:linear-gradient(135deg,#1A2A0A,#2D4A10);border-radius:12px;padding:28px;margin:40px 0;text-align:center;color:#fff;}
+.app-cta h3{color:var(--green);font-size:18px;margin-bottom:8px;}
+.app-cta p{color:#A0C070;font-size:13px;margin-bottom:16px;}
+.app-cta a{background:var(--green);color:#0A0A0F;font-weight:700;padding:12px 28px;border-radius:100px;font-size:14px;display:inline-block;transition:opacity .2s;}
+.app-cta a:hover{opacity:.85;text-decoration:none;}
+
+footer{background:#111827;padding:28px 24px;text-align:center;margin-top:64px;}
+footer a{font-size:12px;color:#4A5568;margin:0 10px;}
+footer p{font-size:11px;color:#2D3748;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="lp.html">⚔ スタディクエスト</a>
+    <a class="nav-cta" href="index.html">無料で始める</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb">
+    <a href="lp.html">TOP</a> &gt; <a href="boki.html">簿記</a> &gt; 経過勘定（前払・未払・前受・未収）
+  </div>
+
+  <p class="meta">日商簿記3級 | 公開：2026年5月7日</p>
+  <h1>経過勘定（前払・未払・前受・未収）<br>たった2パターンで完全攻略</h1>
+  <p class="meta">著者：大谷 一輝（大阪経済大学3回生・日商簿記1級勉強中）</p>
+
+  <p class="lead">
+    「前払利息・未払利息・前受家賃・未収手数料…種類が多くて覚えられない！」と思っていませんか？<br>
+    実は考え方は<strong>たった2パターン</strong>しかありません。この2パターンを理解すれば、どの勘定科目でも同じ手順で解けます。
+  </p>
+
+  <div class="sq-chat"></div>
+
+  <h2>まず「発生主義」の大原則を理解する</h2>
+
+  <p>経過勘定を理解するには、簿記の重要な大原則を知る必要があります。</p>
+
+  <div class="point-card">
+    <div class="label">📌 発生主義の大原則</div>
+    <p>費用・収益は「当期に発生した分だけ」当期に計上する</p>
+  </div>
+
+  <p>たとえば12か月分の利息を一度に現金で払っても、当期は8か月分しか経過していなければ、費用として計上できるのは8か月分だけ。残り4か月分は「まだ発生していない」ので当期の費用から除く必要があります。これが決算整理仕訳の目的です。</p>
+
+  <h2>経過勘定は2パターンに整理する</h2>
+
+  <div class="pattern-compare">
+    <div class="pc-card type-a">
+      <span class="pc-badge">パターンA</span>
+      <div class="pc-title">お金を先に払った・受け取った</div>
+      <div class="pc-sub">翌期分（まだ発生していない分）を取り消す</div>
+      <div class="pc-examples">→ 前払費用・前受収益</div>
+    </div>
+    <div class="pc-card type-b">
+      <span class="pc-badge">パターンB</span>
+      <div class="pc-title">お金をまだ払っていない・受け取っていない</div>
+      <div class="pc-sub">当期分（すでに発生した分）を追加計上する</div>
+      <div class="pc-examples">→ 未払費用・未収収益</div>
+    </div>
+  </div>
+
+  <h3>4つの勘定科目まとめ</h3>
+
+  <div class="four-grid">
+    <div class="fg-card maebara">
+      <div class="fg-name">前払費用</div>
+      <div class="fg-type">資産</div>
+      <div class="fg-body">先払いした費用のうち、翌期分。例：前払利息・前払保険料</div>
+    </div>
+    <div class="fg-card mibarai">
+      <div class="fg-name">未払費用</div>
+      <div class="fg-type">負債</div>
+      <div class="fg-body">当期に発生したがまだ払っていない費用。例：未払利息・未払家賃</div>
+    </div>
+    <div class="fg-card maeuke">
+      <div class="fg-name">前受収益</div>
+      <div class="fg-type">負債</div>
+      <div class="fg-body">先に受け取った収益のうち、翌期分。例：前受利息・前受家賃</div>
+    </div>
+    <div class="fg-card mishuu">
+      <div class="fg-name">未収収益</div>
+      <div class="fg-type">資産</div>
+      <div class="fg-body">当期に発生したがまだ受け取っていない収益。例：未収利息・未収手数料</div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>資産・負債は覚えなくていい！</strong><br>
+    前払費用が「資産」かどうか暗記する必要はありません。「支払利息（費用）の反対側に来る勘定」と覚えれば自然と貸方に来ます。勘定科目名より「どっちのパターンか」を判断するほうが大切です。
+  </div>
+
+  <h2>パターンA：前払利息の解き方（3ステップ）</h2>
+
+  <div class="mondai">
+    <div class="mondai-label">例題</div>
+    <p>5月1日に借入金¥1,000、年利率12%で借り入れた。向こう1年分の利息を現金で支払った。当期は1月1日〜12月31日。</p>
+  </div>
+
+  <div class="timeline-box">
+    <div class="tl-label">当期（1月〜12月）のうち、利息の対象期間</div>
+    <div class="tl-bar">
+      <div class="tl-cur" style="flex:8;">当期分 8か月（5〜12月）¥80</div>
+      <div class="tl-next" style="flex:4;">翌期分 4か月（1〜4月）¥40</div>
+    </div>
+    <div class="tl-legend">
+      <span><span class="tl-dot" style="background:#8CC63F;"></span>当期の費用として計上する</span>
+      <span><span class="tl-dot" style="background:#EBF8FF;border:1px solid #90CDF4;"></span>翌期分 → 取り消す（前払利息）</span>
+    </div>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>支払い時：12か月分全額を「支払利息」に計上</strong>
+        <p>払ったときは全額費用でOK。あとで決算整理で調整する。</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>決算整理：翌期分を「前払利息」に振り替える</strong>
+        <p>翌期4か月分を支払利息から取り消す。支払利息が減るので右（貸方）へ。</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>翌期首（再振替仕訳）：決算整理の逆仕訳</strong>
+        <p>翌期分の利息を当期の費用に戻す。前期末と逆の仕訳をするだけ。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="kaitou-label">▶ ①支払い時（5月1日）</div>
+  <div class="calc-box">
+    <div class="calc-title">📐 利息の計算</div>
+    <div class="calc-row">
+      <span class="label">年利息</span>
+      <span class="val">1,000 × 12% =</span>
+      <span class="val result">¥120</span>
+    </div>
+    <div class="calc-row">
+      <span class="label">1か月分</span>
+      <span class="val">120 ÷ 12か月 =</span>
+      <span class="val result">¥10</span>
+    </div>
+  </div>
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item"><span class="kamoku">支払利息</span><span class="amount">120</span></div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item"><span class="kamoku">現金</span><span class="amount">120</span></div>
+    </div>
+  </div>
+
+  <div class="kaitou-label">▶ ②決算整理仕訳（12月31日）</div>
+  <div class="calc-box">
+    <div class="calc-title">📐 翌期分の計算</div>
+    <div class="calc-row">
+      <span class="label">翌期分（1〜4月）</span>
+      <span class="val">4か月 × ¥10 =</span>
+      <span class="val result">¥40</span>
+    </div>
+  </div>
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item"><span class="kamoku">前払利息</span><span class="amount">40</span></div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item"><span class="kamoku">支払利息</span><span class="amount">40</span></div>
+    </div>
+  </div>
+
+  <div class="kaitou-label">▶ ③期首再振替仕訳（翌年1月1日）</div>
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item"><span class="kamoku">支払利息</span><span class="amount">40</span></div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item"><span class="kamoku">前払利息</span><span class="amount">40</span></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>再振替仕訳は「決算整理の逆」をするだけ！</strong><br>
+    難しく考えず、②の仕訳の借方・貸方を入れ替えるだけです。理由は「翌期首にリセットして、翌期分の費用を正しく計上できるようにするため」です。
+  </div>
+
+  <h2>パターンB：未払利息の解き方（2ステップ）</h2>
+
+  <div class="mondai">
+    <div class="mondai-label">例題</div>
+    <p>7月1日に借入金¥1,000、年利率6%で借り入れた。決算整理で利息の未払分を計上する。当期は1月1日〜12月31日。</p>
+  </div>
+
+  <div class="timeline-box">
+    <div class="tl-label">当期（1月〜12月）のうち、利息の対象期間</div>
+    <div class="tl-bar">
+      <div class="tl-cur" style="flex:6;">当期分 6か月（7〜12月）¥30 → まだ払っていない</div>
+    </div>
+    <div class="tl-legend">
+      <span><span class="tl-dot" style="background:#8CC63F;"></span>当期に発生 → 未払利息として追加計上</span>
+    </div>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>決算整理：当期分を「未払利息」で追加計上</strong>
+        <p>まだ払っていないが当期に発生した分を費用として計上。支払利息が増えるので左（借方）へ。</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>翌期首（再振替仕訳）：決算整理の逆仕訳</strong>
+        <p>翌期に実際に支払うときと相殺するためにリセットする。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="kaitou-label">▶ ①決算整理仕訳（12月31日）</div>
+  <div class="calc-box">
+    <div class="calc-title">📐 未払利息の計算</div>
+    <div class="calc-row">
+      <span class="label">年利息</span>
+      <span class="val">1,000 × 6% =</span>
+      <span class="val result">¥60</span>
+    </div>
+    <div class="calc-row">
+      <span class="label">1か月分</span>
+      <span class="val">60 ÷ 12か月 =</span>
+      <span class="val result">¥5</span>
+    </div>
+    <div class="calc-row">
+      <span class="label">当期分（7〜12月）</span>
+      <span class="val">6か月 × ¥5 =</span>
+      <span class="val result">¥30</span>
+    </div>
+  </div>
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item"><span class="kamoku">支払利息</span><span class="amount">30</span></div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item"><span class="kamoku">未払利息</span><span class="amount">30</span></div>
+    </div>
+  </div>
+
+  <div class="kaitou-label">▶ ②期首再振替仕訳（翌年1月1日）</div>
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item"><span class="kamoku">未払利息</span><span class="amount">30</span></div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item"><span class="kamoku">支払利息</span><span class="amount">30</span></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>家賃・手数料も勘定名が違うだけで解き方は同じ！</strong><br>
+    未払家賃・未収手数料・前受家賃など、勘定科目名が変わっても「パターンAかB」を判断して同じ手順で仕訳するだけ。利息で手順を覚えれば全部対応できます。
+  </div>
+
+  <div class="app-cta">
+    <h3>⚔ Study Quest で学習を記録しよう</h3>
+    <p>簿記3級の学習時間をRPG感覚で記録。ボス（試験日）まであと何時間かリアルタイムで確認できます。</p>
+    <a href="index.html">無料で始める →</a>
+  </div>
+
+  <div class="matome">
+    <h3>📋 まとめ：経過勘定 2パターン対応表</h3>
+    <div class="matome-row">
+      <span class="trigger">先に払った → 翌期分を取り消す</span>
+      <span class="result">前払費用（借方）／ 費用勘定（貸方）</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">先に受け取った → 翌期分を取り消す</span>
+      <span class="result">収益勘定（借方）／ 前受収益（貸方）</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">まだ払っていない → 当期分を追加</span>
+      <span class="result">費用勘定（借方）／ 未払費用（貸方）</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">まだ受け取っていない → 当期分を追加</span>
+      <span class="result">未収収益（借方）／ 収益勘定（貸方）</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">再振替仕訳（翌期首）</span>
+      <span class="result">決算整理仕訳の借方・貸方を逆にするだけ</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <a href="lp.html">記事トップ</a>
+  <a href="index.html">アプリを使う</a>
+  <p>© 2026 スタディクエスト</p>
+</footer>
+
+<script src="article-widgets.js"></script>
+</body>
+</html>

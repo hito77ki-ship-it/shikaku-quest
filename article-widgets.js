@@ -627,6 +627,31 @@ html[data-theme="dark"] .matome-row .trigger{color:#F8FAFC !important;}
 html[data-theme="dark"] .matome-row .result{color:#B6E27C !important;}
 /* ── ここまで ── */
 
+/* ── 経過勘定記事 固有コンポーネント ダークモード ── */
+html[data-theme="dark"] .pc-card.type-a{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.3) !important;}
+html[data-theme="dark"] .pc-card.type-b{background:rgba(140,198,63,.10) !important;border-color:rgba(140,198,63,.28) !important;}
+html[data-theme="dark"] .pc-card.type-a .pc-badge{background:rgba(59,130,246,.25) !important;color:#90CDF4 !important;}
+html[data-theme="dark"] .pc-card.type-b .pc-badge{background:rgba(140,198,63,.22) !important;color:#B6E27C !important;}
+html[data-theme="dark"] .pc-title{color:#F8FAFC !important;}
+html[data-theme="dark"] .pc-sub{color:#9BA7BB !important;}
+html[data-theme="dark"] .pc-card.type-a .pc-examples{color:#90CDF4 !important;}
+html[data-theme="dark"] .pc-card.type-b .pc-examples{color:#B6E27C !important;}
+html[data-theme="dark"] .fg-card.maebara{background:rgba(59,130,246,.12) !important;border-color:#3B82F6 !important;}
+html[data-theme="dark"] .fg-card.mibarai{background:rgba(252,129,129,.10) !important;border-color:#FC8181 !important;}
+html[data-theme="dark"] .fg-card.maeuke{background:rgba(246,224,94,.08) !important;border-color:#F6E05E !important;}
+html[data-theme="dark"] .fg-card.mishuu{background:rgba(140,198,63,.10) !important;border-color:#9AE6B4 !important;}
+html[data-theme="dark"] .fg-card.maebara .fg-name{color:#90CDF4 !important;}
+html[data-theme="dark"] .fg-card.mibarai .fg-name{color:#FC8181 !important;}
+html[data-theme="dark"] .fg-card.maeuke .fg-name{color:#F7D774 !important;}
+html[data-theme="dark"] .fg-card.mishuu .fg-name{color:#B6E27C !important;}
+html[data-theme="dark"] .fg-card .fg-type{color:#9BA7BB !important;}
+html[data-theme="dark"] .fg-card .fg-body{color:#CCD6E5 !important;}
+html[data-theme="dark"] .timeline-box{background:linear-gradient(180deg,#111826,#0E1421) !important;border-color:rgba(140,198,63,.14) !important;}
+html[data-theme="dark"] .tl-label{color:#9BA7BB !important;}
+html[data-theme="dark"] .tl-bar .tl-next{background:rgba(59,130,246,.14) !important;border-color:rgba(59,130,246,.3) !important;color:#90CDF4 !important;}
+html[data-theme="dark"] .tl-legend{color:#9BA7BB !important;}
+/* ── ここまで ── */
+
 /* ── ゼロからの簿記シリーズ 共通ダークモード ── */
 /* シリーズナビ */
 html[data-theme="dark"] .series-nav{background:linear-gradient(180deg,#0E2218,#0B1A14) !important;border-color:rgba(140,198,63,.3) !important;}
