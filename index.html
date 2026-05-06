@@ -13375,14 +13375,15 @@ function renderPaceDiag(){
   const eg = upcoming[0];
   const examDate = new Date(eg.date); examDate.setHours(0,0,0,0);
   const daysLeft = Math.round((examDate - today) / 86400000);
-  const totalStudiedMins = studyMins(sessions);
+  const totalStudiedMins = Math.round(levelStudyMins(sessions));
   const job = JOBS.find(j => selectedJobIds.includes(j.id));
   const totalTargetMins = (eg.targetHours > 0 ? eg.targetHours : (job?.avgHours || 300)) * 60;
   const remainMins = Math.max(0, totalTargetMins - totalStudiedMins);
   const progressPct = Math.min(100, Math.round(totalStudiedMins / totalTargetMins * 100));
   const dailyNeedMins = daysLeft > 0 ? Math.ceil(remainMins / daysLeft) : 0;
   const sevenDaysAgo = new Date(today.getTime() - 7 * 86400000);
-  const recentMins = sessions.filter(s => isStudyType(s) && s.date && new Date(s.date) >= sevenDaysAgo).reduce((a,s) => a + s.amount, 0);
+  const subjectSet = new Set(selectedSubjectKeys || []);
+  const recentMins = Math.round(sessions.filter(s => isStudyType(s) && s.date && new Date(s.date) >= sevenDaysAgo && (!subjectSet.size || subjectSet.has(s.subject))).reduce((a,s) => a + s.amount, 0));
   const recentDailyMins = Math.round(recentMins / 7);
   let status = 'ok';
   if(dailyNeedMins > recentDailyMins * 1.5 || dailyNeedMins > 240) status = 'danger';
@@ -20031,6 +20032,55 @@ const NEWS_READ_KEY = 'sq2_news_read';
 
 // ── アップデートログ（新しい順） ──
 const NEWS_ITEMS = [
+  {
+    id: 'v20260507_boki3_articles',
+    date: '2026-05-07',
+    type: 'feature',
+    title: '📒 簿記3級 解説記事を3本追加',
+    desc: '「現金・当座預金の違いと仕訳」「流れで覚える現金過不足の仕訳」「貸倒引当金の仕訳と計算」を公開しました。小切手の○×判定・差額補充法・雑損雑益まで、例題つきで丁寧に解説しています。'
+  },
+  {
+    id: 'v20260507_boki_zero_series',
+    date: '2026-05-07',
+    type: 'feature',
+    title: '✏️ 初心者向け連載「ゼロからの簿記」全5回を公開',
+    desc: '簿記がまったくわからない人向けに、取引・仕訳・財務諸表までを5回で学べる連載を追加しました。対話形式のチャットUIで読みやすく構成しています。攻略記事ページからご覧ください。'
+  },
+  {
+    id: 'v20260507_subject_combine',
+    date: '2026-05-07',
+    type: 'feature',
+    title: '🔗 複数科目を1つに組み合わせる機能を追加',
+    desc: '日商簿記1級の「商業簿記＋会計学」など、複数の科目をまとめて1つとして学習記録できるようになりました。2科目以上ある全資格に対応しています。資格設定の「科目をカスタマイズ」から使えます。'
+  },
+  {
+    id: 'v20260507_combine_split_modal',
+    date: '2026-05-07',
+    type: 'feature',
+    title: '⚖ 組み合わせ科目を解除するとき学習時間を配賦できるように',
+    desc: '結合科目を削除する際、これまでの学習時間を各科目に任意の比率で振り分けてから解除できるモーダルを追加しました。配賦せずにそのまま削除することも可能です。'
+  },
+  {
+    id: 'v20260507_textbook_bugfix',
+    date: '2026-05-07',
+    type: 'fix',
+    title: '🐛 教科書登録が失敗するバグを修正',
+    desc: '教材タブで教科書を新規登録しようとすると「subjectKey is not defined」エラーが発生し、登録できない問題を修正しました。'
+  },
+  {
+    id: 'v20260507_pace_diag_fix',
+    date: '2026-05-07',
+    type: 'fix',
+    title: '🎯 合格ペース診断が総合学習時間を参照していた問題を修正',
+    desc: '合格ペース診断の「学習済み」が全資格合算の学習時間を表示していた問題を修正しました。現在選択中の資格の科目に絞った学習時間を正しく参照するようになります。'
+  },
+  {
+    id: 'v20260507_article_chat_ui',
+    date: '2026-05-07',
+    type: 'improve',
+    title: '💬 全記事に会話形式UIを導入',
+    desc: '攻略記事ページに、受験生と講師の対話形式で解説を読める会話UIコンポーネントを導入しました。難しい概念をやりとりの流れで理解できます。'
+  },
   {
     id: 'v20260504_article_header_theme_fix',
     date: '2026-05-04',
