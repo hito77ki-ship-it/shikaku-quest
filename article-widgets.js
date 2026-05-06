@@ -772,6 +772,17 @@ html[data-theme="dark"] .sq-article-theme-group{
 .sq-mid-cta a:hover{opacity:.88;text-decoration:none;transform:translateY(-1px);}
 /* 広告プレースホルダー（本文内） */
 .sq-ad-slot{background:var(--sq-surface-soft);border:1px dashed var(--sq-border);border-radius:8px;min-height:90px;display:flex;align-items:center;justify-content:center;color:var(--sq-muted);font-size:11px;margin:24px 0;}
+/* 会話UI */
+.sq-chat{margin:28px 0;display:flex;flex-direction:column;gap:16px;}
+.sq-chat-row{display:flex;align-items:flex-start;gap:12px;}
+.sq-chat-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.10);}
+.sq-chat-avatar.student{background:linear-gradient(135deg,#E0F0FF,#BAD9F5);}
+.sq-chat-avatar.teacher{background:linear-gradient(135deg,#E8F7B8,#8CC63F);}
+.sq-chat-name{font-size:10px;font-weight:700;color:var(--sq-muted);margin-bottom:4px;letter-spacing:.05em;}
+.sq-chat-bubble{position:relative;background:var(--sq-surface-soft);border:1px solid var(--sq-border);border-radius:0 12px 12px 12px;padding:12px 16px;font-size:13px;color:var(--sq-text);line-height:1.8;max-width:calc(100% - 60px);}
+.sq-chat-row.teacher .sq-chat-bubble{background:linear-gradient(135deg,rgba(140,198,63,.08),rgba(140,198,63,.03));border-color:rgba(140,198,63,.3);border-radius:0 12px 12px 12px;}
+html[data-theme="dark"] .sq-chat-bubble{background:rgba(255,255,255,.04);}
+html[data-theme="dark"] .sq-chat-row.teacher .sq-chat-bubble{background:rgba(140,198,63,.06);}
 /* 著者プロフィール */
 .sq-author{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--sq-surface-soft),var(--sq-surface-strong));border:1px solid var(--sq-border-strong);box-shadow:var(--sq-shadow);border-radius:12px;padding:14px 18px;margin:24px 0 32px;}
 .sq-author-avatar{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#E8F7B8,#8CC63F 55%,#416F14);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 0 24px rgba(140,198,63,.22);}
