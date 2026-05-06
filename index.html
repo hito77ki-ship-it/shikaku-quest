@@ -19434,7 +19434,7 @@ function saveMaterial(){
     const idx = materials.findIndex(m => m.id === editId);
     if(idx >= 0) materials[idx] = {...materials[idx], ...entry};
   } else {
-    gtag('event','material_added',{material_name: name, subject_key: subjectKey});
+    gtag('event','material_added',{material_name: name, subject_key: entry.subjectKey});
     materials.unshift(entry);
   }
   saveMaterials();
