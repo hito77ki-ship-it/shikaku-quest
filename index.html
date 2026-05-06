@@ -7754,6 +7754,18 @@ function addCustomSubj(jobId){
   buildSubjSelect();
 }
 function deleteCustomSubj(jobId, key){
+  const subj = loadCustomSubjects(jobId).find(s => s.key === key);
+  // 組み合わせ科目で蓄積時間がある場合は配賦モーダルを表示
+  if(subj && subj.mergedKeys && subj.mergedKeys.length >= 2){
+    const accMins = sessions.filter(x=>(x.type==='study'||x.type==='exam')&&x.subject===key).reduce((a,x)=>a+x.amount,0);
+    if(accMins > 0){
+      showCombinedSplitModal(jobId, subj, accMins);
+      return;
+    }
+  }
+  _doDeleteCustomSubj(jobId, key);
+}
+function _doDeleteCustomSubj(jobId, key){
   const updated = loadCustomSubjects(jobId).filter(s => s.key !== key);
   saveCustomSubjects(jobId, updated);
   selectedSubjectKeys = selectedSubjectKeys.filter(k => k !== key);
@@ -7764,17 +7776,111 @@ function addCombinedSubj(jobId){
   if(!container) return;
   const checked = [...container.querySelectorAll('input[type=checkbox]:checked')];
   if(checked.length < 2){ alert('2つ以上の科目を選んでください'); return; }
-  const name  = checked.map(c=>c.dataset.name).join('＋');
-  const avgH  = checked.reduce((s,c)=>s+Number(c.dataset.avgh),0);
-  const maxH  = checked.reduce((s,c)=>s+Number(c.dataset.maxh),0);
-  const color = checked[0].dataset.color;
-  const key   = 'custom_'+jobId+'_'+Date.now();
-  const existing = loadCustomSubjects(jobId);
-  existing.push({key, name, desc:'組み合わせ科目', color, avgH, maxH, attrs:{int:.5,dex:.5}});
+  const name       = checked.map(c=>c.dataset.name).join('＋');
+  const avgH       = checked.reduce((s,c)=>s+Number(c.dataset.avgh),0);
+  const maxH       = checked.reduce((s,c)=>s+Number(c.dataset.maxh),0);
+  const color      = checked[0].dataset.color;
+  const key        = 'custom_'+jobId+'_'+Date.now();
+  const mergedKeys = checked.map(c=>c.dataset.key);
+  const mergedNames= checked.map(c=>c.dataset.name);
+  const existing   = loadCustomSubjects(jobId);
+  existing.push({key, name, desc:'組み合わせ科目', color, avgH, maxH, attrs:{int:.5,dex:.5}, mergedKeys, mergedNames});
   saveCustomSubjects(jobId, existing);
   if(!selectedSubjectKeys.includes(key)) selectedSubjectKeys.push(key);
   checked.forEach(c=>c.checked=false);
   buildSubjSelect();
+}
+function showCombinedSplitModal(jobId, subj, totalMins){
+  const totalH = (totalMins/60).toFixed(1);
+  // 既存モーダルがあれば削除
+  const old = document.getElementById('splitModal');
+  if(old) old.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'splitModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:16px;';
+
+  const inputsHTML = subj.mergedKeys.map((k,i)=>`
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:700;color:var(--text);display:block;margin-bottom:6px;">${subj.mergedNames[i]}</label>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="split_${k}" min="0" step="0.5"
+          style="width:90px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+                 background:var(--panel);color:var(--text);font-size:14px;text-align:right;"
+          value="0" oninput="updateSplitRemaining('${subj.key}',${totalMins})">
+        <span style="font-size:13px;color:var(--muted);">時間</span>
+      </div>
+    </div>`).join('');
+
+  modal.innerHTML = `
+    <div style="background:var(--panel);border-radius:16px;padding:28px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);">
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px;">学習時間を配賦する</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px;">
+        「${subj.name}」の蓄積時間 <strong style="color:var(--text);">${totalH}時間</strong> を各科目に割り振ってください。<br>
+        <span style="font-size:12px;">未配賦分は記録から除外されます。</span>
+      </div>
+      ${inputsHTML}
+      <div id="splitRemaining_${subj.key}" style="font-size:12px;color:var(--accent2);margin-bottom:20px;padding:8px 12px;background:rgba(140,198,63,.08);border-radius:8px;">
+        残り配賦可能：${totalH}時間
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="applyCombinedSplit('${jobId}','${subj.key}',${totalMins})"
+          style="flex:1;padding:10px;background:var(--accent2);color:#fff;font-weight:700;font-size:14px;border:none;border-radius:10px;cursor:pointer;">
+          配賦して解除
+        </button>
+        <button onclick="document.getElementById('splitModal').remove()"
+          style="flex:1;padding:10px;background:var(--border);color:var(--muted);font-size:14px;border:none;border-radius:10px;cursor:pointer;">
+          キャンセル
+        </button>
+      </div>
+      <div style="margin-top:10px;text-align:center;">
+        <button onclick="if(confirm('配賦せずに削除しますか？蓄積時間は失われます。')){document.getElementById('splitModal').remove();_doDeleteCustomSubj('${jobId}','${subj.key}');}"
+          style="font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;">
+          配賦せずにそのまま削除する
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+function updateSplitRemaining(combinedKey, totalMins){
+  const modal = document.getElementById('splitModal');
+  if(!modal) return;
+  const inputs = [...modal.querySelectorAll('input[type=number]')];
+  const usedH = inputs.reduce((s,inp)=>s+Number(inp.value||0),0);
+  const remH  = Math.max(0, totalMins/60 - usedH);
+  const el = document.getElementById('splitRemaining_'+combinedKey);
+  if(el) el.textContent = `残り配賦可能：${remH.toFixed(1)}時間`;
+}
+function applyCombinedSplit(jobId, combinedKey, totalMins){
+  const modal = document.getElementById('splitModal');
+  if(!modal) return;
+  const inputs = [...modal.querySelectorAll('input[type=number]')];
+  const totalUsedMins = inputs.reduce((s,inp)=>s+Math.round(Number(inp.value||0)*60),0);
+  if(totalUsedMins > totalMins + 1){
+    alert(`配賦合計が蓄積時間（${(totalMins/60).toFixed(1)}時間）を超えています`);
+    return;
+  }
+  const today = getTodayStr();
+  inputs.forEach(inp=>{
+    const mins = Math.round(Number(inp.value||0)*60);
+    if(mins <= 0) return;
+    const subjKey = inp.id.replace('split_','');
+    sessions.push({
+      date: today,
+      subject: subjKey,
+      type: 'study',
+      amount: mins,
+      exp: Math.round(mins * 1.2),
+      note: `「${loadCustomSubjects(jobId).find(s=>s.key===combinedKey)?.name||'組み合わせ科目'}」より配賦`,
+      startedAt: new Date().toISOString(),
+      endedAt: new Date().toISOString(),
+      condition: 3
+    });
+  });
+  saveAll();
+  modal.remove();
+  _doDeleteCustomSubj(jobId, combinedKey);
+  renderSubjectStats && renderSubjectStats();
 }
 
 async function startAdventure(){
