@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>精算表の書き方（8桁精算表）【日商簿記3級】決算整理から財務諸表まで図解解説｜スタディクエスト</title>
+<meta name="description" content="日商簿記3級の8桁精算表の書き方を図解で解説。試算表から決算整理仕訳を加えて損益計算書・貸借対照表を作成する手順を例題つきでわかりやすく説明。">
+<meta name="keywords" content="精算表 書き方 簿記3級,8桁精算表 解き方,決算整理仕訳 精算表,精算表 損益計算書 貸借対照表">
+<meta property="og:title" content="精算表の書き方（8桁精算表）【日商簿記3級】">
+<meta property="og:description" content="8桁精算表の書き方と決算整理仕訳を例題つきで図解解説。">
+<meta property="og:url" content="https://hito77ki-ship-it.github.io/study-quest/boki3-seisanhyo.html">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/ogp_icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8524998392329204" crossorigin="anonymous"></script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"精算表の書き方（8桁精算表）【日商簿記3級】","description":"8桁精算表の書き方と決算整理仕訳を例題つきで図解解説。","url":"https://hito77ki-ship-it.github.io/study-quest/boki3-seisanhyo.html","datePublished":"2026-05-07","dateModified":"2026-05-07","author":{"@type":"Person","name":"大谷 一輝"},"publisher":{"@type":"Organization","name":"スタディクエスト"}}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--green:#8CC63F;--green2:#6AAF2B;--text:#1A202C;--muted:#718096;--border:#E2E8F0;--bg:#FFFFFF;--light:#F7FAFC;}
+body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);line-height:1.9;}
+a{color:var(--green2);text-decoration:none;}a:hover{text-decoration:underline;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;}
+.nav-inner{max-width:900px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:15px;font-weight:700;color:var(--green2);}
+.nav-cta{background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:100px;}
+.nav-cta:hover{opacity:.85;text-decoration:none;}
+.container{max-width:900px;margin:0 auto;padding:88px 24px 80px;}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:24px;}.breadcrumb a{color:var(--muted);}
+h1{font-size:clamp(20px,4vw,30px);font-weight:700;line-height:1.4;margin-bottom:8px;}
+.meta{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.lead{font-size:15px;line-height:1.9;margin-bottom:40px;padding:20px;background:var(--light);border-left:3px solid var(--green);border-radius:0 8px 8px 0;}
+h2{font-size:20px;font-weight:700;margin:48px 0 16px;padding-left:12px;border-left:3px solid var(--green);}
+h3{font-size:16px;font-weight:700;margin:28px 0 10px;color:var(--green2);}
+p{font-size:14px;color:#374151;margin-bottom:16px;}
+ul,ol{font-size:14px;color:#374151;margin:0 0 16px 20px;}li{margin-bottom:6px;}
+.tip-box{background:#F0FFF4;border:1px solid #9AE6B4;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}.tip-box strong{color:#276749;}
+.warn-box{background:#FFFBEB;border:1px solid #F6E05E;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}.warn-box strong{color:#975A16;}
+.mondai{background:#F7F9FF;border:1px solid #C3DAFE;border-radius:10px;padding:16px 20px;margin:20px 0;}
+.mondai .m-label{font-size:11px;font-weight:700;color:#3B4DA8;letter-spacing:.08em;margin-bottom:8px;}
+.mondai p{font-size:14px;color:#374151;margin:0;}
+.shiwake-box{background:var(--light);border-radius:10px;padding:14px 18px;margin:12px 0;}
+.shiwake-box .sw-label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;}
+.sw-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;font-size:13px;margin-bottom:4px;}
+.sw-row:last-child{margin-bottom:0;}
+.sw-row .kari{color:#2B6CB0;font-weight:700;}
+.sw-row .kashi{color:#C05621;font-weight:700;text-align:right;}
+.sw-row .sep{color:var(--muted);font-size:11px;}
+.sw-row .amt{font-size:11px;color:var(--muted);margin-left:4px;}
+
+/* 精算表 */
+.seisan-wrap{overflow-x:auto;margin:20px 0;}
+.seisan-table{width:100%;border-collapse:collapse;font-size:12px;min-width:640px;}
+.seisan-table th{padding:8px 10px;text-align:center;border:1px solid var(--border);background:#F7FAFC;font-weight:700;font-size:11px;}
+.seisan-table td{padding:7px 10px;border:1px solid var(--border);text-align:right;font-size:12px;}
+.seisan-table td.col-name{text-align:left;font-weight:700;white-space:nowrap;}
+.seisan-table th.h-shisan{background:#EBF8FF;color:#1D4ED8;}
+.seisan-table th.h-keika{background:#FFF5F5;color:#B91C1C;}
+.seisan-table th.h-pl{background:#F0FFF4;color:#15803D;}
+.seisan-table th.h-bs{background:#EDE9FE;color:#5B21B6;}
+.seisan-table .row-total{font-weight:700;background:#F7FAFC;}
+.seisan-table .row-rieki{background:#FFFBEB;}
+.seisan-table .val-blue{color:#1D4ED8;font-weight:700;}
+.seisan-table .val-red{color:#B91C1C;font-weight:700;}
+.seisan-table .val-green{color:#15803D;font-weight:700;}
+.seisan-table .val-purple{color:#5B21B6;font-weight:700;}
+
+/* 手順フロー */
+.step-flow{display:flex;flex-direction:column;gap:0;margin:20px 0;}
+.step-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:0;border-bottom:none;background:var(--bg);}
+.step-item:first-child{border-radius:10px 10px 0 0;}
+.step-item:last-child{border-bottom:1px solid var(--border);border-radius:0 0 10px 10px;}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--green2);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:13px;color:#374151;line-height:1.7;}
+.step-text strong{color:var(--text);}
+
+.matome{background:linear-gradient(135deg,#F0FFF4,#E8F7B8);border:2px solid #9AE6B4;border-radius:14px;padding:24px 28px;margin:32px 0;}
+.matome h3{color:#276749;font-size:16px;margin:0 0 16px;}
+.matome-row{display:flex;align-items:baseline;gap:10px;font-size:14px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);}
+.matome-row:last-child{border-bottom:none;}
+.matome-row .trigger{font-weight:700;min-width:130px;flex-shrink:0;}
+.matome-row .result{color:#276749;font-weight:700;}
+@media(max-width:540px){.matome-row{flex-direction:column;gap:2px;}.matome-row .trigger{min-width:auto;}}
+.app-cta{background:linear-gradient(135deg,#1A2A0A,#2D4A10);border-radius:12px;padding:28px;margin:40px 0;text-align:center;color:#fff;}
+.app-cta h3{color:var(--green);font-size:18px;margin-bottom:8px;}
+.app-cta p{color:#A0C070;font-size:13px;margin-bottom:16px;}
+.app-cta a{background:var(--green);color:#0A0A0F;font-weight:700;padding:12px 28px;border-radius:100px;font-size:14px;display:inline-block;}
+.app-cta a:hover{opacity:.85;text-decoration:none;}
+footer{background:#111827;padding:28px 24px;text-align:center;margin-top:64px;}
+footer a{font-size:12px;color:#4A5568;margin:0 10px;}
+footer p{font-size:11px;color:#2D3748;margin-top:8px;}
+</style>
+</head>
+<body>
+<nav><div class="nav-inner"><a class="nav-logo" href="lp.html">⚔ スタディクエスト</a><a class="nav-cta" href="index.html">無料で始める</a></div></nav>
+<div class="container">
+  <div class="breadcrumb"><a href="lp.html">TOP</a> &gt; <a href="lp.html#cat-boki3">日商簿記3級</a> &gt; 精算表の書き方</div>
+  <p class="meta">日商簿記3級 | 公開：2026年5月7日</p>
+  <h1>精算表の書き方（8桁精算表）<br>決算整理から財務諸表まで図解解説</h1>
+  <p class="meta">著者：大谷 一輝（大阪経済大学3回生・日商簿記1級勉強中）</p>
+  <p class="lead">精算表は試算表に決算整理仕訳を加え、損益計算書（P/L）と貸借対照表（B/S）を一枚のワークシートで完成させるものです。列が「試算表・修正記入・P/L・B/S」の8桁（8欄）あることから<strong>8桁精算表</strong>と呼ばれます。</p>
+  <div class="sq-chat"></div>
+
+  <h2>① 8桁精算表の構造</h2>
+  <p>精算表は左から「勘定科目」＋8列（4ペア）で構成されます。</p>
+
+  <div class="seisan-wrap">
+    <table class="seisan-table">
+      <tr>
+        <th rowspan="2" style="width:120px;">勘定科目</th>
+        <th colspan="2" class="h-shisan">①試算表</th>
+        <th colspan="2" class="h-keika">②修正記入</th>
+        <th colspan="2" class="h-pl">③損益計算書</th>
+        <th colspan="2" class="h-bs">④貸借対照表</th>
+      </tr>
+      <tr>
+        <th class="h-shisan">借方</th><th class="h-shisan">貸方</th>
+        <th class="h-keika">借方</th><th class="h-keika">貸方</th>
+        <th class="h-pl">借方</th><th class="h-pl">貸方</th>
+        <th class="h-bs">借方</th><th class="h-bs">貸方</th>
+      </tr>
+      <tr><td class="col-name">現金</td><td class="val-blue">200</td><td></td><td></td><td></td><td></td><td></td><td class="val-purple">200</td><td></td></tr>
+      <tr><td class="col-name">売掛金</td><td class="val-blue">300</td><td></td><td></td><td></td><td></td><td></td><td class="val-purple">300</td><td></td></tr>
+      <tr><td class="col-name">繰越商品</td><td class="val-blue">100</td><td></td><td class="val-red">200</td><td class="val-red">100</td><td></td><td></td><td class="val-purple">200</td><td></td></tr>
+      <tr><td class="col-name">買掛金</td><td></td><td class="val-blue">150</td><td></td><td></td><td></td><td></td><td></td><td class="val-purple">150</td></tr>
+      <tr><td class="col-name">資本金</td><td></td><td class="val-blue">500</td><td></td><td></td><td></td><td></td><td></td><td class="val-purple">500</td></tr>
+      <tr><td class="col-name">売上</td><td></td><td class="val-blue">800</td><td></td><td></td><td></td><td class="val-green">800</td><td></td><td></td></tr>
+      <tr><td class="col-name">仕入</td><td class="val-blue">500</td><td></td><td class="val-red">100</td><td class="val-red">200</td><td class="val-green">400</td><td></td><td></td><td></td></tr>
+      <tr><td class="col-name">減価償却費</td><td></td><td></td><td class="val-red">50</td><td></td><td class="val-green">50</td><td></td><td></td><td></td></tr>
+      <tr><td class="col-name">減価償却累計額</td><td></td><td class="val-blue">100</td><td></td><td class="val-red">50</td><td></td><td></td><td></td><td class="val-purple">150</td></tr>
+      <tr class="row-total"><td class="col-name">合計</td><td class="val-blue">1,100</td><td class="val-blue">1,100</td><td></td><td></td><td class="val-green">450</td><td class="val-green">800</td><td class="val-purple">700</td><td class="val-purple">350</td></tr>
+      <tr class="row-rieki"><td class="col-name">当期純利益</td><td></td><td></td><td></td><td></td><td class="val-green">350</td><td></td><td></td><td class="val-purple">350</td></tr>
+      <tr class="row-total"><td class="col-name">最終合計</td><td></td><td></td><td></td><td></td><td class="val-green">800</td><td class="val-green">800</td><td class="val-purple">700</td><td class="val-purple">700</td></tr>
+    </table>
+  </div>
+  <p style="font-size:12px;color:var(--muted);">※数字は説明用の簡略例です。単位：千円</p>
+
+  <h2>② 精算表の作成手順</h2>
+
+  <div class="step-flow">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-text"><strong>試算表欄に残高を転記</strong>する<br>決算前の各勘定の残高を「試算表」借方・貸方に記入します。</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-text"><strong>決算整理仕訳を「修正記入」欄に記入</strong>する<br>減価償却費の計上、繰越商品の振替、貸倒引当金の設定、経過勘定の調整など。</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-text"><strong>試算表 ± 修正記入 を計算</strong>し、P/L または B/S に振り分ける<br>収益・費用の勘定 → P/L欄、資産・負債・純資産の勘定 → B/S欄。</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-text"><strong>P/L・B/S それぞれ合計して当期純利益（または損失）を求める</strong><br>P/Lの貸方合計 − 借方合計 ＝ 当期純利益（プラスなら利益、マイナスなら損失）。</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div class="step-text"><strong>当期純利益を P/L 借方・B/S 貸方に記入</strong>して締め切る<br>左右の合計が一致したら精算表の完成です。</div>
+    </div>
+  </div>
+
+  <h2>③ 主な決算整理仕訳（修正記入欄に記入するもの）</h2>
+  <p>精算表で最も重要なのが修正記入欄への決算整理仕訳の転記です。</p>
+
+  <h3>① 売上原価の計算（三分法→繰越商品の振替）</h3>
+  <div class="shiwake-box">
+    <div class="sw-label">期首在庫を仕入に振替</div>
+    <div class="sw-row"><span class="kari">仕入<span class="amt">期首商品</span></span><span class="sep">／</span><span class="kashi">繰越商品<span class="amt">期首商品</span></span></div>
+  </div>
+  <div class="shiwake-box">
+    <div class="sw-label">期末在庫を仕入から除外</div>
+    <div class="sw-row"><span class="kari">繰越商品<span class="amt">期末商品</span></span><span class="sep">／</span><span class="kashi">仕入<span class="amt">期末商品</span></span></div>
+  </div>
+
+  <h3>② 減価償却費の計上</h3>
+  <div class="shiwake-box">
+    <div class="sw-label">仕訳</div>
+    <div class="sw-row"><span class="kari">減価償却費<span class="amt">xxx</span></span><span class="sep">／</span><span class="kashi">減価償却累計額<span class="amt">xxx</span></span></div>
+  </div>
+
+  <h3>③ 貸倒引当金の設定（差額補充法）</h3>
+  <div class="shiwake-box">
+    <div class="sw-label">追加積立が必要な場合</div>
+    <div class="sw-row"><span class="kari">貸倒引当金繰入<span class="amt">追加額</span></span><span class="sep">／</span><span class="kashi">貸倒引当金<span class="amt">追加額</span></span></div>
+  </div>
+
+  <h3>④ 経過勘定の調整</h3>
+  <div class="shiwake-box">
+    <div class="sw-label">例：未払費用の計上</div>
+    <div class="sw-row"><span class="kari">○○費<span class="amt">未払額</span></span><span class="sep">／</span><span class="kashi">未払○○費<span class="amt">未払額</span></span></div>
+  </div>
+
+  <div class="tip-box"><strong>B/SとP/Lの振り分けルール</strong><br>
+  収益（売上・受取利息など）→ <strong>P/L 貸方</strong><br>
+  費用（仕入・給料・減価償却費など）→ <strong>P/L 借方</strong><br>
+  資産（現金・売掛金・繰越商品など）→ <strong>B/S 借方</strong><br>
+  負債（買掛金・未払金など）・純資産 → <strong>B/S 貸方</strong></div>
+
+  <div class="warn-box"><strong>試験でよくあるミス</strong><br>
+  ① 修正記入の数字を試算表に足し引きせず、そのままP/L・B/Sに移してしまう<br>
+  ② 「減価償却累計額」を B/S 貸方に忘れる（資産のマイナス項目）<br>
+  ③ 当期純利益の入れる列を逆にする（P/L→借方、B/S→貸方）</div>
+
+  <div class="app-cta"><h3>⚔ Study Quest で学習を記録しよう</h3><p>簿記3級の学習時間をRPG感覚で記録。ボスまであと何時間かリアルタイムで確認できます。</p><a href="index.html">無料で始める →</a></div>
+
+  <div class="matome">
+    <h3>📋 まとめ：精算表 早見表</h3>
+    <div class="matome-row"><span class="trigger">試算表欄</span><span class="result">決算整理前の残高を転記</span></div>
+    <div class="matome-row"><span class="trigger">修正記入欄</span><span class="result">決算整理仕訳（商品振替・減価償却・貸倒引当金・経過勘定）を記入</span></div>
+    <div class="matome-row"><span class="trigger">P/L欄</span><span class="result">収益（貸方）・費用（借方）の勘定を振り分け</span></div>
+    <div class="matome-row"><span class="trigger">B/S欄</span><span class="result">資産（借方）・負債・純資産（貸方）の勘定を振り分け</span></div>
+    <div class="matome-row"><span class="trigger">当期純利益</span><span class="result">P/L借方・B/S貸方に記入して左右を一致させる</span></div>
+  </div>
+</div>
+<footer><a href="lp.html">記事トップ</a><a href="index.html">アプリを使う</a><p>© 2026 スタディクエスト</p></footer>
+<script src="article-widgets.js"></script>
+</body>
+</html>

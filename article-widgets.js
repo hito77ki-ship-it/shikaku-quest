@@ -91,6 +91,7 @@ const ARTICLES = {
   'boki3-sonota.html': {label:'簿記3級', title:'その他の債権・債務（前払金・前受金・仮払金・仮受金・立替金・預り金）'},
   'boki3-kabushiki.html':{label:'簿記3級',title:'株式会社の取引の仕訳（株式発行・剰余金の配当・利益準備金）'},
   'boki3-shohi.html':  {label:'簿記3級', title:'消費税の仕訳（税抜方式）仮払消費税・仮受消費税'},
+  'boki3-seisanhyo.html':{label:'簿記3級',title:'精算表の書き方（8桁精算表）決算整理から財務諸表まで'},
 };
 
 const CATS = {
@@ -968,6 +969,23 @@ html[data-theme="dark"] .zc-row.zc-shii{background:rgba(59,130,246,.10) !importa
 html[data-theme="dark"] .zc-row.zc-shii .zc-label,.zc-row.zc-shii .zc-amt{color:#90CDF4 !important;}
 html[data-theme="dark"] .zc-row.zc-nofu{background:rgba(140,198,63,.10) !important;}
 html[data-theme="dark"] .zc-row.zc-nofu .zc-label,.zc-row.zc-nofu .zc-amt{color:#B6E27C !important;}
+/* ── 精算表記事 ── */
+html[data-theme="dark"] .seisan-table th{background:#1A2232 !important;border-color:rgba(255,255,255,.08) !important;color:#CCD6E5 !important;}
+html[data-theme="dark"] .seisan-table th.h-shisan{background:rgba(59,130,246,.12) !important;color:#90CDF4 !important;}
+html[data-theme="dark"] .seisan-table th.h-keika{background:rgba(252,129,129,.10) !important;color:#FC8181 !important;}
+html[data-theme="dark"] .seisan-table th.h-pl{background:rgba(140,198,63,.10) !important;color:#B6E27C !important;}
+html[data-theme="dark"] .seisan-table th.h-bs{background:rgba(139,92,246,.10) !important;color:#C4B5FD !important;}
+html[data-theme="dark"] .seisan-table td{border-color:rgba(255,255,255,.06) !important;background:#111827 !important;color:#9BA7BB !important;}
+html[data-theme="dark"] .seisan-table td.col-name{color:#CCD6E5 !important;}
+html[data-theme="dark"] .seisan-table .row-total td{background:#1A2232 !important;}
+html[data-theme="dark"] .seisan-table .row-rieki td{background:rgba(255,248,220,.04) !important;}
+html[data-theme="dark"] .seisan-table .val-blue{color:#90CDF4 !important;}
+html[data-theme="dark"] .seisan-table .val-red{color:#FC8181 !important;}
+html[data-theme="dark"] .seisan-table .val-green{color:#B6E27C !important;}
+html[data-theme="dark"] .seisan-table .val-purple{color:#C4B5FD !important;}
+html[data-theme="dark"] .step-item{border-color:rgba(255,255,255,.10) !important;background:#111827 !important;}
+html[data-theme="dark"] .step-text{color:#9BA7BB !important;}
+html[data-theme="dark"] .step-text strong{color:#CCD6E5 !important;}
 /* ── ここまで ── */
 
 .sq-key,
@@ -1545,6 +1563,7 @@ const BOKI3_FILES = [
   'boki3-shisanhyo.html','boki3-denpyo.html','boki3-nikkei.html',
   'boki3-sanpou.html','boki3-kake.html','boki3-tegata.html','boki3-kyuryo.html',
   'boki3-kotei.html','boki3-sonota.html','boki3-kabushiki.html','boki3-shohi.html',
+  'boki3-seisanhyo.html',
 ];
 
 function buildBoki3Sidebar(sidebar){
