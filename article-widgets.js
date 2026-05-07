@@ -841,6 +841,68 @@ html[data-theme="dark"] .fs-row .label{color:#CCD6E5 !important;}
 html[data-theme="dark"] .grad-card p{color:#CCD6E5 !important;}
 /* ── ここまで ── */
 
+/* ── 新4記事 共通コンポーネント ダークモード ── */
+/* shiwake-box（三分法・掛取引・手形・給料で共通使用） */
+html[data-theme="dark"] .shiwake-box{background:rgba(255,255,255,.04) !important;}
+html[data-theme="dark"] .sw-row .kari{color:#90CDF4 !important;}
+html[data-theme="dark"] .sw-row .kashi{color:#FBD38D !important;}
+html[data-theme="dark"] .sw-row .sep{color:#4A5568 !important;}
+html[data-theme="dark"] .sw-row .amt{color:#9BA7BB !important;}
+/* ── 三分法記事 ── */
+html[data-theme="dark"] .san-card.s-shii{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.3) !important;}
+html[data-theme="dark"] .san-card.s-uriage{background:rgba(140,198,63,.10) !important;border-color:rgba(140,198,63,.28) !important;}
+html[data-theme="dark"] .san-card.s-kuri{background:rgba(251,211,141,.08) !important;border-color:rgba(251,211,141,.3) !important;}
+html[data-theme="dark"] .san-card.s-shii .san-badge{background:rgba(59,130,246,.25) !important;color:#90CDF4 !important;}
+html[data-theme="dark"] .san-card.s-uriage .san-badge{background:rgba(140,198,63,.22) !important;color:#B6E27C !important;}
+html[data-theme="dark"] .san-card.s-kuri .san-badge{background:rgba(251,211,141,.2) !important;color:#F7D774 !important;}
+html[data-theme="dark"] .san-card.s-shii .san-name{color:#90CDF4 !important;}
+html[data-theme="dark"] .san-card.s-uriage .san-name{color:#B6E27C !important;}
+html[data-theme="dark"] .san-card.s-kuri .san-name{color:#F7D774 !important;}
+html[data-theme="dark"] .san-desc{color:#CCD6E5 !important;}
+html[data-theme="dark"] .c2-card.buy{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.25) !important;}
+html[data-theme="dark"] .c2-card.sell{background:rgba(140,198,63,.10) !important;border-color:rgba(140,198,63,.25) !important;}
+html[data-theme="dark"] .c2-card.buy .c2-title{color:#90CDF4 !important;}
+html[data-theme="dark"] .c2-card.sell .c2-title{color:#B6E27C !important;}
+/* ── 掛取引記事 ── */
+html[data-theme="dark"] .kake-card.urikake{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.3) !important;}
+html[data-theme="dark"] .kake-card.kaikake{background:rgba(252,129,129,.10) !important;border-color:rgba(252,129,129,.3) !important;}
+html[data-theme="dark"] .kake-card.urikake .kake-badge{background:rgba(59,130,246,.25) !important;color:#90CDF4 !important;}
+html[data-theme="dark"] .kake-card.kaikake .kake-badge{background:rgba(252,129,129,.22) !important;color:#FC8181 !important;}
+html[data-theme="dark"] .kake-card.urikake .kake-name{color:#90CDF4 !important;}
+html[data-theme="dark"] .kake-card.kaikake .kake-name{color:#FC8181 !important;}
+html[data-theme="dark"] .kake-type{color:#9BA7BB !important;}
+html[data-theme="dark"] .kake-desc{color:#CCD6E5 !important;}
+html[data-theme="dark"] .flow-node{background:rgba(255,255,255,.06) !important;border-color:rgba(255,255,255,.1) !important;color:#CCD6E5 !important;}
+html[data-theme="dark"] .flow-node.highlight{background:rgba(59,130,246,.15) !important;border-color:rgba(59,130,246,.3) !important;color:#90CDF4 !important;}
+/* ── 手形記事 ── */
+html[data-theme="dark"] .role-card.meiate{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.3) !important;}
+html[data-theme="dark"] .role-card.furidashi{background:rgba(252,129,129,.10) !important;border-color:rgba(252,129,129,.3) !important;}
+html[data-theme="dark"] .role-card.meiate .role-badge{background:rgba(59,130,246,.25) !important;color:#90CDF4 !important;}
+html[data-theme="dark"] .role-card.furidashi .role-badge{background:rgba(252,129,129,.22) !important;color:#FC8181 !important;}
+html[data-theme="dark"] .role-card.meiate .role-name{color:#90CDF4 !important;}
+html[data-theme="dark"] .role-card.furidashi .role-name{color:#FC8181 !important;}
+html[data-theme="dark"] .role-desc{color:#CCD6E5 !important;}
+html[data-theme="dark"] .denshi-card.urike{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.4) !important;}
+html[data-theme="dark"] .denshi-card.shiike{background:rgba(252,129,129,.10) !important;border-color:rgba(252,129,129,.4) !important;}
+html[data-theme="dark"] .denshi-title{color:#F8FAFC !important;}
+html[data-theme="dark"] .denshi-sub{color:#9BA7BB !important;}
+html[data-theme="dark"] .denshi-card.urike .denshi-kamoku{color:#90CDF4 !important;}
+html[data-theme="dark"] .denshi-card.shiike .denshi-kamoku{color:#FC8181 !important;}
+/* ── 給料記事 ── */
+html[data-theme="dark"] .kyuryo-breakdown{border-color:rgba(255,255,255,.1) !important;}
+html[data-theme="dark"] .kb-row{border-bottom-color:rgba(255,255,255,.06) !important;}
+html[data-theme="dark"] .kb-row.total{background:rgba(59,130,246,.12) !important;}
+html[data-theme="dark"] .kb-row.deduct{background:rgba(252,129,129,.08) !important;}
+html[data-theme="dark"] .kb-row.net{background:rgba(140,198,63,.10) !important;}
+html[data-theme="dark"] .kb-label{color:#CCD6E5 !important;}
+html[data-theme="dark"] .kb-row.deduct .kb-label{color:#FC8181 !important;}
+html[data-theme="dark"] .kb-row.net .kb-label{color:#B6E27C !important;}
+html[data-theme="dark"] .kb-amt{color:#F8FAFC !important;}
+html[data-theme="dark"] .kb-row.deduct .kb-amt{color:#FC8181 !important;}
+html[data-theme="dark"] .kb-row.net .kb-amt{color:#B6E27C !important;}
+html[data-theme="dark"] .kb-row.total .kb-amt{color:#90CDF4 !important;}
+/* ── ここまで ── */
+
 .sq-key,
 .sq-important{
   color:var(--sq-highlight-text);
