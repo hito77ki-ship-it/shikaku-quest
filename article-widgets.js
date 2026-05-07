@@ -627,6 +627,30 @@ html[data-theme="dark"] .matome-row .trigger{color:#F8FAFC !important;}
 html[data-theme="dark"] .matome-row .result{color:#B6E27C !important;}
 /* ── ここまで ── */
 
+/* ── 毎年同額前払い記事 固有コンポーネント ダークモード ── */
+html[data-theme="dark"] .tl-month-cell.m-rev{background:rgba(246,173,85,.12) !important;border-color:rgba(246,173,85,.3) !important;color:#FBD38D !important;}
+html[data-theme="dark"] .tl-month-cell.m-paid{background:rgba(59,130,246,.18) !important;color:#90CDF4 !important;}
+html[data-theme="dark"] .tl-month-cell.m-next{background:rgba(237,137,54,.18) !important;border-color:rgba(237,137,54,.4) !important;color:#FBD38D !important;}
+html[data-theme="dark"] .tl-month-nums span{color:#9BA7BB !important;}
+html[data-theme="dark"] .tl-legend{color:#9BA7BB !important;}
+html[data-theme="dark"] .balance-box{border-color:rgba(140,198,63,.16) !important;}
+html[data-theme="dark"] .bb-item.rev{background:rgba(246,173,85,.10) !important;border-color:rgba(246,173,85,.3) !important;}
+html[data-theme="dark"] .bb-item.paid{background:rgba(59,130,246,.12) !important;}
+html[data-theme="dark"] .bb-item.rev .bb-label{color:#FBD38D !important;}
+html[data-theme="dark"] .bb-item.paid .bb-label{color:#90CDF4 !important;}
+html[data-theme="dark"] .bb-item.rev .bb-val{color:#F6AD55 !important;}
+html[data-theme="dark"] .bb-item.paid .bb-val{color:#90CDF4 !important;}
+html[data-theme="dark"] .bb-item .bb-sub{color:#9BA7BB !important;}
+html[data-theme="dark"] .bb-plus{background:transparent !important;color:#9BA7BB !important;border-color:rgba(140,198,63,.16) !important;}
+html[data-theme="dark"] .ba-col.before{background:rgba(252,129,129,.10) !important;border-color:rgba(252,129,129,.28) !important;}
+html[data-theme="dark"] .ba-col.after{background:rgba(140,198,63,.10) !important;border-color:rgba(140,198,63,.28) !important;}
+html[data-theme="dark"] .ba-col.before .ba-title{color:#FC8181 !important;}
+html[data-theme="dark"] .ba-col.after .ba-title{color:#B6E27C !important;}
+html[data-theme="dark"] .ba-item{color:#CCD6E5 !important;}
+html[data-theme="dark"] .ba-item strong{color:#F8FAFC !important;}
+html[data-theme="dark"] .ba-arrow{color:#9BA7BB !important;}
+/* ── ここまで ── */
+
 /* ── 経過勘定記事 固有コンポーネント ダークモード ── */
 html[data-theme="dark"] .pc-card.type-a{background:rgba(59,130,246,.12) !important;border-color:rgba(59,130,246,.3) !important;}
 html[data-theme="dark"] .pc-card.type-b{background:rgba(140,198,63,.10) !important;border-color:rgba(140,198,63,.28) !important;}

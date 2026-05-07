@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>経過勘定・毎年同額の前払い保険料【日商簿記3級】なぜ18か月で割るのか完全解説｜スタディクエスト</title>
+<meta name="description" content="毎年同額を前払いしている保険料の決算整理仕訳を解説。なぜ残高を18か月で割るのか、再振替仕訳との関係をタイムライン図で視覚的に完全解説。日商簿記3級の頻出論点。">
+<meta name="keywords" content="前払保険料 仕訳,毎年同額 前払い,経過勘定 18か月,支払保険料 決算整理,日商簿記3級 経過勘定,再振替仕訳">
+<meta property="og:title" content="経過勘定・毎年同額の前払い【日商簿記3級】なぜ18か月で割るのか">
+<meta property="og:description" content="毎年同額を前払いしている保険料の決算整理仕訳をタイムライン図で完全解説。">
+<meta property="og:url" content="https://hito77ki-ship-it.github.io/study-quest/boki3-keika2.html">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/ogp_icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8524998392329204"
+     crossorigin="anonymous"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "経過勘定・毎年同額の前払い保険料【日商簿記3級】なぜ18か月で割るのか",
+  "description": "毎年同額を前払いしている保険料の決算整理仕訳をタイムライン図で完全解説。",
+  "url": "https://hito77ki-ship-it.github.io/study-quest/boki3-keika2.html",
+  "datePublished": "2026-05-07",
+  "dateModified": "2026-05-07",
+  "author": {"@type": "Person", "name": "大谷 一輝", "url": "https://hito77ki-ship-it.github.io/study-quest/about.html"},
+  "publisher": {"@type": "Organization", "name": "スタディクエスト", "url": "https://hito77ki-ship-it.github.io/study-quest/"}
+}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--green:#8CC63F;--green2:#6AAF2B;--text:#1A202C;--muted:#718096;--border:#E2E8F0;--bg:#FFFFFF;--light:#F7FAFC;}
+body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);line-height:1.9;}
+a{color:var(--green2);text-decoration:none;}
+a:hover{text-decoration:underline;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;}
+.nav-inner{max-width:900px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:15px;font-weight:700;color:var(--green2);}
+.nav-cta{background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:100px;transition:opacity .2s;}
+.nav-cta:hover{opacity:.85;text-decoration:none;}
+.container{max-width:800px;margin:0 auto;padding:88px 24px 80px;}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:24px;}
+.breadcrumb a{color:var(--muted);}
+h1{font-size:clamp(20px,4vw,30px);font-weight:700;line-height:1.4;margin-bottom:8px;}
+.meta{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.lead{font-size:15px;line-height:1.9;margin-bottom:40px;padding:20px;background:var(--light);border-left:3px solid var(--green);border-radius:0 8px 8px 0;}
+h2{font-size:20px;font-weight:700;margin:48px 0 16px;padding-left:12px;border-left:3px solid var(--green);}
+h3{font-size:16px;font-weight:700;margin:28px 0 10px;color:var(--green2);}
+p{font-size:14px;color:#374151;margin-bottom:16px;}
+ul,ol{font-size:14px;color:#374151;margin:0 0 16px 20px;}
+li{margin-bottom:6px;}
+.tip-box{background:#F0FFF4;border:1px solid #9AE6B4;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}
+.tip-box strong{color:#276749;}
+.warn-box{background:#FFFBEB;border:1px solid #F6E05E;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}
+.warn-box strong{color:#975A16;}
+.point-card{background:#fff;border:2px solid var(--green);border-radius:12px;padding:20px 24px;margin:24px 0;}
+.point-card .label{font-size:11px;font-weight:700;color:var(--green2);letter-spacing:.1em;margin-bottom:8px;}
+.point-card p{font-size:15px;font-weight:700;color:var(--text);margin:0;}
+
+/* タイムライングリッド */
+.tl-grid{margin:28px 0;overflow-x:auto;}
+.tl-grid-inner{min-width:560px;}
+.tl-year-label{display:flex;margin-bottom:4px;}
+.tl-year-label .tl-yl-item{font-size:11px;font-weight:700;color:var(--muted);text-align:center;}
+.tl-months{display:grid;grid-template-columns:repeat(18,1fr);gap:2px;margin-bottom:4px;}
+.tl-month-cell{height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.tl-month-cell.m-prev-paid{background:#FED7AA;color:#C05621;}
+.tl-month-cell.m-rev{background:#FFFBEB;border:1px dashed #F6AD55;color:#975A16;}
+.tl-month-cell.m-paid{background:#BEE3F8;color:#2B6CB0;}
+.tl-month-cell.m-next{background:#FED7AA;border:2px solid #F6AD55;color:#C05621;}
+.tl-month-cell.m-cur{background:#C6F6D5;color:#276749;}
+.tl-month-nums{display:grid;grid-template-columns:repeat(18,1fr);gap:2px;margin-bottom:8px;}
+.tl-month-nums span{font-size:9px;color:var(--muted);text-align:center;}
+.tl-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--muted);}
+.tl-legend span{display:flex;align-items:center;gap:4px;}
+.tl-dot{width:12px;height:12px;border-radius:3px;display:inline-block;flex-shrink:0;}
+
+/* 残高内訳ボックス */
+.balance-box{display:flex;border-radius:12px;overflow:hidden;border:2px solid var(--border);margin:20px 0;}
+.bb-item{flex:1;padding:14px 16px;text-align:center;}
+.bb-item.rev{background:#FFFBEB;border-right:2px solid var(--border);}
+.bb-item.paid{background:#EBF8FF;}
+.bb-item .bb-label{font-size:10px;font-weight:700;letter-spacing:.05em;margin-bottom:4px;}
+.bb-item.rev .bb-label{color:#975A16;}
+.bb-item.paid .bb-label{color:#2B6CB0;}
+.bb-item .bb-val{font-size:16px;font-weight:900;}
+.bb-item.rev .bb-val{color:#C05621;}
+.bb-item.paid .bb-val{color:#2B6CB0;}
+.bb-item .bb-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.bb-plus{display:flex;align-items:center;padding:0 8px;font-size:20px;color:var(--muted);background:#fff;border-right:2px solid var(--border);}
+
+/* 計算ボックス */
+.calc-box{background:#fff;border:2px solid var(--green);border-radius:14px;padding:20px 24px;margin:16px 0;}
+.calc-box .calc-title{font-size:11px;font-weight:700;color:var(--green2);letter-spacing:.1em;margin-bottom:12px;}
+.calc-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;padding:5px 0;}
+.calc-row .label{color:var(--muted);font-size:13px;min-width:140px;}
+.calc-row .val{font-weight:700;color:var(--text);}
+.calc-row .val.result{color:var(--green2);font-size:15px;}
+
+/* 仕訳ボックス */
+.shiwake{display:flex;border:2px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0;font-size:14px;}
+.shiwake-col{flex:1;padding:14px 18px;}
+.shiwake-col.kari{background:#EBF8FF;border-right:2px solid var(--border);}
+.shiwake-col.kashi{background:#FFF9F0;}
+.shiwake-label{font-size:10px;font-weight:700;letter-spacing:.1em;margin-bottom:8px;}
+.shiwake-col.kari .shiwake-label{color:#2B6CB0;}
+.shiwake-col.kashi .shiwake-label{color:#C05621;}
+.shiwake-item{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.shiwake-item .kamoku{font-weight:700;font-size:14px;}
+.shiwake-item .amount{font-size:14px;color:var(--muted);}
+
+/* 例題ブロック */
+.mondai{background:#FAFAFA;border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin:20px 0;}
+.mondai .mondai-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;}
+.mondai p{font-size:14px;margin:0;line-height:1.9;}
+.kaitou-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:#276749;margin:16px 0 6px;}
+
+/* 前後比較テーブル */
+.before-after{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin:24px 0;align-items:center;}
+.ba-col{border-radius:10px;padding:16px 18px;}
+.ba-col.before{background:#FFF5F5;border:1px solid #FEB2B2;}
+.ba-col.after{background:#F0FFF4;border:1px solid #9AE6B4;}
+.ba-arrow{font-size:24px;color:var(--muted);text-align:center;padding:0 12px;}
+.ba-title{font-size:11px;font-weight:700;letter-spacing:.05em;margin-bottom:10px;}
+.ba-col.before .ba-title{color:#9B2C2C;}
+.ba-col.after .ba-title{color:#276749;}
+.ba-item{font-size:13px;padding:3px 0;color:#374151;}
+.ba-item strong{font-weight:700;}
+@media(max-width:540px){.before-after{grid-template-columns:1fr;}.ba-arrow{padding:8px 0;}}
+
+/* まとめカード */
+.matome{background:linear-gradient(135deg,#F0FFF4,#E8F7B8);border:2px solid #9AE6B4;border-radius:14px;padding:24px 28px;margin:32px 0;}
+.matome h3{color:#276749;font-size:16px;margin:0 0 16px;}
+.matome-row{display:flex;align-items:baseline;gap:10px;font-size:14px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);}
+.matome-row:last-child{border-bottom:none;}
+.matome-row .trigger{font-weight:700;min-width:200px;flex-shrink:0;}
+.matome-row .result{color:#276749;font-weight:700;}
+@media(max-width:540px){.matome-row{flex-direction:column;gap:2px;}.matome-row .trigger{min-width:auto;}}
+
+/* アプリCTA */
+.app-cta{background:linear-gradient(135deg,#1A2A0A,#2D4A10);border-radius:12px;padding:28px;margin:40px 0;text-align:center;color:#fff;}
+.app-cta h3{color:var(--green);font-size:18px;margin-bottom:8px;}
+.app-cta p{color:#A0C070;font-size:13px;margin-bottom:16px;}
+.app-cta a{background:var(--green);color:#0A0A0F;font-weight:700;padding:12px 28px;border-radius:100px;font-size:14px;display:inline-block;transition:opacity .2s;}
+.app-cta a:hover{opacity:.85;text-decoration:none;}
+
+footer{background:#111827;padding:28px 24px;text-align:center;margin-top:64px;}
+footer a{font-size:12px;color:#4A5568;margin:0 10px;}
+footer p{font-size:11px;color:#2D3748;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="lp.html">⚔ スタディクエスト</a>
+    <a class="nav-cta" href="index.html">無料で始める</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="breadcrumb">
+    <a href="lp.html">TOP</a> &gt; <a href="boki.html">簿記</a> &gt; <a href="boki3-keika.html">経過勘定</a> &gt; 毎年同額の前払い
+  </div>
+
+  <p class="meta">日商簿記3級 | 公開：2026年5月7日</p>
+  <h1>経過勘定・毎年同額の前払い保険料<br>なぜ残高を「18か月」で割るのか</h1>
+  <p class="meta">著者：大谷 一輝（大阪経済大学3回生・日商簿記1級勉強中）</p>
+
+  <p class="lead">
+    「保険料の残高は12か月分のはずなのに、なぜ18か月で割るの？」と混乱していませんか？<br>
+    これは<strong>再振替仕訳の6か月分が残高に混ざっている</strong>から。タイムライン図で順番に追えば、18か月の理由がスッキリわかります。
+  </p>
+
+  <div class="sq-chat"></div>
+
+  <h2>例題で確認する</h2>
+
+  <div class="mondai">
+    <div class="mondai-label">例題</div>
+    <p>
+      次の取引について決算整理仕訳を行いなさい。当期は1月1日〜12月31日。<br><br>
+      保険料は全額、建物に対する火災保険料で、<strong>毎年同額を7月1日に向こう12か月分支払っている</strong>。<br>
+      支払保険料の決算整理前残高は¥180。
+    </p>
+  </div>
+
+  <div class="warn-box">
+    <strong>「毎年同額」がポイント！</strong><br>
+    「当期から加入・支払い開始」とは書いていない。つまり前期にも同額を支払っていて、<strong>期首に再振替仕訳が行われている</strong>ことが前提です。
+  </div>
+
+  <h2>なぜ残高が「18か月分」になるのか</h2>
+
+  <p>決算整理前の残高¥180には、実は<strong>2つの仕訳分が積み重なって</strong>います。タイムラインで確認しましょう。</p>
+
+  <div class="tl-grid">
+    <div class="tl-grid-inner">
+      <div class="tl-months">
+        <!-- 前期7〜12月（前期払い分のうち当期にかかる6か月） -->
+        <div class="tl-month-cell m-rev" title="①再振替">再</div>
+        <div class="tl-month-cell m-rev" title="①再振替">振</div>
+        <div class="tl-month-cell m-rev" title="①再振替">替</div>
+        <div class="tl-month-cell m-rev" title="①再振替">6</div>
+        <div class="tl-month-cell m-rev" title="①再振替">か</div>
+        <div class="tl-month-cell m-rev" title="①再振替">月</div>
+        <!-- 当期7〜12月（当期払い分の当期分6か月） -->
+        <div class="tl-month-cell m-paid" title="②当期払い">当</div>
+        <div class="tl-month-cell m-paid">期</div>
+        <div class="tl-month-cell m-paid">払</div>
+        <div class="tl-month-cell m-paid">い</div>
+        <div class="tl-month-cell m-paid">12</div>
+        <div class="tl-month-cell m-paid">か</div>
+        <!-- 翌期1〜6月（当期払い分の翌期分6か月）→ここを取り消す -->
+        <div class="tl-month-cell m-paid">月</div>
+        <div class="tl-month-cell m-paid">分</div>
+        <div class="tl-month-cell m-next">翌</div>
+        <div class="tl-month-cell m-next">期</div>
+        <div class="tl-month-cell m-next">分</div>
+        <div class="tl-month-cell m-next">6月</div>
+      </div>
+      <div class="tl-month-nums">
+        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+        <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+        <span>翌1</span><span>翌2</span><span>翌3</span><span>翌4</span><span>翌5</span><span>翌6</span>
+      </div>
+      <div class="tl-legend">
+        <span><span class="tl-dot" style="background:#FFFBEB;border:1px dashed #F6AD55;"></span>①再振替仕訳 6か月分（1〜6月）</span>
+        <span><span class="tl-dot" style="background:#BEE3F8;"></span>②7/1支払い 12か月分（7月〜翌6月）</span>
+        <span><span class="tl-dot" style="background:#FED7AA;border:2px solid #F6AD55;"></span>翌期分 → 決算整理で取り消す</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>残高¥180の内訳</h3>
+
+  <div class="balance-box">
+    <div class="bb-item rev">
+      <div class="bb-label">①再振替仕訳分</div>
+      <div class="bb-val">6か月分</div>
+      <div class="bb-sub">1/1〜6/30</div>
+    </div>
+    <div class="bb-plus">＋</div>
+    <div class="bb-item paid">
+      <div class="bb-label">②7/1支払い分</div>
+      <div class="bb-val">12か月分</div>
+      <div class="bb-sub">7/1〜翌6/30</div>
+    </div>
+  </div>
+
+  <div class="point-card">
+    <div class="label">📌 まとめ</div>
+    <p>残高¥180 ＝ 6か月分 ＋ 12か月分 ＝ <strong>18か月分</strong><br>だから ¥180 ÷ 18か月 ＝ <strong>1か月¥10</strong></p>
+  </div>
+
+  <h2>決算整理仕訳の解き方</h2>
+
+  <div class="kaitou-label">▶ 計算手順</div>
+
+  <div class="calc-box">
+    <div class="calc-title">📐 ステップごとに計算する</div>
+    <div class="calc-row">
+      <span class="label">残高が何か月分か</span>
+      <span class="val">6か月（再振替）＋ 12か月（支払い）＝</span>
+      <span class="val result">18か月分</span>
+    </div>
+    <div class="calc-row">
+      <span class="label">1か月あたりの保険料</span>
+      <span class="val">¥180 ÷ 18か月 ＝</span>
+      <span class="val result">¥10</span>
+    </div>
+    <div class="calc-row">
+      <span class="label">翌期分（1〜6月）</span>
+      <span class="val">¥10 × 6か月 ＝</span>
+      <span class="val result">¥60 → 取り消す</span>
+    </div>
+  </div>
+
+  <div class="kaitou-label">▶ 決算整理仕訳</div>
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item"><span class="kamoku">前払保険料</span><span class="amount">60</span></div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item"><span class="kamoku">支払保険料</span><span class="amount">60</span></div>
+    </div>
+  </div>
+
+  <h3>決算整理の前後で残高がどう変わるか</h3>
+
+  <div class="before-after">
+    <div class="ba-col before">
+      <div class="ba-title">決算整理前</div>
+      <div class="ba-item">支払保険料 <strong>¥180</strong>（18か月分）</div>
+      <div class="ba-item">前払保険料 <strong>¥0</strong></div>
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-col after">
+      <div class="ba-title">決算整理後</div>
+      <div class="ba-item">支払保険料 <strong>¥120</strong>（当期12か月分）</div>
+      <div class="ba-item">前払保険料 <strong>¥60</strong>（翌期6か月分）</div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <strong>「当期12か月分」が損益計算書に、「翌期6か月分」が貸借対照表に計上される</strong><br>
+    支払保険料¥120は費用として当期のP/Lに。前払保険料¥60は資産として当期末のB/Sに載ります。これで発生主義の原則どおりに整理できます。
+  </div>
+
+  <h2>翌期首の再振替仕訳（来年1/1）</h2>
+
+  <p>翌期首には決算整理仕訳の逆をするだけです。</p>
+
+  <div class="shiwake">
+    <div class="shiwake-col kari">
+      <div class="shiwake-label">借　方</div>
+      <div class="shiwake-item"><span class="kamoku">支払保険料</span><span class="amount">60</span></div>
+    </div>
+    <div class="shiwake-col kashi">
+      <div class="shiwake-label">貸　方</div>
+      <div class="shiwake-item"><span class="kamoku">前払保険料</span><span class="amount">60</span></div>
+    </div>
+  </div>
+
+  <p>この再振替仕訳をするから、来年の決算整理前残高にも「6か月分」が積み重なって18か月分になります。毎年このサイクルが繰り返されます。</p>
+
+  <div class="warn-box">
+    <strong>「当期から加入」の場合は12か月で割る！</strong><br>
+    問題文に「当期7/1から保険に加入した」と書いてある場合は、再振替仕訳がありません。残高は支払い時の12か月分のみなので、¥180 ÷ 12か月 ＝ ¥15 で計算します。問題文を必ず確認しましょう。
+  </div>
+
+  <div class="app-cta">
+    <h3>⚔ Study Quest で学習を記録しよう</h3>
+    <p>簿記3級の学習時間をRPG感覚で記録。ボス（試験日）まであと何時間かリアルタイムで確認できます。</p>
+    <a href="index.html">無料で始める →</a>
+  </div>
+
+  <div class="matome">
+    <h3>📋 まとめ：毎年同額の前払い 解き方フロー</h3>
+    <div class="matome-row">
+      <span class="trigger">「毎年同額」の問題と気づく</span>
+      <span class="result">再振替仕訳分が残高に含まれている</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">残高が何か月分か計算</span>
+      <span class="result">再振替月数 ＋ 支払い月数（今回は6＋12＝18）</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">1か月あたりの金額</span>
+      <span class="result">残高 ÷ 合計月数（¥180÷18＝¥10）</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">翌期分を取り消す</span>
+      <span class="result">前払費用 ／ 支払費用</span>
+    </div>
+    <div class="matome-row">
+      <span class="trigger">「当期から加入」と書いてある場合</span>
+      <span class="result">再振替なし → 支払い月数のみで割る</span>
+    </div>
+  </div>
+
+  <p style="font-size:13px;color:var(--muted);">
+    ← <a href="boki3-keika.html">前の記事：経過勘定の基本（前払・未払・前受・未収）</a>
+  </p>
+
+</div>
+
+<footer>
+  <a href="lp.html">記事トップ</a>
+  <a href="index.html">アプリを使う</a>
+  <p>© 2026 スタディクエスト</p>
+</footer>
+
+<script src="article-widgets.js"></script>
+</body>
+</html>
