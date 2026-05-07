@@ -90,6 +90,7 @@ const ARTICLES = {
   'boki3-kotei.html':  {label:'簿記3級', title:'固定資産の取得・売却の仕訳（付随費用・売却損益）'},
   'boki3-sonota.html': {label:'簿記3級', title:'その他の債権・債務（前払金・前受金・仮払金・仮受金・立替金・預り金）'},
   'boki3-kabushiki.html':{label:'簿記3級',title:'株式会社の取引の仕訳（株式発行・剰余金の配当・利益準備金）'},
+  'boki3-shohi.html':  {label:'簿記3級', title:'消費税の仕訳（税抜方式）仮払消費税・仮受消費税'},
 };
 
 const CATS = {
@@ -953,6 +954,20 @@ html[data-theme="dark"] .hc-row.hc-haito{background:rgba(59,130,246,.10) !import
 html[data-theme="dark"] .hc-row.hc-haito .hc-label,.hc-row.hc-haito .hc-amt{color:#90CDF4 !important;}
 html[data-theme="dark"] .hc-row.hc-junbi{background:rgba(140,198,63,.10) !important;}
 html[data-theme="dark"] .hc-row.hc-junbi .hc-label,.hc-row.hc-junbi .hc-amt{color:#B6E27C !important;}
+/* ── 消費税記事 ── */
+html[data-theme="dark"] .tf-card.kari-tax{background:rgba(59,130,246,.10) !important;border-color:rgba(59,130,246,.35) !important;}
+html[data-theme="dark"] .tf-card.kashi-tax{background:rgba(252,129,129,.08) !important;border-color:rgba(252,129,129,.35) !important;}
+html[data-theme="dark"] .tf-card.kari-tax .tf-title{color:#90CDF4 !important;}
+html[data-theme="dark"] .tf-card.kashi-tax .tf-title{color:#FC8181 !important;}
+html[data-theme="dark"] .tf-body{color:#9BA7BB !important;}
+html[data-theme="dark"] .zei-calc{border-color:rgba(255,255,255,.12) !important;}
+html[data-theme="dark"] .zc-row{border-bottom-color:rgba(255,255,255,.08) !important;background:#1A2232 !important;color:#CCD6E5 !important;}
+html[data-theme="dark"] .zc-row.zc-uriage{background:rgba(252,129,129,.08) !important;}
+html[data-theme="dark"] .zc-row.zc-uriage .zc-label,.zc-row.zc-uriage .zc-amt{color:#FC8181 !important;}
+html[data-theme="dark"] .zc-row.zc-shii{background:rgba(59,130,246,.10) !important;}
+html[data-theme="dark"] .zc-row.zc-shii .zc-label,.zc-row.zc-shii .zc-amt{color:#90CDF4 !important;}
+html[data-theme="dark"] .zc-row.zc-nofu{background:rgba(140,198,63,.10) !important;}
+html[data-theme="dark"] .zc-row.zc-nofu .zc-label,.zc-row.zc-nofu .zc-amt{color:#B6E27C !important;}
 /* ── ここまで ── */
 
 .sq-key,
@@ -1529,7 +1544,7 @@ const BOKI3_FILES = [
   'boki3-genka.html','boki3-keika.html','boki3-keika2.html',
   'boki3-shisanhyo.html','boki3-denpyo.html','boki3-nikkei.html',
   'boki3-sanpou.html','boki3-kake.html','boki3-tegata.html','boki3-kyuryo.html',
-  'boki3-kotei.html','boki3-sonota.html','boki3-kabushiki.html',
+  'boki3-kotei.html','boki3-sonota.html','boki3-kabushiki.html','boki3-shohi.html',
 ];
 
 function buildBoki3Sidebar(sidebar){

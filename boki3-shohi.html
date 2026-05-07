@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>消費税の仕訳（税抜方式）仮払消費税・仮受消費税【日商簿記3級】｜スタディクエスト</title>
+<meta name="description" content="日商簿記3級の消費税の仕訳（税抜方式）を図解で解説。仮払消費税・仮受消費税の意味と仕訳、決算時の納付額の計算まで例題つきでわかりやすく説明。">
+<meta name="keywords" content="消費税 仕訳 簿記3級,仮払消費税 仮受消費税,税抜方式 仕訳,消費税 納付 仕訳">
+<meta property="og:title" content="消費税の仕訳（税抜方式）仮払消費税・仮受消費税【日商簿記3級】">
+<meta property="og:description" content="消費税の税抜方式の仕訳と決算時の納付処理を例題つきで解説。">
+<meta property="og:url" content="https://hito77ki-ship-it.github.io/study-quest/boki3-shohi.html">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://hito77ki-ship-it.github.io/study-quest/screenshots/ogp_icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8524998392329204" crossorigin="anonymous"></script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"消費税の仕訳（税抜方式）仮払消費税・仮受消費税【日商簿記3級】","description":"消費税の税抜方式の仕訳と決算時の納付処理を例題つきで解説。","url":"https://hito77ki-ship-it.github.io/study-quest/boki3-shohi.html","datePublished":"2026-05-07","dateModified":"2026-05-07","author":{"@type":"Person","name":"大谷 一輝"},"publisher":{"@type":"Organization","name":"スタディクエスト"}}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--green:#8CC63F;--green2:#6AAF2B;--text:#1A202C;--muted:#718096;--border:#E2E8F0;--bg:#FFFFFF;--light:#F7FAFC;}
+body{font-family:'Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);line-height:1.9;}
+a{color:var(--green2);text-decoration:none;}a:hover{text-decoration:underline;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 24px;}
+.nav-inner{max-width:900px;margin:0 auto;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:15px;font-weight:700;color:var(--green2);}
+.nav-cta{background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:100px;}
+.nav-cta:hover{opacity:.85;text-decoration:none;}
+.container{max-width:800px;margin:0 auto;padding:88px 24px 80px;}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:24px;}.breadcrumb a{color:var(--muted);}
+h1{font-size:clamp(20px,4vw,30px);font-weight:700;line-height:1.4;margin-bottom:8px;}
+.meta{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.lead{font-size:15px;line-height:1.9;margin-bottom:40px;padding:20px;background:var(--light);border-left:3px solid var(--green);border-radius:0 8px 8px 0;}
+h2{font-size:20px;font-weight:700;margin:48px 0 16px;padding-left:12px;border-left:3px solid var(--green);}
+h3{font-size:16px;font-weight:700;margin:28px 0 10px;color:var(--green2);}
+p{font-size:14px;color:#374151;margin-bottom:16px;}
+ul,ol{font-size:14px;color:#374151;margin:0 0 16px 20px;}li{margin-bottom:6px;}
+.tip-box{background:#F0FFF4;border:1px solid #9AE6B4;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}.tip-box strong{color:#276749;}
+.warn-box{background:#FFFBEB;border:1px solid #F6E05E;border-radius:8px;padding:16px 20px;margin:24px 0;font-size:14px;}.warn-box strong{color:#975A16;}
+.mondai{background:#F7F9FF;border:1px solid #C3DAFE;border-radius:10px;padding:16px 20px;margin:20px 0;}
+.mondai .m-label{font-size:11px;font-weight:700;color:#3B4DA8;letter-spacing:.08em;margin-bottom:8px;}
+.mondai p{font-size:14px;color:#374151;margin:0;}
+.shiwake-box{background:var(--light);border-radius:10px;padding:14px 18px;margin:12px 0;}
+.shiwake-box .sw-label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;}
+.sw-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;font-size:13px;margin-bottom:4px;}
+.sw-row:last-child{margin-bottom:0;}
+.sw-row .kari{color:#2B6CB0;font-weight:700;}
+.sw-row .kashi{color:#C05621;font-weight:700;text-align:right;}
+.sw-row .sep{color:var(--muted);font-size:11px;}
+.sw-row .amt{font-size:11px;color:var(--muted);margin-left:4px;}
+
+/* 消費税フロー図 */
+.tax-flow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin:20px 0;align-items:center;}
+@media(max-width:560px){.tax-flow{grid-template-columns:1fr;}.tax-arrow{transform:rotate(90deg);}}
+.tf-card{border-radius:12px;padding:14px 16px;text-align:center;}
+.tf-card.kari-tax{background:#EBF8FF;border:2px solid #90CDF4;}
+.tf-card.kashi-tax{background:#FFF5F5;border:2px solid #FC8181;}
+.tf-title{font-size:12px;font-weight:700;margin-bottom:6px;}
+.tf-card.kari-tax .tf-title{color:#1D4ED8;}
+.tf-card.kashi-tax .tf-title{color:#B91C1C;}
+.tf-body{font-size:12px;color:#374151;line-height:1.7;}
+.tax-arrow{text-align:center;font-size:22px;color:var(--muted);}
+
+/* 納付計算ボックス */
+.zei-calc{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:20px 0;}
+.zc-row{display:grid;grid-template-columns:1fr auto;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px;align-items:center;}
+.zc-row:last-child{border-bottom:none;}
+.zc-row.zc-uriage{background:#FFF5F5;}
+.zc-row.zc-shii{background:#EBF8FF;}
+.zc-row.zc-nofu{background:#F0FFF4;font-weight:700;}
+.zc-label{color:var(--text);}
+.zc-row.zc-uriage .zc-label{color:#B91C1C;}
+.zc-row.zc-shii .zc-label{color:#1D4ED8;}
+.zc-row.zc-nofu .zc-label{color:#15803D;}
+.zc-amt{font-weight:700;}
+.zc-row.zc-uriage .zc-amt{color:#B91C1C;}
+.zc-row.zc-shii .zc-amt{color:#1D4ED8;}
+.zc-row.zc-nofu .zc-amt{color:#15803D;}
+
+.matome{background:linear-gradient(135deg,#F0FFF4,#E8F7B8);border:2px solid #9AE6B4;border-radius:14px;padding:24px 28px;margin:32px 0;}
+.matome h3{color:#276749;font-size:16px;margin:0 0 16px;}
+.matome-row{display:flex;align-items:baseline;gap:10px;font-size:14px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);}
+.matome-row:last-child{border-bottom:none;}
+.matome-row .trigger{font-weight:700;min-width:130px;flex-shrink:0;}
+.matome-row .result{color:#276749;font-weight:700;}
+@media(max-width:540px){.matome-row{flex-direction:column;gap:2px;}.matome-row .trigger{min-width:auto;}}
+.app-cta{background:linear-gradient(135deg,#1A2A0A,#2D4A10);border-radius:12px;padding:28px;margin:40px 0;text-align:center;color:#fff;}
+.app-cta h3{color:var(--green);font-size:18px;margin-bottom:8px;}
+.app-cta p{color:#A0C070;font-size:13px;margin-bottom:16px;}
+.app-cta a{background:var(--green);color:#0A0A0F;font-weight:700;padding:12px 28px;border-radius:100px;font-size:14px;display:inline-block;}
+.app-cta a:hover{opacity:.85;text-decoration:none;}
+footer{background:#111827;padding:28px 24px;text-align:center;margin-top:64px;}
+footer a{font-size:12px;color:#4A5568;margin:0 10px;}
+footer p{font-size:11px;color:#2D3748;margin-top:8px;}
+</style>
+</head>
+<body>
+<nav><div class="nav-inner"><a class="nav-logo" href="lp.html">⚔ スタディクエスト</a><a class="nav-cta" href="index.html">無料で始める</a></div></nav>
+<div class="container">
+  <div class="breadcrumb"><a href="lp.html">TOP</a> &gt; <a href="lp.html#cat-boki3">日商簿記3級</a> &gt; 消費税の仕訳</div>
+  <p class="meta">日商簿記3級 | 公開：2026年5月7日</p>
+  <h1>消費税の仕訳（税抜方式）<br>仮払消費税・仮受消費税を図解で解説</h1>
+  <p class="meta">著者：大谷 一輝（大阪経済大学3回生・日商簿記1級勉強中）</p>
+  <p class="lead">簿記3級では消費税の処理として<strong>税抜方式</strong>を学びます。仕入のたびに「仮払消費税（資産）」、売上のたびに「仮受消費税（負債）」を計上し、決算時に差し引いた金額を納付します。</p>
+  <div class="sq-chat"></div>
+
+  <h2>① 税抜方式の基本的な考え方</h2>
+  <p>税抜方式では、消費税を<strong>仮払消費税（資産）</strong>と<strong>仮受消費税（負債）</strong>に分けて記録します。</p>
+
+  <div class="tax-flow">
+    <div class="tf-card kari-tax">
+      <div class="tf-title">仮払消費税（資産）</div>
+      <div class="tf-body">仕入・経費を払うときに、消費税分を一時的に立て替えて国に納める予定のもの</div>
+    </div>
+    <div class="tax-arrow">⇄</div>
+    <div class="tf-card kashi-tax">
+      <div class="tf-title">仮受消費税（負債）</div>
+      <div class="tf-body">売上を受け取るときに、消費税分を一時的に預かっており、国に納める義務があるもの</div>
+    </div>
+  </div>
+
+  <div class="tip-box"><strong>消費税は「預かり金」と同じ発想！</strong><br>売上から受け取った消費税は「お客様から預かっているもの」で、後で国に納めます。仕入で支払った消費税は「先払いした分」として後で差し引けます。</div>
+
+  <h2>② 仕入時・売上時の仕訳（税抜方式）</h2>
+
+  <h3>仕入時（仮払消費税を計上）</h3>
+  <div class="mondai">
+    <div class="m-label">例題①</div>
+    <p>商品 ¥100,000（税抜）を仕入れ、消費税10% ¥10,000 とともに現金で支払った（合計 ¥110,000）。</p>
+  </div>
+  <div class="shiwake-box">
+    <div class="sw-label">仕訳</div>
+    <div class="sw-row"><span class="kari">仕入<span class="amt">100,000</span></span><span class="sep">／</span><span class="kashi">現金<span class="amt">110,000</span></span></div>
+    <div class="sw-row"><span class="kari">仮払消費税<span class="amt">10,000</span></span><span class="sep"></span><span class="kashi"></span></div>
+  </div>
+
+  <h3>売上時（仮受消費税を計上）</h3>
+  <div class="mondai">
+    <div class="m-label">例題②</div>
+    <p>商品 ¥200,000（税抜）を売り上げ、消費税10% ¥20,000 とともに現金で受け取った（合計 ¥220,000）。</p>
+  </div>
+  <div class="shiwake-box">
+    <div class="sw-label">仕訳</div>
+    <div class="sw-row"><span class="kari">現金<span class="amt">220,000</span></span><span class="sep">／</span><span class="kashi">売上<span class="amt">200,000</span></span></div>
+    <div class="sw-row"><span class="kari"></span><span class="sep"></span><span class="kashi">仮受消費税<span class="amt">20,000</span></span></div>
+  </div>
+
+  <h2>③ 決算時の処理（消費税の納付額を確定）</h2>
+  <p>決算時に「仮受消費税」から「仮払消費税」を差し引いた金額が<strong>納付すべき消費税</strong>です。差額を「未払消費税（負債）」に振り替えます。</p>
+
+  <div class="zei-calc">
+    <div class="zc-row zc-uriage"><span class="zc-label">仮受消費税（売上にかかった消費税）</span><span class="zc-amt">20,000</span></div>
+    <div class="zc-row zc-shii"><span class="zc-label">－ 仮払消費税（仕入にかかった消費税）</span><span class="zc-amt">△ 10,000</span></div>
+    <div class="zc-row zc-nofu"><span class="zc-label">未払消費税（納付額）</span><span class="zc-amt">10,000</span></div>
+  </div>
+
+  <div class="shiwake-box">
+    <div class="sw-label">仕訳（決算整理）</div>
+    <div class="sw-row"><span class="kari">仮受消費税<span class="amt">20,000</span></span><span class="sep">／</span><span class="kashi">仮払消費税<span class="amt">10,000</span></span></div>
+    <div class="sw-row"><span class="kari"></span><span class="sep"></span><span class="kashi">未払消費税<span class="amt">10,000</span></span></div>
+  </div>
+
+  <div class="shiwake-box">
+    <div class="sw-label">仕訳（納付時）</div>
+    <div class="sw-row"><span class="kari">未払消費税<span class="amt">10,000</span></span><span class="sep">／</span><span class="kashi">現金<span class="amt">10,000</span></span></div>
+  </div>
+
+  <div class="warn-box"><strong>「税込方式」との違いに注意！</strong><br>税込方式では消費税を分けず、売上・仕入に含めてしまいます。3級の試験では問題文に「税抜方式（または控除対象外消費税なし）」と指定があれば税抜方式で処理します。</div>
+
+  <h2>④ 総合例題</h2>
+  <div class="mondai">
+    <div class="m-label">例題③（総合）</div>
+    <p>当期の取引は次のとおりでした（税抜方式、消費税率10%）。<br>
+    ・仕入 合計 ¥500,000（税抜）→ 仮払消費税 ¥50,000<br>
+    ・売上 合計 ¥800,000（税抜）→ 仮受消費税 ¥80,000<br>
+    決算で消費税を確定させなさい。</p>
+  </div>
+  <div class="shiwake-box">
+    <div class="sw-label">仕訳（決算）</div>
+    <div class="sw-row"><span class="kari">仮受消費税<span class="amt">80,000</span></span><span class="sep">／</span><span class="kashi">仮払消費税<span class="amt">50,000</span></span></div>
+    <div class="sw-row"><span class="kari"></span><span class="sep"></span><span class="kashi">未払消費税<span class="amt">30,000</span></span></div>
+  </div>
+
+  <div class="app-cta"><h3>⚔ Study Quest で学習を記録しよう</h3><p>簿記3級の学習時間をRPG感覚で記録。ボスまであと何時間かリアルタイムで確認できます。</p><a href="index.html">無料で始める →</a></div>
+
+  <div class="matome">
+    <h3>📋 まとめ：消費税（税抜方式）早見表</h3>
+    <div class="matome-row"><span class="trigger">仕入時</span><span class="result">仮払消費税（資産）を計上。税抜仕入額と消費税を分けて記録</span></div>
+    <div class="matome-row"><span class="trigger">売上時</span><span class="result">仮受消費税（負債）を計上。税抜売上額と消費税を分けて記録</span></div>
+    <div class="matome-row"><span class="trigger">決算時</span><span class="result">仮受消費税 − 仮払消費税 ＝ 未払消費税（負債）に振替</span></div>
+    <div class="matome-row"><span class="trigger">納付時</span><span class="result">未払消費税 ／ 現金で解消</span></div>
+  </div>
+</div>
+<footer><a href="lp.html">記事トップ</a><a href="index.html">アプリを使う</a><p>© 2026 スタディクエスト</p></footer>
+<script src="article-widgets.js"></script>
+</body>
+</html>
