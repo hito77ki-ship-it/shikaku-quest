@@ -730,6 +730,23 @@ footer{background:#091505;padding:48px 24px 40px;}
 }
 .art-float.show{opacity:1;transform:none;}
 @media(max-width:1200px){.art-float{display:block;}}
+/* 検索 */
+.lp-search-btn{background:none;border:1px solid var(--border);border-radius:100px;cursor:pointer;padding:6px 14px;color:var(--ink3);font-size:12px;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;gap:6px;transition:border-color .2s,color .2s;}
+.lp-search-btn:hover{border-color:rgba(140,198,63,.5);color:var(--green);}
+.lp-search-modal{display:none;position:fixed;inset:0;z-index:9999;}
+.lp-search-modal.open{display:block;}
+.lp-search-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);}
+.lp-search-box{position:absolute;top:80px;left:50%;transform:translateX(-50%);width:min(580px,92vw);background:var(--card-bg);border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,.3);overflow:hidden;border:1px solid var(--border);}
+.lp-search-input{width:100%;padding:16px 20px;font-size:15px;border:none;outline:none;border-bottom:1px solid var(--border);background:transparent;color:var(--ink);font-family:'Noto Sans JP',sans-serif;}
+.lp-search-input::placeholder{color:var(--ink3);}
+.lp-search-results{max-height:380px;overflow-y:auto;}
+.lp-search-item{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--border);text-decoration:none;color:var(--ink);transition:background .12s;}
+.lp-search-item:hover{background:var(--card-bg);filter:brightness(0.97);}
+.lp-search-item:last-child{border-bottom:none;}
+.lp-search-label{font-size:10px;font-weight:700;background:rgba(140,198,63,.18);color:#276749;padding:2px 8px;border-radius:100px;flex-shrink:0;white-space:nowrap;}
+.lp-search-title{font-size:13px;font-weight:500;line-height:1.5;color:var(--ink);}
+.lp-search-empty{padding:24px;text-align:center;color:var(--ink3);font-size:13px;}
+.lp-search-hint{padding:8px 20px 12px;font-size:11px;color:var(--ink3);text-align:right;border-top:1px solid var(--border);}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8524998392329204"
      crossorigin="anonymous"></script>
@@ -744,6 +761,10 @@ footer{background:#091505;padding:48px 24px 40px;}
       <button class="theme-btn" id="theme-toggle" aria-label="テーマ切替">
         <span class="icon-light">🌙</span>
         <span class="icon-dark">☀️</span>
+      </button>
+      <button class="lp-search-btn" id="lp-search-open" aria-label="記事を検索">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        記事検索
       </button>
       <a href="#updates" class="nav-updates">更新情報</a>
       <a href="index.html" class="nav-cta">無料で始める</a>
@@ -2050,6 +2071,96 @@ document.querySelectorAll('.fi').forEach(el => io.observe(el));
     });
   }, {threshold:0.5});
   statEls.forEach(el=>observer.observe(el));
+})();
+</script>
+
+<!-- 検索モーダル -->
+<div id="lp-search-modal" class="lp-search-modal">
+  <div class="lp-search-overlay"></div>
+  <div class="lp-search-box">
+    <input class="lp-search-input" type="text" placeholder="記事タイトルで検索... 例：試算表、伝票">
+    <div class="lp-search-results"></div>
+    <div class="lp-search-hint">Esc で閉じる　　/ キーで開く</div>
+  </div>
+</div>
+<script>
+(function(){
+  /* カテゴリラベルのマッピング */
+  const CAT_LABELS = {
+    'cat-boki3':  '簿記3級',
+    'cat-boki2':  '簿記2級',
+    'cat-law':    '法律・会計系',
+    'cat-it':     'IT・技術系',
+    'cat-biz':    'ビジネス系',
+    'cat-med':    '医療・福祉系',
+    'cat-tech':   '技術・工業系',
+    'cat-lang':   '語学・教養系',
+    'cat-tool':   '継続・ツール',
+  };
+
+  /* DOMからカードを収集してインデックス化 */
+  function buildIndex(){
+    const idx = [];
+    const seen = new Set();
+    document.querySelectorAll('[id^="cat-"] a[href$=".html"]').forEach(a => {
+      const href = a.getAttribute('href');
+      if(!href || seen.has(href)) return;
+      seen.add(href);
+      const divs = a.querySelectorAll('div');
+      const title = divs[1]?.textContent.trim() || a.textContent.trim();
+      if(!title) return;
+      /* 親カテゴリを特定 */
+      let label = '記事';
+      let el = a.parentElement;
+      while(el && el !== document.body){
+        if(el.id && CAT_LABELS[el.id]){ label = CAT_LABELS[el.id]; break; }
+        el = el.parentElement;
+      }
+      idx.push({href, title, label});
+    });
+    return idx;
+  }
+
+  const modal   = document.getElementById('lp-search-modal');
+  const openBtn = document.getElementById('lp-search-open');
+  const input   = modal.querySelector('.lp-search-input');
+  const results = modal.querySelector('.lp-search-results');
+  let index = null;
+
+  function open(){
+    if(!index) index = buildIndex();
+    modal.classList.add('open');
+    setTimeout(()=>input.focus(), 40);
+    input.value = '';
+    render('');
+  }
+  function close(){ modal.classList.remove('open'); }
+
+  function render(q){
+    const filtered = q.trim()===''
+      ? index
+      : index.filter(x=>x.title.includes(q)||x.label.includes(q));
+    if(!filtered.length){
+      results.innerHTML = `<div class="lp-search-empty">「${q}」に一致する記事はありませんでした</div>`;
+      return;
+    }
+    results.innerHTML = filtered.slice(0,12).map(x=>
+      `<a href="${x.href}" class="lp-search-item">
+        <span class="lp-search-label">${x.label}</span>
+        <span class="lp-search-title">${x.title}</span>
+      </a>`
+    ).join('');
+  }
+
+  openBtn.addEventListener('click', open);
+  modal.querySelector('.lp-search-overlay').addEventListener('click', close);
+  input.addEventListener('input', ()=>render(input.value));
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ close(); return; }
+    if(e.key==='/' && !modal.classList.contains('open') && e.target.tagName!=='INPUT' && e.target.tagName!=='TEXTAREA'){
+      e.preventDefault(); open();
+    }
+  });
 })();
 </script>
 </body>

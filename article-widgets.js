@@ -1135,6 +1135,25 @@ html[data-theme="dark"] .sq-chat-row.teacher .sq-chat-bubble{background:rgba(140
   .sq-art-auth-bar{justify-content:flex-start;}
   .sq-comment-section{padding:24px 16px;}
 }
+/* ── 検索モーダル ── */
+.sq-search-btn{background:none;border:none;cursor:pointer;padding:6px 10px;color:var(--sq-muted);border-radius:8px;transition:color .15s,background .15s;display:flex;align-items:center;gap:5px;font-size:14px;font-family:inherit;line-height:1;}
+.sq-search-btn:hover{color:var(--sq-text);background:var(--sq-surface-soft);}
+.sq-search-btn svg{flex-shrink:0;}
+.sq-search-modal{display:none;position:fixed;inset:0;z-index:9999;}
+.sq-search-modal.open{display:block;}
+.sq-search-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);}
+.sq-search-box{position:absolute;top:72px;left:50%;transform:translateX(-50%);width:min(560px,90vw);background:var(--sq-surface);border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,.3);overflow:hidden;border:1px solid var(--sq-border-strong);}
+.sq-search-input{width:100%;padding:16px 20px;font-size:15px;border:none;outline:none;border-bottom:1px solid var(--sq-border);background:transparent;color:var(--sq-text);font-family:inherit;}
+.sq-search-input::placeholder{color:var(--sq-muted);}
+.sq-search-results{max-height:360px;overflow-y:auto;}
+.sq-search-item{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--sq-border);text-decoration:none;color:var(--sq-text);transition:background .12s;}
+.sq-search-item:hover{background:var(--sq-surface-soft);text-decoration:none;}
+.sq-search-item:last-child{border-bottom:none;}
+.sq-search-item--current{border-left:3px solid #8CC63F;background:rgba(140,198,63,.06);}
+.sq-search-label{font-size:10px;font-weight:700;background:rgba(140,198,63,.18);color:#276749;padding:2px 8px;border-radius:100px;flex-shrink:0;white-space:nowrap;}
+.sq-search-title{font-size:13px;font-weight:500;line-height:1.5;}
+.sq-search-empty{padding:24px;text-align:center;color:var(--sq-muted);font-size:13px;}
+.sq-search-hint{padding:8px 20px 12px;font-size:11px;color:var(--sq-muted);text-align:right;border-top:1px solid var(--sq-border);}
   `;
   document.head.appendChild(s);
 }
@@ -1165,6 +1184,64 @@ function buildThemeToggle(){
   if(cta) navInner.insertBefore(group, cta);
   else navInner.appendChild(group);
   syncThemeControls();
+}
+
+/* ── 検索モーダル ── */
+function buildSearchModal(){
+  const navInner = document.querySelector('.nav-inner');
+  if(!navInner) return;
+
+  const btn = document.createElement('button');
+  btn.className = 'sq-search-btn';
+  btn.title = '記事を検索（/ キー）';
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span style="font-size:12px">検索</span>';
+  const cta = navInner.querySelector('.nav-cta');
+  if(cta) navInner.insertBefore(btn, cta);
+  else navInner.appendChild(btn);
+
+  const modal = document.createElement('div');
+  modal.id = 'sq-search-modal';
+  modal.className = 'sq-search-modal';
+  modal.innerHTML = '<div class="sq-search-overlay"></div><div class="sq-search-box"><input class="sq-search-input" type="text" placeholder="記事タイトルで検索... 例：試算表、経過勘定"><div class="sq-search-results"></div><div class="sq-search-hint">Esc で閉じる　　/ キーで開く</div></div>';
+  document.body.appendChild(modal);
+
+  const input  = modal.querySelector('.sq-search-input');
+  const results= modal.querySelector('.sq-search-results');
+
+  function openModal(){
+    modal.classList.add('open');
+    setTimeout(()=>input.focus(),40);
+    input.value='';
+    render('');
+  }
+  function closeModal(){ modal.classList.remove('open'); }
+
+  function render(q){
+    const entries = Object.entries(ARTICLES);
+    const filtered = q.trim()===''
+      ? entries
+      : entries.filter(([,a])=>a.title.includes(q)||a.label.includes(q));
+    if(!filtered.length){
+      results.innerHTML=`<div class="sq-search-empty">「${q}」に一致する記事はありませんでした</div>`;
+      return;
+    }
+    results.innerHTML = filtered.slice(0,10).map(([f,a])=>
+      `<a href="${f}" class="sq-search-item${f===PAGE?' sq-search-item--current':''}">
+        <span class="sq-search-label">${a.label}</span>
+        <span class="sq-search-title">${a.title}</span>
+      </a>`
+    ).join('');
+  }
+
+  btn.addEventListener('click', openModal);
+  modal.querySelector('.sq-search-overlay').addEventListener('click', closeModal);
+  input.addEventListener('input', ()=>render(input.value));
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ closeModal(); return; }
+    if(e.key==='/' && !modal.classList.contains('open') && e.target.tagName!=='INPUT' && e.target.tagName!=='TEXTAREA'){
+      e.preventDefault(); openModal();
+    }
+  });
 }
 
 /* ── サイドバー構築（position:fixed、コンテナは触らない） ── */
@@ -1886,6 +1963,7 @@ document.addEventListener('DOMContentLoaded', async function(){
   trackPageView();
   injectStyles();
   buildThemeToggle();
+  buildSearchModal();
   injectBreadcrumbLD();
   const layout = buildLayout();
   buildTOC(layout.right);
