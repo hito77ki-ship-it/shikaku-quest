@@ -69,6 +69,18 @@ const ARTICLES = {
   'eiken1.html':               {label:'英検準1級',   title:'英検準1級の独学合格ガイド'},
   'fp3.html':                  {label:'FP3級',       title:'FP3級の勉強時間・独学合格スケジュール'},
   'cpa-yobikou.html':          {label:'勉強法',      title:'公認会計士・税理士は予備校と独学どっちがいい？'},
+  'boki-zero-01.html':  {label:'簿記3級', title:'ゼロからの簿記①取引・簿記とは？'},
+  'boki-zero-02.html':  {label:'簿記3級', title:'ゼロからの簿記②なぜ簿記が大事？'},
+  'boki-zero-03.html':  {label:'簿記3級', title:'ゼロからの簿記③簿記の流れ'},
+  'boki-zero-04.html':  {label:'簿記3級', title:'ゼロからの簿記④仕訳のしくみ'},
+  'boki-zero-05.html':  {label:'簿記3級', title:'ゼロからの簿記⑤仕訳から財務諸表へ'},
+  'boki3-genkin.html':  {label:'簿記3級', title:'現金・当座預金の違いと仕訳'},
+  'boki3-kafusoku.html':{label:'簿記3級', title:'現金過不足（雑損・雑益）'},
+  'boki3-kashidaore.html':{label:'簿記3級',title:'貸倒引当金の仕訳と計算'},
+  'boki3-genka.html':   {label:'簿記3級', title:'減価償却（定額法）の計算と仕訳'},
+  'boki3-keika.html':   {label:'簿記3級', title:'経過勘定（前払・未払・前受・未収）'},
+  'boki3-keika2.html':  {label:'簿記3級', title:'毎年同額の前払い（18か月の理由）'},
+  'boki3-shisanhyo.html':{label:'簿記3級',title:'試算表3種類の違い'},
 };
 
 const CATS = {
@@ -1165,6 +1177,30 @@ function buildSidebarCTA(sidebar){
   sidebar.appendChild(box);
 }
 
+/* ── 簿記3級 記事一覧サイドバー ── */
+const BOKI3_FILES = [
+  'boki-zero-01.html','boki-zero-02.html','boki-zero-03.html',
+  'boki-zero-04.html','boki-zero-05.html',
+  'boki3-genkin.html','boki3-kafusoku.html','boki3-kashidaore.html',
+  'boki3-genka.html','boki3-keika.html','boki3-keika2.html',
+  'boki3-shisanhyo.html',
+];
+
+function buildBoki3Sidebar(sidebar){
+  if(!sidebar) return;
+  if(!BOKI3_FILES.includes(PAGE)) return;
+  const box = document.createElement('div');
+  box.className = 'sq-sidebar-box';
+  box.innerHTML = '<div class="sq-sidebar-box-title" style="color:#3B82F6">📘 日商簿記3級 記事一覧</div><div class="sq-side-links"></div>';
+  const list = box.querySelector('.sq-side-links');
+  BOKI3_FILES.forEach(f => {
+    const a = ARTICLES[f]; if(!a) return;
+    const isCurrent = f === PAGE;
+    list.innerHTML += `<a href="${f}" class="sq-side-link${isCurrent ? ' sq-side-link--active' : ''}" style="${isCurrent ? 'border-left:3px solid #3B82F6;font-weight:700;' : ''}"><div class="sq-side-link-title" style="font-size:0.82rem">${a.title}</div></a>`;
+  });
+  sidebar.appendChild(box);
+}
+
 /* ── 左サイドバー（回遊導線） ── */
 function buildLeftSidebar(leftbar){
   if(!leftbar) return;
@@ -1786,6 +1822,7 @@ document.addEventListener('DOMContentLoaded', async function(){
   injectBreadcrumbLD();
   const layout = buildLayout();
   buildTOC(layout.right);
+  buildBoki3Sidebar(layout.right);
   buildCatBadge();
   buildSidebarCTA(layout.right);
   buildLeftSidebar(layout.left);
