@@ -1,13 +1,13 @@
 /**
  * Gmail 自動仕分けスクリプト
- * 対象：就活エージェント系メールを自動ラベリング
+ * 対象：就活エージェント系・大学からのメールを自動ラベリング
  *
  * 【使い方】
  * 1. https://script.google.com を開く
  * 2. 「新しいプロジェクト」を作成
  * 3. このコードを貼り付けて保存
- * 4. sortJobAgentEmails() を一度手動実行して権限を許可
- * 5. トリガーを設定（毎日 or 毎時間）
+ * 4. sortEmails() を一度手動実行して権限を許可
+ * 5. setupTrigger() を実行してトリガーを設定
  */
 
 // ============================
@@ -15,6 +15,34 @@
 // ============================
 
 const RULES = [
+  {
+    label: "大学",
+    keywords: [
+      "大阪経済大学",
+      "osaka-ue",
+      "履修",
+      "シラバス",
+      "授業料",
+      "学費",
+      "奨学金",
+      "単位",
+      "成績",
+      "試験",
+      "休講",
+      "補講",
+      "就職課",
+      "キャリアセンター",
+      "学務",
+      "教務",
+      "学生支援",
+      "学生課",
+    ],
+    senderDomains: [
+      "osaka-ue.ac.jp",
+    ],
+    archive: false,
+    markAsRead: false,
+  },
   {
     label: "就活エージェント",
     keywords: [
@@ -72,7 +100,7 @@ const RULES = [
 // メイン処理
 // ============================
 
-function sortJobAgentEmails() {
+function sortEmails() {
   RULES.forEach(rule => applyRule(rule));
 }
 
@@ -122,13 +150,13 @@ function getOrCreateLabel(name) {
 function setupTrigger() {
   // 既存トリガーを削除してから再設定
   ScriptApp.getProjectTriggers().forEach(t => {
-    if (t.getHandlerFunction() === "sortJobAgentEmails") {
+    if (t.getHandlerFunction() === "sortEmails") {
       ScriptApp.deleteTrigger(t);
     }
   });
 
   // 毎日 午前7時に実行
-  ScriptApp.newTrigger("sortJobAgentEmails")
+  ScriptApp.newTrigger("sortEmails")
     .timeBased()
     .everyDays(1)
     .atHour(7)
